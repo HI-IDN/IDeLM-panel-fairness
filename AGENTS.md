@@ -16,7 +16,8 @@ fairness for anaesthetists is
   (`code/run_experiments.py`), which collect their runs in `data/tdf/experiments/experiments.sqlite`.
 * **Write-up is a Quarto book** in `docs/`, in Icelandic (HÍ theme `haskoli-islands-html`,
   pinned v0.2.0). Chapters source `docs/_setup.R`, which loads `code/panel_workload.R`; model
-  figures come from `code/panel_schedule.R`. Code chunks are hidden; code is shown in the appendix.
+  figures come from `code/panel_schedule.R`. Code chunks are hidden; the "Kóði" page under
+  *Viðaukar* links to the GitHub repository and describes its layout in plain Icelandic.
   Render with `quarto render` or `quarto preview` from `docs/`. The book reads model results from
   `docs/data/` (committed), which `code/export_docs_data.py` fills from `data/tdf/results/` with
   whitelisted, code-only columns; Gurobi logs are never committed (licence details). GitHub

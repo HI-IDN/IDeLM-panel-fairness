@@ -33,8 +33,11 @@ book:
     - roles.qmd
     - assign.qmd
     - limitations.qmd
-  appendices:
-    - code.qmd
+    # Kept out of `appendices`: that numbers them A, B, ... and they read better as plain pages.
+    - part: "Viðaukar"
+      chapters:
+        - code.qmd
+        - references.qmd
 
 lang: is
 bibliography: references.bib

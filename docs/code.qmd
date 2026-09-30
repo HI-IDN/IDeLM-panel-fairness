@@ -1,35 +1,28 @@
-# Kóði {#sec-code}
+# Kóði {.unnumbered #sec-code}
 
-Myndir og töflur um gögnin eru búnar til með `code/panel_workload.R`, sem les dulkóðuðu skrána
-`data/tdf/panel.csv`. Hún hefur eina línu fyrir hverja umsókn: application, meeting (M1–M9 í
-tímaröð), coi, editor, reader1, reader2 og position (röð á dagskrá, fyrir fundi sem eru
-búnir). Kerfi TÞS gæti skilað þessari skrá beint.
+Allur kóði bókarinnar og líkananna er opinn á GitHub:
+<https://github.com/HI-IDN/IDeLM-panel-fairness>. Þar er líka lýst hvernig á að setja upp og
+keyra hann. Hér er aðeins sagt í stuttu máli hvernig safnið er byggt upp.
 
-```{r}
-#| file: ../code/panel_workload.R
-#| echo: true
-#| eval: false
-```
+**Gögnin.** Einu gögnin í safninu eru dulkóðuð: ein lína fyrir hverja umsókn, með fundi,
+ritstjóra, lesurum, vanhæfi og röð á dagskrá fyrir fundi sem eru búnir. Fagráðsmenn og umsóknir
+eru aðeins kóðar. Raunveruleg nöfn, umsóknarnúmer og lykillinn á milli þeirra fara aldrei í
+safnið. Kerfi TÞS gæti skilað sömu skrá beint.
 
-Myndir úr líkaninu eru búnar til með `code/panel_schedule.R`:
+**Líkönin** eru skrifuð í Python og leyst með Gurobi:
 
-```{r}
-#| file: ../code/panel_schedule.R
-#| echo: true
-#| eval: false
-```
+* fundalíkanið ákveður á hvaða fundi hver umsókn er tekin fyrir og í hvaða röð (@sec-model), og
+  stillingar þess eru í sérstakri skrá sem bókin les líka;
+* hlutverkalíkanið ákveður hver er ritstjóri og hvor lesaranna talar á undan, eða úthlutar öllum
+  umsóknum frá grunni (@sec-roles, @sec-assign);
+* sérstakt eftirlit fer yfir hverja dagskrá og staðfestir að hún fylgi reglum sinnar sviðsmyndar.
 
-Allar sviðsmyndir í @sec-model eru keyrðar með `code/run_panel_scenarios.sh` (úr `code/`).
-Stillingar líkansins eru í `code/models/panel_model.yml`.
+**Keyrslurnar.** Ein skrifta keyrir allar sviðsmyndir bókarinnar í röð, þar sem hver byrjar á
+lausn þeirrar á undan. Önnur skrifta afritar niðurstöðurnar, dulkóðaðar, á þann stað sem bókin les
+þær. Keyrsluskrár Gurobi fara ekki í safnið, því þær geyma upplýsingar um leyfið.
 
-```{bash}
-#| eval: false
-#| echo: true
-#| file: ../code/run_panel_scenarios.sh
-```
+**Myndir og töflur** eru gerðar í R með ggplot2: ein skrá fyrir gögnin (@sec-data) og önnur fyrir
+niðurstöður líkananna.
 
-Bestunarlíkanið er `code/models/panel_model.py`:
-
-```{embed}
-#| file: ../code/models/panel_model.py
-```
+**Bókin sjálf** er skrifuð í Quarto. Hún er byggð og birt sjálfkrafa á GitHub Pages í hvert sinn
+sem breyting er sett á aðalgreinina.
