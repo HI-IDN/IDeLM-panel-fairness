@@ -2,10 +2,27 @@ project:
   type: book
   output-dir: _output
 
+# The HÍ logos are not part of the theme extension; img/hi/ is copied from HI-IDN/quarto-hi.
 book:
   title: "Sanngjarnari fagráðsfundir"
   subtitle: "Frumgerð byggð á APAP-sanngirnislíkaninu"
+  author: "Dr. Helga Ingimundardóttir"
   date: today
+  favicon: img/hi/favicon.svg
+  navbar:
+    pinned: true
+    logo: img/hi/hi_named_logo-is.svg
+    logo-alt: "Háskóli Íslands"
+    logo-href: https://hi.is/
+    right:
+      - icon: github
+        href: https://github.com/HI-IDN/IDeLM-panel-fairness
+        aria-label: "Kóðasafn á GitHub"
+  page-footer:
+    background: "#10099F"
+    foreground: "#ffffff"
+    left: "© 2026 Helga Ingimundardóttir"
+    right: "Quarto-sniðmát: [HI-IDN/quarto-hi](https://github.com/HI-IDN/quarto-hi)"
   chapters:
     - index.qmd
     - apap.qmd
@@ -43,6 +60,10 @@ format:
     date-format: "D.M.YYYY"
     code-fold: true
     code-summary: "Sýna kóða"
+    theme: styles.scss
+    # Browser tab: "book | chapter" (Quarto's default is "chapter – book").
+    template-partials:
+      - _partials/metadata.html
 
 execute:
   echo: false
