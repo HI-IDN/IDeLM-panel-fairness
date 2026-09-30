@@ -1,0 +1,37 @@
+# Kóði {#sec-code}
+
+Myndir og töflur um gögnin eru búnar til með `code/panel_workload.R`, sem les dulkóðuðu skrána
+`data/tdf/panel.csv`. Hún hefur eina línu fyrir hverja umsókn: application, meeting (M1–M9 í
+tímaröð), coi, editor, reader1, reader2 og position (röð á dagskrá, fyrir fundi sem eru
+búnir). Kerfi TÞS gæti skilað þessari skrá beint.
+
+```{r}
+#| file: ../code/panel_workload.R
+#| echo: true
+#| eval: false
+```
+
+Myndir úr líkaninu eru búnar til með `code/panel_schedule.R`:
+
+```{r}
+#| file: ../code/panel_schedule.R
+#| echo: true
+#| eval: false
+```
+
+Allar sviðsmyndir í @sec-model eru keyrðar með `code/run_panel_scenarios.sh` (úr `code/`).
+Stillingar líkansins eru í `code/models/panel_model.yml`.
+
+```{bash}
+#| eval: false
+#| echo: true
+#| file: ../code/run_panel_scenarios.sh
+```
+
+Bestunarlíkanið er `code/models/panel_model.py`:
+
+```{python}
+#| eval: false
+#| echo: true
+#| file: ../code/models/panel_model.py
+```

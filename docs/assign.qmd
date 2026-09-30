@@ -1,0 +1,145 @@
+# Hvað ef: jöfn úthlutun frá grunni {#sec-assign}
+
+```{r}
+#| label: setup-assign
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+results <- "data"  # pseudonymised copies, see code/export_docs_data.py
+config <- yaml::read_yaml("../code/models/panel_model.yml")
+have_assign <- file.exists(file.path(results, "assign_panel.csv"))
+have_schedule <- file.exists(file.path(results, "assign_schedule_agenda.csv"))
+if (have_assign) {
+  assigned <- panel_with_roles(panel, file.path(results, "assign_panel.csv"))
+  counts_assign <- role_counts(assigned)
+}
+if (have_schedule) {
+  scheduled <- panel_from_agenda(assigned, file.path(results, "assign_schedule_agenda.csv"))
+  runs <- read_scenarios(results)
+  compare <- bind_rows(
+    filter(runs, startsWith(as.character(scenario), "1.")),
+    filter(runs, startsWith(as.character(scenario), "5.")),
+    read_members(file.path(results, "assign_schedule"), "Jöfn úthlutun frá grunni")
+  ) %>% mutate(scenario = factor(scenario, levels = unique(scenario)))
+}
+```
+
+Hvað ef allir fagráðsmenn væru jafnhæfir til að fjalla um allar umsóknir, og lotan væri skipulögð
+frá grunni? Þá mætti skipta álaginu jafnt, svo enginn beri áberandi meira en aðrir. Þetta er
+einföldun: í raun skipta hæfni, fyrri yfirferð og óskir fagráðsmanna máli. Samanburðurinn sýnir
+hversu jafnt álagið *gæti* verið.
+
+Bestað er lagskipt, í tveimur skrefum (@sec-model):
+
+1. **Pörun og hlutverk.** Líkanið velur þrjá fagráðsmenn og ritstjóra á hverja umsókn, og hver er
+   lesari 1 og lesari 2. Ekkert er fest, ekki heldur fundir sem eru búnir. Vanhæfur fagráðsmaður
+   fjallar aldrei um umsókn. Álagi er skipt jafnt á alla, og ritstjórahlutverkum jafnt á reynda
+   fagráðsmenn; nýir eru ritstjórar á mest
+   `r scales::percent(config$new_editor_share)` umsókna sinna.
+2. **Fundir og röð.** Líkanið skipuleggur lotuna frá grunni fyrir þessa pörun: á fyrsta fundi mæta
+   allir með eina umsókn hver, en eftir það er allt frjálst. Nýir fagráðsmenn eru ekki ritstjórar
+   fyrr en eftir miðbik lotunnar (M5). Þar sem fundir hvers og eins eru ekki þekktir fyrr en í þessu
+   skrefi er miðbik lotunnar notað í stað miðbiks eigin funda.
+
+## Pörun og hlutverk
+
+```{r}
+#| label: tbl-assign
+#| tbl-cap: "Tillaga starfsmanna og jöfn úthlutun frá grunni bornar saman (bil yfir fagráðsmenn)."
+#| eval: !expr have_assign
+assignment_summary(list(`Tillaga starfsmanna` = panel, `Jöfn úthlutun` = assigned)) %>%
+  select(-`Ritstjóri á fleiri en einni umsókn á sama fundi`) %>%
+  knitr::kable()
+```
+
+### Umsóknir á hvern fagráðsmann
+
+::: {.panel-tabset}
+
+#### Fyrir
+
+```{r}
+#| label: fig-members-assign-before
+#| fig-cap: "Umsóknir á hvern fagráðsmann, skipt í ritstjóra- og lesarahlutverk, í tillögu starfsmanna."
+#| fig-height: 6
+plot_members(counts)
+```
+
+#### Eftir
+
+```{r}
+#| label: fig-members-assign
+#| fig-cap: "Umsóknir á hvern fagráðsmann, skipt í ritstjóra- og lesarahlutverk, eftir jafnri úthlutun frá grunni."
+#| fig-height: 6
+#| eval: !expr have_assign
+plot_members(counts_assign)
+```
+
+:::
+
+### Greiðslur
+
+::: {.panel-tabset}
+
+#### Fyrir
+
+```{r}
+#| label: fig-pay-assign-before
+#| fig-cap: "Greiðslur til hvers fagráðsmanns í tillögu starfsmanna."
+#| fig-height: 6
+plot_pay(counts)
+```
+
+#### Eftir
+
+```{r}
+#| label: fig-pay-assign
+#| fig-cap: "Greiðslur til hvers fagráðsmanns eftir jafnri úthlutun frá grunni."
+#| fig-height: 6
+#| eval: !expr have_assign
+plot_pay(counts_assign)
+```
+
+:::
+
+## Fundir og röð
+
+```{r}
+#| label: no-schedule
+#| results: asis
+if (!have_schedule) {
+  cat("::: {.callout-warning}\nFundaskipan fyrir jöfnu úthlutunina hefur ekki verið keyrð enn.\n:::\n")
+}
+```
+
+```{r}
+#| label: tbl-assign-schedule
+#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við tillögu starfsmanna (sviðsmynd 1) og bestun frá byrjun með núverandi úthlutun (sviðsmynd 5)."
+#| eval: !expr have_schedule
+summary_table(compare) %>%
+  rename(Skipulag = Sviðsmynd) %>%
+  knitr::kable(digits = 2, format.args = list(decimal.mark = ","))
+```
+
+::: {.panel-tabset}
+
+#### Umsóknir á hvern fagráðsmann og fund
+
+```{r}
+#| label: fig-meetings-assign
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi, með jafnri úthlutun frá grunni."
+#| fig-height: 6
+#| eval: !expr have_schedule
+plot_meetings(scheduled)
+```
+
+#### Fundir sem hver þarf að mæta á
+
+```{r}
+#| label: fig-attendance-assign
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á, með jafnri úthlutun frá grunni."
+#| fig-height: 6
+#| eval: !expr have_schedule
+plot_attendance(scheduled)
+```
+
+:::

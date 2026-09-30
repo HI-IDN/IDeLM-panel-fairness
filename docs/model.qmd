@@ -1,0 +1,204 @@
+# Líkanið {#sec-model}
+
+```{r}
+#| label: setup-model
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+results <- "data"  # pseudonymised copies, see code/export_docs_data.py
+config <- yaml::read_yaml("../code/models/panel_model.yml")
+num <- function(x) format(x, decimal.mark = ",", scientific = FALSE, drop0trailing = TRUE)
+# Gurobi version of the model runs (from the logs, summarised in data/solver.csv).
+gurobi_version <- gurobi_version_of(results)
+```
+
+## Þrjú samtengd bestunarverkefni
+
+Skipulag fagráðsins felur í sér þrjár ákvarðanir sem hafa áhrif hver á aðra:
+
+| Ákvörðun | Hvað skiptir máli | Í þessari bók |
+|---|---|---|
+| 1. **Hverjir fjalla um hverja umsókn** (ritstjóri og tveir lesarar) | Umsókn má **alls ekki** úthluta á fagráðsmann sem er vanhæfur í henni. Að öðru leyti: hæfni til að meta umsóknina; helst einhver úr fyrri yfirferð ef umsókn er endursend; óskir fagráðsmanna, sem merkja í kerfinu hvort þeir *vilja ekki*, *er sama* eða *vilja gjarnan* fara yfir umsókn; jafnt álag | Tekin sem gefin (núverandi úthlutun) |
+| 2. **Á hvaða fundi hver umsókn er tekin fyrir** | Fjöldi funda sem hver þarf að mæta á. Vanhæfur fagráðsmaður á helst ekki að sitja sama fund og umsóknin; ef hann gerir það þarf hann að vera farinn áður en hún er tekin fyrir, og í versta falli að bregða sér af fundi, sem er lágmarkað svo það trufli ekki flæði fundarins. Líkar umsóknir í sama holli, svo umræðan verði þematísk og hlustun virkari, sem skiptir sérstaklega máli fyrir nýja fagráðsmenn sem læra af umræðu sem þeir geta tengt við | Bestuð, en án tillits til efnis umsókna (@sec-limitations) |
+| 3. **Röðin innan hvers fundar** | Að lágmarka biðpunkta, með tilliti til álags hvers og eins yfir lotuna; vanhæfur fagráðsmaður farinn áður en umsóknin er tekin fyrir | Bestuð |
+
+Hægt er að besta þetta lagskipt, eina ákvörðun í einu, eða í einu allsherjarlíkani. Allsherjarlíkan
+flækir ákvörðunarbreyturnar til muna og gæti orðið of þungt í keyrslu. Þessi frumgerð heldur sig
+því nálægt núverandi verklagi: **pörun fagráðsmanna og umsókna (1) er óbreytt**, og líkanið
+ákveður aðeins fundi (2) og röð (3). Almennara líkan er efni í NSN-verkefni (@sec-limitations). Þessi kafli setur líkönin fram; niðurstöðurnar eru í @sec-scenarios, @sec-roles og @sec-assign.
+
+Líkanið er blandað heiltölubestunarlíkan og byggir á @sec-fairness. Það er leyst með Gurobi
+[@gurobi], útgáfu `r gurobi_version`, undir **akademísku leyfi**, sem má aðeins nota í rannsóknum og
+kennslu en ekki í rekstri. Til að TÞS geti keyrt líkanið sjálft þyrfti að endurskrifa það fyrir opinn
+lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-verkefni, sjá
+@sec-limitations.
+
+## Framsetning
+
+**Mengi og gögn**
+
+* $P$: umsóknir; $R$: fagráðsmenn; $M$: fundir, í tímaröð.
+* $P_r \subseteq P$: umsóknir fagráðsmanns $r$ (sem ritstjóri eða lesari); $n_r = |P_r|$, þar af
+  $n^E_r$ sem ritstjóri og $n^L_r = n_r - n^E_r$ sem lesari (lesari 1 eða 2).
+* $K = \{1, \dots, \bar K\}$: dagskrárliðir á fundi, þar sem $\bar K$ er mesti fjöldi umsókna sem
+  fundur ræður við.
+* $\alpha_r$: kostnaður fagráðsmanns $r$ við að mæta á einn fund, í dagskrárliðum.
+* $F$: umsóknir á fundum sem þegar eru haldnir, festar við fund sinn $m_p$ og dagskrárlið $k_p$.
+* $U_r \subseteq M$: fundir sem fagráðsmaður $r$ kemst ekki á.
+* $V_p \subseteq R$: fagráðsmenn sem eru vanhæfir í umsókn $p$.
+* $m^*$: næsti fundur, og $N \subseteq P$: umsóknir sem eru auglýstar á hann.
+* $\bar k$: mesti fjöldi eigin umsókna sem fagráðsmaður má hafa á einum fundi.
+* $t_r$: markgildi fyrir fjölda eigin umsókna á hverjum fundi sem fagráðsmaður $r$ mætir á
+  (t.d. `r num(config$target_experienced)` fyrir reynda og `r num(config$target_new)` fyrir nýja).
+
+Í þessari fyrstu útgáfu tekur hver umsókn einn dagskrárlið af sömu lengd.
+
+**Ákvörðunarbreytur**
+
+* $x_{pmk} \in \{0,1\}$: umsókn $p$ er tekin fyrir á fundi $m$ í dagskrárlið $k$.
+* $a_{rm} \in \{0,1\}$: fagráðsmaður $r$ þarf að mæta á fund $m$.
+* $\ell_{rm} \ge 0$: dagskrárliðurinn eftir sem fagráðsmaður $r$ má fara af fundi $m$ (0 ef hann
+  mætir ekki).
+* $z \ge 0$: mesta byrði á umsókn meðal allra fagráðsmanna.
+* $v_{prm} \in \{0,1\}$: vanhæfur fagráðsmaður $r$ er viðstaddur þegar umsókn $p$ er tekin fyrir á
+  fundi $m$ (frávik frá mjúku skorðunni).
+* $d_{rm} \ge 0$: frávik fagráðsmanns $r$ frá markgildi sínu á fundi $m$.
+
+**Skorður**
+
+| Skorða | Jafna |
+|---|---|
+| Hver umsókn er tekin fyrir einu sinni | $\sum_{m \in M} \sum_{k \in K} x_{pmk} = 1 \quad \forall p \in P$ |
+| Ein umsókn í hverjum dagskrárlið | $\sum_{p \in P} x_{pmk} \le 1 \quad \forall m, k$ |
+| Engin göt í dagskránni | $\sum_{p} x_{pm,k+1} \le \sum_{p} x_{pmk} \quad \forall m,\ k < \bar K$ |
+| Fundir sem eru búnir haldast eins og þeir voru | $x_{p m_p k_p} = 1 \quad \forall p \in F$ |
+| Engri umsókn er bætt á næsta fund; auglýstum umsóknum má fresta á seinni fund | $x_{p m^* k} = 0 \quad \forall p \notin N,\ k$ |
+| Á fyrsta fundi mæta allir, með nákvæmlega eina umsókn hver | $\sum_{p \in P_r} \sum_{k} x_{p m_1 k} = 1 \quad \forall r$ |
+| Á seinni fundum hefur hver fagráðsmaður mest $\bar k$ umsóknir | $\sum_{p \in P_r} \sum_{k} x_{pmk} \le \bar k \quad \forall r,\ m \ne m_1$ |
+| Fagráðsmaður er ekki settur á fund sem hann kemst ekki á | $a_{rm} = 0 \quad \forall r,\ m \in U_r$ |
+| Fagráðsmaður mætir ef einhver umsókna hans er á dagskrá (ein skorða fyrir hverja umsókn hans) | $a_{rm} \ge \sum_{k} x_{pmk} \quad \forall r,\ p \in P_r,\ m$ |
+| Fagráðsmaður situr þar til síðasta umsókn hans er afgreidd (ein skorða fyrir hverja umsókn hans) | $\ell_{rm} \ge \sum_{k} k\, x_{pmk} \quad \forall r,\ p \in P_r,\ m$ |
+| Vanhæfur fagráðsmaður er farinn áður en umsóknin er tekin fyrir (mjúk skorða) | $\sum_{k} k\, x_{pmk} \ge \ell_{rm} + 1 - (\bar K + 1)\left(1 - \sum_{k} x_{pmk} + v_{prm}\right) \quad \forall p,\ r \in V_p,\ m$ |
+| Fjöldi eigin umsókna á fundi er nálægt markgildi (mjúk skorða) | $d_{rm} \ge \left\lvert\, \sum_{p \in P_r} \sum_{k} x_{pmk} - t_r\, a_{rm} \right\rvert \quad \forall r,\ m$ |
+| $z$ er byrði á umsókn hjá verst setta fagráðsmanninum | $B_r \le z \, n_r \quad \forall r$ |
+
+Skorðurnar um mætingu og setu eru settar fyrir hverja umsókn $p$ fagráðsmanns sérstaklega. Þar sem
+hver umsókn er tekin fyrir einu sinni er $\sum_k x_{pmk} \in \{0, 1\}$, svo $a_{rm}$ helst
+tvíundarbreyta þótt fagráðsmaður hafi margar umsóknir á sama fundi. Samanlögð útgáfa,
+$\bar k \, a_{rm} \ge \sum_{p \in P_r} \sum_k x_{pmk}$, er líka rétt en gefur veikari slökun, og því
+gengur lausnaranum verr að loka bilinu.
+
+Byrði fagráðsmanns $r$ yfir lotuna er binding auk biðar:
+
+$$
+B_r = \sum_{m \in M} \left( \alpha_r \, a_{rm} + \ell_{rm} \right).
+$$
+
+**Greiðslur**
+
+Greiðslureglan (lýst í orðum í @sec-data) er sett fram með grunngjaldi $f_0$, greiðslu $f_E$ fyrir
+hvert ritstjórahlutverk og $f_L$ fyrir hvert lesarahlutverk. Greiðsla fagráðsmanns $r$ fyrir lotuna
+er
+
+$$
+G_r = f_0 + f_E \, n^E_r + f_L \, n^L_r
+$$ {#eq-pay}
+
+og greiðsla á umsókn
+
+$$
+\frac{G_r}{n_r} = f_L + (f_E - f_L) \, \frac{n^E_r}{n_r} + \frac{f_0}{n_r}.
+$$ {#eq-pay-per-proposal}
+
+Greiðsla á umsókn er því á bilinu $f_L$ (eingöngu lesari) til $f_E$ (eingöngu ritstjóri), að
+viðbættum hlut grunngjaldsins, $f_0 / n_r$. Greiðslan $G_r$ ræðst eingöngu af hlutverkum og breytist
+því ekki með fundaskipan.
+
+**Markfall**
+
+$$
+\begin{aligned}
+\min \;\; & \underbrace{z}_{\text{verst setti fagráðsmaðurinn}}
+\;+\; w \, \underbrace{\frac{1}{|R|} \sum_{r \in R} B_r}_{\text{meðalbyrði}}
+\;+\; c \, \underbrace{\sum_{p, r, m} v_{prm}}_{\text{vanhæfur bregður sér út}} \\
+& \;+\; g \, \underbrace{\frac{1}{|R|} \sum_{r, m} d_{rm}}_{\text{frávik frá markgildi}}
+\;+\; q \, \underbrace{\sum_{p \in N} \Big(1 - \sum_k x_{p m^* k}\Big)}_{\text{frestað af næsta fundi}}
+\end{aligned}
+$$
+
+Á mannamáli:
+
+* **Verst setti fagráðsmaðurinn** ræður mestu. $z$ er byrði á umsókn hjá þeim sem verst er
+  settur, og líkanið gerir hana eins litla og hægt er. Hinir mega vera betur settir; það er ekki
+  refsað fyrir að einhver sleppi vel.
+* **Meðalbyrði**, með lítilli vigt $w$, gerir út um jafntefli. Án hennar gæti líkanið látið alla
+  aðra bíða að óþörfu, svo lengi sem enginn fer upp fyrir þann verst setta.
+* **Vanhæfur bregður sér út**: hvert skipti sem vanhæfur fagráðsmaður á enn eftir eigin umsókn
+  þegar umsóknin sem hann er vanhæfur í er tekin fyrir, og þarf því að fara út og koma inn aftur
+  (vigt $c$). Að vera á sama fundi er í lagi ef hann er farinn áður.
+* **Frávik frá markgildi** (vigt $g$, aðeins í sviðsmynd 4) heldur fjölda eigin umsókna á hverjum
+  fundi nálægt markgildi fagráðsmannsins.
+* **Frestað af næsta fundi** (vigt $q$) kostar, svo umsókn sé aðeins frestað ef þörf krefur.
+
+**Stillingar**
+
+Stillingarnar eru lesnar úr `code/models/panel_model.yml`, sömu skrá og líkanið notar.
+
+```{r}
+#| label: tbl-settings
+#| tbl-cap: "Stillingar líkansins."
+tibble(
+  Færibreyta = c("Kostnaður við að mæta á fund", "Mesti fjöldi umsókna á fundi",
+                 "Vigt heildarbyrði", "Refsing fyrir vanhæfan viðstaddan", "Tímamörk bestunar",
+                 "Fundir sem fagráðsmenn komast ekki á", "Mest umsóknir á fagráðsmann á fundi",
+                 "Allir mæta á fyrsta fund með eina umsókn", "Markgildi á fund, reyndir",
+                 "Markgildi á fund, nýir", "Vigt fráviks frá markgildi",
+                 "Refsing fyrir frestun af næsta fundi", "Mest hlutfall ritstjóra hjá nýjum (kafli 6)"),
+  Tákn = c("$\\alpha_r$", "$\\bar K$", "$w$", "$c$", "", "$U_r$", "$\\bar k$", "", "$t_r$", "$t_r$",
+           "$g$", "$q$", "$\\rho$"),
+  Gildi = c(paste(num(config$alpha), "dagskrárliðir fyrir alla"), num(config$max_per_meeting),
+            num(config$total_weight), num(config$coi_penalty), paste(num(config$time_limit), "sek."),
+            if (is.null(config$unavailable)) "engir skráðir ($U_r = \\emptyset$)" else config$unavailable,
+            if (is.null(config$max_per_member)) "ekkert hámark" else num(config$max_per_member),
+            if (isTRUE(config$first_meeting_rule)) "já" else "nei",
+            paste(num(config$target_experienced), "umsóknir"), paste(num(config$target_new), "umsóknir"),
+            num(config$target_weight), num(config$postpone_penalty),
+            scales::percent(config$new_editor_share))
+) %>% knitr::kable(escape = FALSE)
+```
+
+## Líkön fyrir úthlutun (ákvörðun 1)
+
+Tvö einfaldari líkön taka fyrstu ákvörðunina fyrir. Í báðum er fundur hverrar umsóknar gefinn, og
+fundir sem eru búnir haldast eins og þeir voru. $y_{pr} \in \{0,1\}$ er 1 ef fagráðsmaður $r$ er
+ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem ritstjóri eða lesari).
+
+| Skorða | Jafna |
+|---|---|
+| Einn ritstjóri á hverja umsókn | $\sum_{r} y_{pr} = 1 \quad \forall p$ |
+| Þrír fagráðsmenn á hverja umsókn | $\sum_{r} z_{pr} = 3 \quad \forall p$ |
+| Ritstjórinn er einn af þeim þremur | $y_{pr} \le z_{pr} \quad \forall p, r$ |
+| Vanhæfur fagráðsmaður fjallar aldrei um umsóknina | $z_{pr} = 0 \quad \forall p,\ r \in V_p$ |
+| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin funda | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á fundi fyrir miðbik } r$ |
+| Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^{\text{nýr}}$ |
+
+**Endurúthlutun hlutverka** (@sec-roles): sömu þrír fagráðsmenn eru á hverri umsókn
+($z_{pr}$ er fast), en líkanið velur hver þeirra er ritstjóri og hver er lesari 1 (talar næstur;
+$u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er lesari 2. Nýr fagráðsmaður er ekki
+ritstjóri á fyrri helmingi sinna eigin funda, og eftir það á mest hlutfallinu $\rho$ af umsóknum
+sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn). Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
+reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum.
+
+**Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
+allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á
+mesta og minnsta fjölda umsókna á fagráðsmann og muninn á mesta og minnsta fjölda
+ritstjórahlutverka meðal reyndra. Nýir eru ritstjórar á mest tilteknum hluta umsókna sinna. Síðan er
+fundaskipanin bestuð frá grunni með líkaninu hér að ofan, þar sem nýir verða ekki ritstjórar fyrr en
+eftir miðbik lotunnar.
+
+Í báðum líkönum er líka aukamarkmið, með minni vigt: að munurinn á fjölda lesara 1- og lesara
+2-hlutverka hjá hverjum fagráðsmanni sé sem minnstur, svo allir fái svipað rými í umræðunni.
+
+## Heimildir {.unnumbered}
+
+::: {#refs}
+:::

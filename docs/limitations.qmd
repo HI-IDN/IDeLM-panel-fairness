@@ -1,0 +1,100 @@
+# Forsendur og takmarkanir {#sec-limitations}
+
+Þessi kafli dregur saman þær forsendur sem greiningin byggir á, takmarkanir líkansins og næstu
+skref.
+
+## Forsendur um gögnin
+
+* **Gögnin voru tekin handvirkt.** Yfirlitið úr kerfi TÞS var tekið úr PDF-skjali með einnota
+  skriftu. Tveir reitir voru styttir í yfirlitinu og leiðréttir handvirkt (@sec-data). Helst myndi
+  TÞS skila gögnunum beint úr sínum kerfum.
+* **Dagskrárröð er aðeins þekkt fyrir fyrstu tvo fundina.** Hún var fengin úr eldri tölvupóstum.
+  Fyrir seinni fundi er aðeins vitað hvaða umsóknir eru á hvaða fundi, ekki í hvaða röð þær verða
+  teknar fyrir.
+* **Hverjir eru nýir byggir á minni höfundar.** Höfundur merkti nýja fagráðsmenn eftir minni, og
+  merkingin getur verið röng. Hún tekur heldur ekki tillit til reynslu úr öðrum flokkum sjóðsins:
+  fagráðsmaður sem hefur setið árum saman í Sprota er varla nýgræðingur þótt hann sé nýr í
+  Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin í sviðsmynd 4 ber að lesa með
+  það í huga.
+* **Lesari 1 og lesari 2 fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
+  yfirlitinu ráði því hver talar næstur á fundi.
+* **Greiðslur** eru reiknaðar út frá hlutverkum (grunngjald, ritstjóri, lesari), ekki út frá
+  raunverulegum greiðslum.
+
+## Takmarkanir líkansins
+
+* **Jafnlangir dagskrárliðir.** Hver umsókn tekur jafnlangan tíma. Í raun tekur það lengri tíma
+  að afgreiða umsókn þegar nýir fagráðsmenn ræða hana, en styttri tíma ef umsóknin hefur verið
+  unnin áður og fagráðsmenn þekkja hana vel. Eðlileg viðbót er að gefa hverri umsókn áætlaða
+  tímalengd $d_p$ á innri kvarða: sjálfgefið 1, að viðbættu t.d. 0,1 fyrir hvern nýjan
+  fagráðsmann sem fjallar um hana, og styttri ef umsóknin hefur komið áður. Líkanið myndi þá
+  mæla bið í tíma frekar en í fjölda umsókna.
+* **Bil í lausn.** Bestaðar dagskrár eru þær bestu sem fundust innan tímamarka, ekki sannaðar
+  bestu lausnir. Fundir eftir næsta fund eru innbyrðis skiptanlegir, sem gerir erfitt að loka
+  bilinu; að brjóta samhverfu eða skipta vandanum upp (fyrst fundir, svo röð) myndi hjálpa.
+* **Mæta oft, fara snemma.** Líkanið umbunar ekki enn beint tíðri mætingu með því að leyfa
+  viðkomandi að fara fyrr. Að mæla byrði á hvern fund sem mætt er á, eða hærra $\alpha$, myndi ýta
+  dagskránni í þá átt.
+* **Óskir um fundi.** $\alpha_r$ er það sama fyrir alla. Óskir fagráðsmanna um umsóknir eru
+  þegar merktar í kerfi TÞS (*vil ekki*, *sama*, *vil gjarnan*) og eiga heima í pöruninni. Við það
+  mætti bæta óskum um fundi: hvaða vikudagar henta hverjum og einum, og hvort viðkomandi vilji frekar
+  mæta sjaldnar og sitja lengur eða oftar og styttra ($\alpha_r$). Sama á við um fundi sem hver og
+  einn kemst ekki á; engir slíkir eru enn skráðir.
+* **Frestun vegna manneklu.** Ef umsókn er frestað um fund er hún færð handvirkt og líkanið keyrt
+  aftur; það gerist ekki sjálfkrafa.
+* **Leyfi lausnarans.** Líkanið er leyst með Gurobi undir akademísku leyfi, sem má aðeins nota
+  í rannsóknum og kennslu (@sec-model). TÞS gæti ekki keyrt það sjálft með því leyfi. Hlutverk
+  NSN-verkefnis væri m.a. að endurskrifa líkanið fyrir opinn lausnara, t.d. SCIP [@scip], sem
+  krefst ekki leyfis til að keyra.
+
+## Næstu skref
+
+* **Pörun fagráðsmanna og umsókna.** Fyrsta ákvörðunin (@sec-model) er tekin sem gefin í þessari
+  frumgerð. Næsta skref er að besta hana líka: velja fagráðsmenn sem eru hæfir til að meta hverja
+  umsókn, helst einhvern úr fyrri yfirferð ef umsókn er endursend, og taka tillit til óska
+  fagráðsmanna (*vil ekki*, *sama*, *vil gjarnan*), sem eru þegar merktar í kerfi TÞS.
+* **Þematísk holl.** Taka líkar umsóknir fyrir á sama fundi, svo umræðan verði samfelldari og
+  hlustun virkari. Það styður sérstaklega nýja fagráðsmenn, sem læra best af umræðu sem þeir geta
+  tengt við. Þetta er hunsað í frumgerðinni. Það gæti verið rannsóknarverkefni fyrir NSN að nota
+  einföld mállíkön á opinber ágrip verkefna og flokkana sem
+  umsækjendur velja til að lýsa verkefninu, og meta þannig hversu líkar umsóknir eru. Líkindin mætti
+  svo taka inn í líkanið sem viðbót í markfallinu, sem umbunar fyrir að líkar umsóknir séu á sama
+  fundi.
+* **Fleiri og styttri fundir.** Að halda fleiri og styttri fundi (t.d. mest 8 umsóknir á fundi í
+  stað allt að 15) gæti minnkað biðina, en fyrstu tilraunir sýndu að þá þurftu sumir fagráðsmenn að
+  mæta á fleiri fundi en áður. Hugmyndin er að dreifa álaginu, ekki að auka mætingu, svo bæta þarf
+  við skorðu um hámarksfjölda funda á fagráðsmann. Með skorðunni *enginn mætir á fleiri fundi en
+  áður* fann lausnarinn enga lausn innan fjögurra mínútna, en með föstu hámarki (8 fundir) var
+  vandinn gerlegur. Að finna gott jafnvægi þarna er efni í NSN-verkefni.
+* **Umfang á fundi eftir óskum hvers og eins.** Í NSN-lausninni gæti fjöldi eigin umsókna á fundi
+  verið stiki sem hver fagráðsmaður getur stillt. Gott viðmið væri sjálfgefið (t.d. 2–5 umsóknir á
+  fund), en hægt væri að leyfa færri eða fleiri. Sá sem vill frekar mæta sjaldnar tæki þá fleiri
+  umsóknir á hvern fund og sá sem vill mæta oftar færri. Líkanið myndi áfram fækka fundum eins og
+  hægt er og tryggja að sá sem mætir oft fái að fara snemma, svo enginn bíði lengur en í núverandi
+  skipulagi.
+* **Lagskipt eða allsherjarlíkan.** Kanna í NSN-verkefni hvort betra sé að besta ákvarðanirnar
+  þrjár lagskipt eða í einu allsherjarlíkani, og hvort allsherjarlíkanið sé nógu létt í keyrslu.
+* **Pörun, hlutverk og röðun saman.** Endurúthlutun hlutverka (@sec-roles) jafnar nú þegar
+  ritstjóra-, lesara 1- og lesara 2-hlutverk, í stað þess að stafrófið ráði röð lesara; það er
+  innbyggt í líkanið og væri auðvelt að bæta við sem eftirvinnslu hvaða úthlutunar sem er. Vanhæfi
+  er hörð skorða í pöruninni (vanhæfur fjallar aldrei um umsókn) en mjúk í röðuninni (vanhæfur á
+  helst ekki að vera viðstaddur). Óskir fagráðsmanna um umsóknir eiga heima í pöruninni og eru ekki
+  enn nýttar.
+* **Ritstjórahlutverk dreifð yfir lotuna.** Að forðast að fagráðsmaður sé ritstjóri á mörgum
+  umsóknum á sama fundi þyngir líkanið lítið, en krefst þess að fundir séu þekktir þegar hlutverkum
+  er úthlutað. Það á því best heima í sameiginlegu líkani fyrir pörun og fundaskipan.
+* **Nýir fagráðsmenn** fá takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
+  þeirra koma seinna í lotunni, eftir að þeir hafa öðlast reynslu sem lesarar. Reyndir fagráðsmenn
+  deila þeim ritstjórahlutverkum sem eftir eru jafnt.
+* **Nýir fagráðsmenn læra á fundum.** Betra er að leyfa nýjum fagráðsmönnum að sitja meðvitað lengri
+  fundi, svo þeir fái að hlusta á umræður hinna reyndu, þar sem þeir heyra rökin og
+  aðferðafræðina við úrvinnslu umsókna.
+* **Vægi ritstjórahlutverks.** Ákveða hversu miklu þyngra ritstjórahlutverk vegur (samantektin og
+  hærri greiðsla) en lesarahlutverk.
+* **Greiðsla fyrir fundarsetu.** Ekki er hægt að mæla hversu lengi fólk er að lesa og undirbúa sig,
+  en fundarsetu má mæla. Þegar hún hefur verið mæld má kanna hvort fagráðsmenn fái um það bil sömu
+  greiðslu fyrir tímann á fundum. Lestur skiptir samt máli: sá sem hefur margar umsóknir má ekki við
+  neinu, t.d. ef hann missir af fundi vegna veikinda, og líkur aukast á að umsóknir ruglist þegar
+  margar eru settar fyrir með stuttum fyrirvara. Allir sinna þessu í hjáverkum.
+* **Innleiðing.** NSN-verkefni, með aðstoð upplýsingatæknideildar TÞS, sem tengir líkanið við
+  kerfi sjóðsins fyrir komandi fundi.

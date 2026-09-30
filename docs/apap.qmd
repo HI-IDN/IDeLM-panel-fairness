@@ -1,0 +1,48 @@
+# Bakgrunnur: APAP-sanngirnislíkanið {#sec-apap}
+
+## Í stuttu máli
+
+*Anesthetist's Peel Assignment Problem* (APAP) snýst um það hver fær að fara fyrstur heim. Í hópi
+svæfingalækna á barnaspítala í Norður-Ameríku eru á hverjum virkum degi nokkrir sérfræðingar án fastrar
+kvöldvaktar. Þeir eru á staðnum meðan skurðstofur þeirra eru í gangi og þegar vinnu þeirra lýkur
+mega þeir fara. Ekki er hægt að vita fyrir fram hversu lengi aðgerð tekur, svo hópurinn kemur sér
+saman um *heimferðarröð*: sá fyrsti á listanum fer fyrstur heim og sá síðasti er þar til yfir
+lýkur.
+
+Að vera framarlega í röðinni er ávinningur og að vera síðastur er ókostur, svo hvert sæti í
+röðinni gefur **stig**. APAP-líkanið raðar læknum í heimferðarröð á hverjum degi þannig að **yfir
+margra vikna tímabil** haldist stig hvers læknis á hvern vinnudag nálægt sameiginlegu marki.
+Læknir sem var síðastur í gær er líklegur til að vera framarlega í dag. Einn dagur getur ekki
+verið sanngjarn við alla; röð daga getur það.
+
+## Líkanið í hnotskurn
+
+* **Ákvörðun:** `x[læknir, dagur, sæti]` er 1 ef læknir fær tiltekið sæti í heimferðarröðinni
+  þann dag.
+* **Fastir þættir:** sumir læknar eru þegar bundnir tiltekinn dag (bakvakt, kvöldvakt,
+  hjartaskurðaðgerðir, stjórnun, stjórnsýsla, annar vinnustaður). Þeim er úthlutað fyrir fram og
+  þeir eru ekki í heimferðarröðinni, en vinnuálag þeirra telur samt.
+* **Jöfnuður:** heildarstig hvers læknis deilt með fjölda vinnudaga er haldið nálægt miðgildi.
+  Tvíundarbreytur merkja lækna sem víkja meira en 1, 0,5 eða 0,2 stig frá og markfallið refsar
+  fyrir þær, mest fyrir stærsta frávikið.
+* **Aðrar reglur:** óskir eru virtar, hlutverkum í hjartaskurðaðgerðum og stjórnun er dreift
+  jafnt, enginn gegnir báðum sama dag og enginn stýrir tvo daga í röð.
+* **Tímabil:** líkanið er keyrt viku fyrir viku og ber stigasögu hvers læknis áfram, svo að
+  ósanngirni fyrr á tímabilinu er bætt upp síðar.
+
+## Hvað flyst yfir á fagráðið
+
+| APAP | Fagráð |
+|---|---|
+| Læknir | Fagráðsmaður |
+| Dagur | Fundur |
+| Skurðstofa sem tekur óþekktan tíma | Umsóknir teknar fyrir ein í einu |
+| Heimferðarröð (1., 2., …) | Dagskrárliður síðustu umsóknar fagráðsmanns: hvenær hann má fara |
+| Stig sem safnast yfir vikur | Byrði sem safnast yfir fundi umsóknarlotunnar |
+| Fyrir fram úthlutaðar skyldur (bakvakt, stjórnsýsla, …) | Fastir þættir: fundir sem þegar eru haldnir, vanhæfi, fundir sem fagráðsmaður kemst ekki á |
+| Dagar sem ekki er unnið | Fundir sem fagráðsmaður þarf ekki að mæta á |
+
+Síðasta línan er þar sem vandamálin eru ólíkust. Læknir sem er ekki í vinnu er einfaldlega í
+fríi; í APAP eru stigin því deilt með fjölda vinnudaga. Í fagráðinu er það ávinningur í sjálfu sér
+að *þurfa ekki að mæta* á fund: kvöldið er frjálst. @sec-fairness byggir sanngirnismælikvarðann í
+kringum þetta.

@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# IDEs
+.idea/
+.vscode/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# Gurobi
+gurobi.log
+*.lp
+*.mps
+
+# Panel data: everything is sensitive (raw extracts, PDFs, pseudonym key) except the
+# pseudonymised panel.csv. Ignore by default so new files are never committed by accident.
+data/tdf/*
+!data/tdf/panel.csv
+
+# One-off extractor for the panel's PDF export (kept locally)
+code/data/tdf_panel_extractor.py
+
+# Rendered book (built by GitHub Actions and published to GitHub Pages)
+docs/_output/
+docs/_book/
+docs/.quarto/
+docs/*_files/

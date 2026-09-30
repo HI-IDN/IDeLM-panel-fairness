@@ -1,0 +1,55 @@
+project:
+  type: book
+  output-dir: _output
+
+book:
+  title: "Sanngjarnari fagráðsfundir"
+  subtitle: "Frumgerð byggð á APAP-sanngirnislíkaninu"
+  date: today
+  chapters:
+    - index.qmd
+    - apap.qmd
+    - data.qmd
+    - fairness.qmd
+    - model.qmd
+    - scenarios.qmd
+    - roles.qmd
+    - assign.qmd
+    - limitations.qmd
+  appendices:
+    - code.qmd
+
+lang: is
+bibliography: references.bib
+# Icelandic long dates render as '2026 M09 29'; use a plain numeric date instead.
+date-format: "D.M.YYYY"
+
+language:
+  crossref-fig-title: "Mynd"
+  crossref-tbl-title: "Tafla"
+  crossref-sec-prefix: "Kafli"
+  crossref-ch-prefix: "Kafli"
+  crossref-apx-prefix: "Viðauki"
+  section-title-appendices: "Viðaukar"
+  toc-title-document: "Efnisyfirlit"
+  toc-title-website: "Á þessari síðu"
+  code-summary: "Sýna kóða"
+  callout-note-title: "Athugið"
+  callout-warning-title: "Viðvörun"
+  search-no-results-text: "Engar niðurstöður"
+
+format:
+  haskoli-islands-html:
+    date-format: "D.M.YYYY"
+    code-fold: true
+    code-summary: "Sýna kóða"
+
+execute:
+  echo: false
+  warning: false
+  message: false
+
+knitr:
+  opts_chunk:
+    fig.width: 7
+    dpi: 150

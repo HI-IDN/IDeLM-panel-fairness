@@ -1,0 +1,139 @@
+# Gögnin {#sec-data}
+
+```{r}
+#| label: setup-data
+source("_setup.R")
+assigned <- panel %>% filter(!is.na(editor) | !is.na(reader1) | !is.na(reader2))
+complete_rows <- panel %>% filter(!is.na(editor), !is.na(reader1), !is.na(reader2))
+per_meeting <- panel %>% filter(!is.na(meeting)) %>% count(meeting)
+s <- function(role, stat) spread[[stat]][spread$Role == role]
+kr <- function(x) format(x, big.mark = ".", decimal.mark = ",", scientific = FALSE)  # 38000 -> "38.000"
+n_held <- n_distinct(panel$meeting[!is.na(panel$position)])
+source("../code/panel_schedule.R", chdir = TRUE)
+# Conflicted members in held meetings: were they still present when the proposal came up?
+coi_held <- panel %>%
+  filter(!is.na(position), !is.na(coi)) %>%
+  mutate(position = as.integer(position)) %>%
+  separate_rows(coi, sep = ";") %>%
+  left_join(held_meetings(panel) %>% select(meeting, member, leave), by = c("meeting", "coi" = "member"))
+n_coi_present <- sum(!is.na(coi_held$leave) & coi_held$leave >= coi_held$position)
+```
+
+Þessi kafli lýsir einni umsóknarlotu af raunverulegum gögnum fagráðsins. Hún er grunnlína fyrir
+þær tvær ákvarðanir sem líkan gæti bætt: *hver les hvaða umsókn* og *hvenær hver umsókn er tekin
+fyrir*.
+
+## Gögn og dulkóðun
+
+Gögnin koma úr tveimur áttum: núverandi tillögu að fundaskipan í kerfi TÞS (hvaða umsókn er á
+hvaða fundi, ritstjóri, lesarar og vanhæfi) og dagskrá þeirra `r n_held` funda sem þegar hafa
+verið haldnir, sem hefur verið sent með tölvupósti.
+
+Allt í þessari bók er dulkóðað:
+
+* fagráðsmenn eru `R01`–`R`r nrow(members)`` og umsóknir `A001`–`A`r nrow(panel)``, úthlutað í
+  slembiröð;
+* fundir eru númeraðir `M1`–`M`r n_meetings`` í tímaröð, án dagsetninga og heita;
+* titlar, umsækjendur og umsóknarnúmer eru ekki hluti af gagnasafninu.
+
+Lykillinn milli kóða og raunverulegra nafna er aðeins geymdur á tölvu höfundar.
+
+| | |
+|---|---|
+| Umsóknir | `r nrow(panel)` |
+| Fagráðsmenn | `r nrow(members)` |
+| Fundir | `r n_meetings` (`r min(per_meeting$n)`–`r max(per_meeting$n)` umsóknir á hverjum) |
+| Umsóknir með ritstjóra og tvo lesara | `r nrow(complete_rows)` |
+| Umsóknir þar sem vanhæfi er skráð | `r sum(!is.na(panel$coi))` |
+
+### Gæði gagna
+
+* **`r nrow(panel) - nrow(assigned)` umsóknir hafa hvorki ritstjóra, lesara né fund**
+  (`r paste(setdiff(panel$application, assigned$application), collapse = ", ")`) og hafa
+  líklega verið felldar á formgalla af starfsmönnum sjóðsins. **`r nrow(filter(assigned, is.na(meeting)))` umsóknir til
+  viðbótar hafa lesara en engan fund enn** (`r paste(filter(assigned, is.na(meeting))$application, collapse = ", ")`).
+  Þær teljast með í álagi hvers fagráðsmanns og eru sýndar sem *Óúthlutað* á myndum um fundi, en
+  ekki sem fundir sem mætt er á.
+* **Lesari 1 og lesari 2 fylgja stafrófinu.** Í `r sum(panel$readers_alphabetical == "1", na.rm = TRUE)`
+  af `r sum(!is.na(panel$readers_alphabetical))` umsóknum með tvo lesara eru þeir
+  skráðir í stafrófsröð. Hver fær að tala næstur ræðst því af upphafsstöfum fagráðsmanna, ekki af úthlutuninni.
+  Hvað álag varðar eru lesararnir tveir sameinaðir í eitt *lesarahlutverk*.
+* Enginn fagráðsmaður les umsókn sem hann er vanhæfur til að fjalla um. Best væri að sá
+  fagráðsmaður væri alfarið ekki á þeim fundi, eða væri farinn af fundi þegar sú umsókn er tekin
+  fyrir. Á fundunum tveimur sem eru búnir var vanhæfur fagráðsmaður enn á fundinum í
+  `r n_coi_present` af `r nrow(coi_held)` tilvikum þegar umsókn sem hann var vanhæfur í var tekin
+  fyrir.
+
+## Álag á hvern fagráðsmann
+
+```{r}
+#| label: tbl-spread
+#| tbl-cap: "Umsóknir á hvern fagráðsmann: bil og miðgildi eftir hlutverki. Lesari 1 og lesari 2 eru sameinaðir."
+knitr::kable(mutate(spread, Role = tr(Role)), col.names = c("Hlutverk", "Minnst", "Miðgildi", "Mest"))
+```
+
+```{r}
+#| label: fig-members
+#| fig-cap: "Umsóknir á hvern fagráðsmann, skipt í ritstjóra- og lesarahlutverk."
+#| fig-height: 6
+plot_members(counts)
+```
+
+```{r}
+#| label: fig-spread
+#| fig-cap: "Dreifing milli fagráðsmanna: ritstjóri, lesari (lesari 1 og 2 sameinaðir) og samtals."
+#| fig-height: 3.2
+plot_spread(counts)
+```
+
+## Greiðslur
+
+Hver fagráðsmaður fær grunngjald, `r kr(pay_rates[["start"]])` kr., auk `r kr(pay_rates[["editor"]])` kr.
+fyrir hvert ritstjórahlutverk og `r kr(pay_rates[["reader"]])` kr. fyrir hvert lesarahlutverk (lesari 1
+og 2 fá það sama).
+
+```{r}
+#| label: fig-pay
+#| fig-cap: "Greiðslur til hvers fagráðsmanns í lotunni. Merkið sýnir samtals og greiðslu á umsókn, í þúsundum króna."
+#| fig-height: 6
+pay <- pay_table(counts)
+q <- quantile(pay$per_proposal / 1000, c(0.25, 0.5, 0.75))
+plot_pay(counts)
+```
+
+```{r}
+#| label: fig-pay-distribution
+#| fig-cap: "Dreifing greiðslu á umsókn."
+#| fig-height: 3.5
+plot_pay_distribution(counts)
+```
+
+Greiðslur eru á bilinu `r kr(min(pay$Pay))`–`r kr(max(pay$Pay))` kr. (@fig-pay). Á umsókn er miðgildið
+`r num_is(q[[2]])` þús. kr. og helmingur fagráðsmanna á bilinu `r num_is(q[[1]])`–`r num_is(q[[3]])`
+þús. kr. (@fig-pay-distribution). Munurinn ræðst nær alfarið af hlutfalli ritstjórahlutverka: þeir
+sem eru að mestu lesarar fá minnst á umsókn. Hvort greiðslan sé sambærileg *á klukkustund* er ekki
+hægt að segja fyrr en tímanotkun hefur verið mæld.
+
+## Athuganir
+
+1. **Heildarálag er ójafnt.** Fagráðsmenn hafa á bilinu `r s("Total", "Min")` til
+   `r s("Total", "Max")` umsóknir (miðgildi `r s("Total", "Median")`), svo sá sem mest hefur er
+   með meira en tvöfalt álag þess sem minnst hefur.
+2. **Ritstjórahlutverkið er líka ójafnt.** Fjöldi ritstjórahlutverka er á bilinu
+   `r s("Editor", "Min")` til `r s("Editor", "Max")` (miðgildi `r s("Editor", "Median")`).
+   Ritstjórn og lestur jafna hvort annað ekki út: sumir ritstýra litlu en lesa mikið og öfugt.
+   Skýringin er að hluta sú að ritstjórahlutverkin falla á þá reyndari: nýir fagráðsmenn hafa
+   færri ritstjórahlutverk en fleiri lesarahlutverk (@tbl-new). Sumir nýir fá sitt eina
+   ritstjórahlutverk ekki fyrr en seint í lotunni (M6), eftir að hafa fyrst verið lesarar.
+3. **Rými í umræðunni er ójafnt.** Sumir eru lesari 1 á allt að
+   `r max(counts$n[counts$role == "Reader 1"])` umsóknum en aðrir aldrei; sumir eru lesari 2 á
+   allt að `r max(counts$n[counts$role == "Reader 2"])` en aðrir aldrei. Þar sem lesari 1 og
+   lesari 2 fylgja stafrófinu fá fagráðsmenn með upphafsstafi framarlega í stafrófinu meira rými
+   til að tjá sig, en þeir aftarlega eru oftast síðastir og hafa lítið við að bæta.
+4. **Dagskrárröð er aðeins þekkt fyrir fundi sem eru búnir.** Tillagan í kerfi TÞS sýnir á hvaða
+   fundi umsókn er, en ekki hvar hún er á dagskrá. Röðin er þekkt fyrir fyrstu `r n_held` fundina,
+   úr tölvupóstum (@sec-fairness). Fagráðsmenn með aðeins eina eða tvær umsóknir á fundi geta
+   samt þurft að sitja allan fundinn ef þeirra umsóknir koma síðast.
+
+Hvernig umsóknum er dreift á fundi, í tillögu starfsmanna og í bestuðu plani, er skoðað í
+@sec-plans. Forsendur, takmarkanir og næstu skref eru dregin saman í @sec-limitations.

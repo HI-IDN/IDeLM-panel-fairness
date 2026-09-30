@@ -1,0 +1,14 @@
+# Python 3.10+
+# Install with: pip install -r requirements.txt
+
+# Optimisation (needs a Gurobi licence; the pip wheel ships a size-limited trial licence)
+gurobipy>=11.0
+
+# Model settings file (models/panel_model.yml)
+pyyaml>=6.0
+
+# Extract the application overview from the panel's PDF exports (local, one-off)
+pdfplumber>=0.11
+
+# Development
+pylint

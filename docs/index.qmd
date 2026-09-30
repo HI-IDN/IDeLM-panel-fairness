@@ -1,0 +1,86 @@
+# Inngangur {.unnumbered}
+
+## Hvers vegna þessi greinargerð
+
+Ég hef setið í fagráði Tækniþróunarsjóðs (TÞS) í nokkur ár og hef ánægju af starfinu. En álagið
+hefur aukist. Umsóknum fjölgar ár frá ári, fundirnir eru tíðir og langir og það tekur tíma að
+koma nýjum fagráðsmönnum inn í starfið. Starfið tekur nú mun meiri tíma en í fyrri
+umsóknarlotum og satt best að segja gerir það mig hikandi við að halda áfram.
+
+Stór hluti álagsins felst ekki í lestrinum heldur í fundunum: hversu oft þarf að mæta og hversu
+lengi þarf að sitja áður en eigin umsóknir eru teknar fyrir. Ég hef lengi tengt þetta við verkefni
+sem ég vann að fyrir nokkrum árum, *Anesthetist's Peel Assignment Problem* (APAP): hver fær að
+fara fyrstur heim og hvernig má gera það sanngjarnt yfir tíma (@sec-apap). Niðurstöður APAP voru
+aldrei birtar því söguleg gögn vantaði. Vandamál fagráðsins er að mörgu leyti einfaldara og hér eru
+gögnin til.
+
+Ef álaginu væri dreift með sanngjarnari hætti, og opið væri hvernig sanngirni er mæld, tel ég að
+það myndi styrkja samband sjóðsins og fagráðsmanna. Það skiptir æ meira máli eftir því sem
+umsóknum fjölgar.
+
+## Frumgerð
+
+Þessi bók er frumgerð (e. *proof of concept*). Hún sýnir, á einni umsóknarlotu af raunverulegum
+(dulkóðuðum) gögnum, að hægt er að gera fundaskipan sanngjarnari með gagnsæju líkani. Tillaga mín
+er að TÞS taki verkefnið áfram sem **sumarverkefni nemenda** með styrk úr Nýsköpunarsjóði
+námsmanna (NSN): nemendur þróa líkanið og verkfærin áfram og með aðstoð upplýsingatæknideildar
+sjóðsins yrði það innleitt í kerfi TÞS og tengt innri kerfum sjóðsins fyrir komandi fundi.
+
+Í þessari frumgerð eru bornar saman tvær gagnalindir: núverandi tillaga að fundaskipan í kerfi
+TÞS og dagskrá funda sem þegar hafa verið haldnir, fengin úr eldri tölvupóstum.
+
+## Fyrirsjáanleiki
+
+Ég þekki ekki núverandi verklag við að raða umsóknum á fundi. Það er hins vegar erfitt að halda
+mörgum boltum á lofti í einu, sérstaklega ef skipulagið er gert í töflureikni. Á milli funda
+berast svo tölvupóstar með óskum um að fá að koma seinna eða fara fyrr af fundi, og dagskránni er
+breytt til að mæta þeim. Með stærðfræðilegu líkani og fjölskiptu markfalli má hins vegar skoða
+margar sviðsmyndir og finna bestu lausnina til hlítar, fyrir gefnar forsendur. Líkanið er líka
+auðvelt að keyra aftur: þegar forsendur breytast, t.d. ef umsókn er frestað eða fagráðsmaður
+kemst ekki á fund, má endurreikna og hagræða komandi fundum með sama hætti.
+
+Með heildarplani sem er sanngjarnt frá upphafi, og fyrirsjáanlegt fyrir alla, ætti að vera hægt að
+fækka slíkum tilfærslum. Það myndi spara tíma starfsmanna sjóðsins, bæta upplifun fagráðsmanna og
+virða tíma allra, ekki aðeins þeirra sem senda póst og óska eftir breytingu sér í hag.
+
+## Fagráðið
+
+Fagráðið fundar einu sinni í viku og fer yfir umsóknir eina í einu. Hverri umsókn fylgja þrír
+fagráðsmenn: **ritstjóri** og tveir **lesarar**. Fagráðsmaður má fara af fundi þegar allar
+umsóknir hans hafa verið teknar fyrir. Það hvernig umsóknum er úthlutað, og í hvaða röð þær eru
+teknar fyrir, ræður því hversu lengi hver og einn þarf að sitja.
+
+## Hlutverk
+
+Undirbúningur fyrir fund er sama vinnan hvert sem hlutverkið er. Hlutverkin eru ólík á fundinum
+og eftir hann:
+
+| Hlutverk | Á fundinum | Eftir fundinn |
+|---|---|---|
+| Ritstjóri | Rifjar upp umsóknina og talar mest | Skrifar samantekt á umræðum fagráðsins sem uppbyggilega endurgjöf til umsækjenda (fær hærri greiðslu en lesari) |
+| Lesari 1 | Talar næstur | Les samantekt ritstjórans og staðfestir að hann sé sammála |
+| Lesari 2 | Talar síðastur; hefur yfirleitt litlu við að bæta þar sem flest hefur þegar komið fram | Les samantekt ritstjórans og staðfestir að hann sé sammála |
+
+Þrátt fyrir heitið ritstýrir ritstjórinn ekki umsókninni: hlutverk hans er að skrifa samantektina,
+sem báðir lesarar fara svo yfir og samþykkja. Hvað *vinnu* varðar er fagráðsmaður því annaðhvort
+ritstjóri eða lesari, og ritstjórahlutverkið er betur greitt. Hvað *orðið á fundinum* varðar er
+röðin ritstjóri, lesari 1, lesari 2. Sanngjörn úthlutun gefur öllum fagráðsmönnum svipað rými í
+umræðunni, ekki aðeins svipaðan fjölda umsókna.
+
+## Uppbygging
+
+* @sec-apap dregur saman fyrra verkefni um sanngjarna röð svæfingalækna heim (APAP), sem þessi
+  vinna byggir á.
+* @sec-data lýsir einni umsóknarlotu af raunverulegum (dulkóðuðum) gögnum og því sem þau sýna um
+  álag, mætingu og greiðslur.
+* @sec-fairness setur fram hvað *sanngjarnt* ætti að þýða fyrir fagráðsfundi: jafnvægi milli þess
+  hversu oft fagráðsmenn þurfa að mæta og hversu lengi þeir þurfa að sitja.
+* @sec-model skiptir skipulaginu í þrjú samtengd bestunarverkefni og setur fram líkönin (Gurobi).
+* @sec-scenarios bestar fundi og röð með núverandi úthlutun og ber saman við handvirka tillögu
+  starfsmanna.
+* @sec-roles skoðar hvort breyta mætti hver er ritstjóri, svo greiðslur verði sanngjarnari.
+* @sec-assign spyr hvað ef: hversu jafnt álagið gæti verið ef allir væru jafnhæfir og lotan skipulögð frá grunni.
+* @sec-limitations dregur saman forsendur, takmarkanir og næstu skref.
+
+Allt er endurgeranlegt úr kóðasafninu: Python fyrir gagnavinnslu og líkön og R (ggplot2) fyrir
+töflur og myndir. Raunveruleg nöfn fara aldrei af tölvu höfundar.

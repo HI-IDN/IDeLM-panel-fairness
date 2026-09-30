@@ -1,0 +1,29 @@
+# Settings for the review-panel schedule model (models/panel_model.py).
+# Read by the model and by the book (docs/model.qmd), which shows them as a table.
+# Command-line options override these values.
+
+alpha: 4              # cost of attending one meeting, in slots (same for every member)
+max_per_meeting: 15   # most proposals one meeting can handle
+total_weight: 0.01    # weight of the total burden next to the worst-off member's burden
+coi_penalty: 1.0      # objective penalty each time a conflicted member is present
+time_limit: 600       # solver time limit in seconds
+unavailable: null     # CSV of meetings members cannot attend (member, meeting), or null for none
+max_per_member: 6     # most own proposals of one member in one meeting (null: no limit)
+first_meeting_rule: true  # first meeting: everyone attends with exactly one proposal
+max_meetings_per_member: null  # most meetings one member attends in the round (null: no limit)
+
+# Target number of own proposals per meeting attended (soft; used with --target).
+members: ../data/tdf/members.csv  # member, new (TRUE/FALSE); relative to code/
+target_experienced: 3.5
+target_new: 2.5
+target_weight: 0.5    # weight of the average deviation from the target, per member
+
+# More, shorter meetings (used with --more-meetings).
+extra_meetings: 6     # meetings added after the last planned one
+open_meeting_size: 8  # most proposals in a meeting that is not closed
+pair_limit: 6         # soft limit on own proposals in two consecutive meetings
+pair_weight: 0.5      # weight of the average excess over pair_limit, per member
+
+# Role models (models/role_model.py)
+new_editor_share: 0.15 # new members: no editor role before the midpoint of their meetings, then at most this share
+postpone_penalty: 0.5  # objective penalty for each proposal postponed from the next meeting

@@ -1,0 +1,9 @@
+scenario,version,minutes,gap
+assign,13.0.3,5.0,9.1
+assign_schedule,13.0.3,30.0,76.4
+current,13.0.3,5.0,4.0
+free,13.0.3,20.0,31.5
+free_max4,13.0.3,20.1,25.0
+free_target,13.0.3,20.1,33.7
+roles,13.0.3,5.0,2.2
+scratch,13.0.3,30.0,63.8

@@ -1,0 +1,134 @@
+# Hvað er sanngjarnt á fagráðsfundi? {#sec-fairness}
+
+```{r}
+#| label: setup-fairness
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+held <- held_meetings(panel)
+worst <- held %>% group_by(member) %>% summarise(waiting = sum(waiting), .groups = "drop") %>%
+  arrange(desc(waiting))
+```
+
+## Hvað gerðist á fyrstu tveimur fundunum
+
+Dagskrárröðin er þekkt fyrir fyrstu tvo fundina (M1 og M2). @fig-held sýnir fyrir hvern
+fagráðsmann hvenær umsóknir hans voru teknar fyrir og hversu lengi hann þurfti að sitja.
+
+```{r}
+#| label: fig-held
+#| fig-cap: "Fundirnir tveir sem eru búnir. Hver lína er einn fagráðsmaður: gráa línan er tími hans á fundinum, frá upphafi þar til síðasta umsókn hans er tekin fyrir; blátt merkir hans eigin umsóknir. Reitirnir hægra megin sýna uppsafnaða biðpunkta eftir hvern fund; fagráðsmenn sem mættu ekki halda stöðu sinni frá fyrri fundi."
+#| fig-height: 6.8
+#| fig-width: 9
+plot_held(panel)
+```
+
+Til að mæla biðina notum við **biðpunkta**: fjölda umsókna *annarra* sem fagráðsmaður situr undir
+áður en síðasta umsókn hans er tekin fyrir. Ef umsóknir fagráðsmanns eru nr. 3 og 9 á dagskrá situr
+hann undir 7 umsóknum annarra (nr. 1, 2 og 4–8) og fær 7 biðpunkta. Reitirnir hægra megin á
+@fig-held sýna biðpunktana uppsafnaða eftir hvern fund.
+
+Biðin er ójöfn og hún safnast upp. Á fundunum tveimur sat sá fagráðsmaður sem lengst beið undir
+`r worst$waiting[1]` umsóknum annarra áður en hans eigin voru afgreiddar, en sá sem styst beið
+sat undir `r min(worst$waiting)`. Þeir sem voru síðastir á M1 voru oft síðastir aftur á M2.
+Ekkert í núverandi ferli man hver beið síðast.
+
+## Bið ein og sér er ekki réttur mælikvarði
+
+Freistandi er að mæla sanngirni eingöngu með bið innan fundar. Þá vantar hálfa byrðina.
+Fagráðsmaður sem á enga umsókn á fundi þarf alls ekki að mæta og getur ráðstafað kvöldinu að vild.
+Fagráðsmaður sem á umsókn á hverjum fundi er bundinn í hverri viku, jafnvel þótt hann sitji aðeins
+stutta stund.
+
+Byrði fagráðsmanns yfir lotuna hefur því tvo þætti:
+
+* **Binding:** hver fundur sem hann þarf að mæta á. Fundurinn bindur kvöldið, hvað sem gerist á
+  honum.
+* **Bið:** hversu lengi hann þarf að sitja á hverjum fundi, þar til síðasta umsókn hans hefur
+  verið tekin fyrir.
+
+Sanngjörn dagskrá jafnar *summu* þáttanna tveggja. Af því leiðir að **fagráðsmenn sem þurfa að
+mæta oftar ættu að fá að fara fyrr** af þeim fundum, þar sem þeir eru bundnir meira en aðrir. Þeir
+sem mæta sjaldan geta með sanngirni verið beðnir um að sitja lengur þegar þeir mæta.
+
+## Eigið mat fagráðsmanna
+
+Hversu mikið einn fundur vegur á móti lengri setu er persónubundið. Sumir vilja frekar mæta sjaldnar
+og sitja lengi; aðrir vilja mæta oft og fara snemma. Líkanið leyfir þetta sem færibreytu fyrir
+hvern fagráðsmann: kostnaðinn við að mæta á einn fund, táknaður $\alpha_r$ og mældur í
+dagskrárliðum (tíma einnar umsóknar).
+
+* **Hátt** $\alpha_r$ þýðir að það er dýrt fyrir viðkomandi að mæta: líkanið safnar umsóknum hans á
+  færri fundi, jafnvel þótt hann þurfi þá að sitja lengur.
+* **Lágt** $\alpha_r$ þýðir að það er ódýrt að mæta: líkanið dreifir umsóknum hans og hann fer
+  snemma.
+
+Í bili fá allir fagráðsmenn sama $\alpha$. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
+þeirra.
+
+## Fundir sem fagráðsmaður kemst ekki á
+
+Sumir fagráðsmenn vita fyrir fram að þeir komast ekki á tiltekna fundi vegna annarra skuldbindinga.
+Líkanið getur tekið tillit til þess: umsóknir viðkomandi eru þá ekki settar á þá fundi, og líkanið
+reynir áfram að halda fjölda funda sem hann þarf að mæta á, og bið hans á þeim, í lágmarki.
+
+## Vanhæfi
+
+Enginn fagráðsmaður les umsókn sem hann er vanhæfur til að fjalla um. Best væri að hann væri
+alfarið ekki á fundinum þegar sú umsókn er tekin fyrir, eða væri þegar farinn. Líkanið reynir að
+tryggja það: vanhæfur fagráðsmaður á annaðhvort ekki umsókn á þeim fundi eða allar umsóknir hans
+eru teknar fyrir á undan umsókninni sem hann er vanhæfur í.
+
+Þetta er ekki alltaf hægt. Ef tveir fagráðsmenn eru vanhæfir hvor í umsókn hins, og báðar
+umsóknirnar eru á sama fundi, verður annar þeirra að vera viðstaddur. Þetta er því **mjúk skorða**: hvert
+frávik er leyft en kostar mikið í markfallinu, og líkanið gefur upp hversu mörg frávik eru eftir.
+
+## Mælikvarðar
+
+Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fagráðsmann:
+
+* **Vanhæfir viðstaddir:** fjöldi skipta sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi
+  meðan umsókn er tekin fyrir. Þetta viljum við lágmarka, helst í 0. Best er að viðkomandi mæti
+  alls ekki á þann fund; annars á hann að vera snemma á dagskrá og farinn þegar umsóknin kemur.
+* **Biðpunktar** (e. *peel-off points*): hversu margar umsóknir annarra fagráðsmaður þarf að hlusta
+  á áður en síðasta umsókn hans er tekin fyrir. Biðpunktarnir safnast upp yfir lotuna.
+* **Biðpunktar á fund og á umsókn:** biðpunktar deilt með fjölda funda sem mætt er á, og með
+  fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
+* **Fundir sem mætt er á** og **byrði á umsókn** (binding auk biðar), sem líkanið jafnar.
+
+## Sanngjarnt miðað við hvað?
+
+Fagráðsmenn hafa ekki allir jafnmargar umsóknir og sá sem hefur 20 umsóknir getur ekki búist við
+jafnstuttum kvöldum og sá sem hefur 10. Byrði er því borin saman **á hverja umsókn**: byrði
+fagráðsmanns deilt með fjölda umsókna hans. Líkanið lágmarkar byrði á umsókn hjá þeim sem verst er settur.
+
+## Tímabilið
+
+Einn fundur getur ekki verið sanngjarn við alla, en röð funda getur það. Byrðin er því gerð upp
+yfir alla lotuna, svo að erfiður fundur er bættur upp síðar:
+
+* Fundir sem þegar hafa verið haldnir eru fastir, eins og þeir voru.
+* Byrði þeirra telst með í lotunni, svo fagráðsmaður sem beið lengi á M1 og M2 fær að fara fyrr á
+  þeim fundum sem eftir eru.
+* Umsóknir sem eru á dagskrá næsta fundar samkvæmt tillögu starfsmanna haldast þar, en innbyrðis
+  röð þeirra er óákveðin og líkanið má velja hana.
+* Aðrar umsóknir má færa á milli seinni funda ef það er sanngjarnara.
+
+Fagráðið breytist frá ári til árs, svo eðlilegt tímabil er ein lota. Fyrir fagráðsmenn sem sitja
+áfram mætti flytja stöðu á milli lotna.
+
+## Sanngirni í úthlutun hlutverka
+
+Fundaskipanin er seinni ákvörðunin af tveimur. Sú fyrri, hver er ritstjóri og hverjir lesarar á
+hverri umsókn, hefur sínar eigin sanngirnisspurningar (@sec-data):
+
+* svipað heildarálag og jafn fjöldi ritstjóra-, lesara 1- og lesara 2-hlutverka, svo allir fái
+  svipað rými í umræðunni;
+* **nýir fagráðsmenn** með takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
+  þeirra seinna í lotunni, eftir að þeir hafa fyrst verið lesarar.
+
+Fyrir nýja fagráðsmenn er löng seta ekki endilega byrði. Það getur verið betra að leyfa þeim að
+sitja meðvitað lengri fundi, svo þeir fái að hlusta á umræður reyndari fagráðsmanna: rökin og
+aðferðafræðina við úrvinnslu umsókna. Í líkaninu má gera það með lægra $\alpha_r$ eða minni vigt á
+bið hjá nýjum fagráðsmönnum.
+
+Þessi bók byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.

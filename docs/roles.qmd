@@ -1,0 +1,117 @@
+# Endurúthlutun hlutverka {#sec-roles}
+
+```{r}
+#| label: setup-roles
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+results <- "data"  # pseudonymised copies, see code/export_docs_data.py
+have_roles <- file.exists(file.path(results, "roles_panel.csv"))
+if (have_roles) {
+  reassigned <- panel_with_roles(panel, file.path(results, "roles_panel.csv"))
+  counts_roles <- role_counts(reassigned)
+}
+```
+
+Hér eru sömu fagráðsmenn á hverri umsókn og í tillögu starfsmanna, og fundir sem eru búnir eru
+óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Nýir
+fagráðsmenn eru ekki ritstjórar á fyrri helmingi sinna eigin funda. Miðbikið getur því verið seinna
+en í miðri lotunni ef fundir þeirra dreifast á seinni hlutann. Eftir það eru þeir ritstjórar á mest
+`r scales::percent(yaml::read_yaml("../code/models/panel_model.yml")$new_editor_share)` umsókna sinna.
+Líkanið velur líka hver er lesari 1, sem talar næstur á eftir ritstjóranum, og hver er lesari 2,
+sem talar síðastur. Í tillögu starfsmanna ræður stafrófið því (@sec-data). Hér er það notað sem
+tækifæri til að gefa öllum svipað rými í umræðunni: hjá hverjum fagráðsmanni eiga hlutverk
+lesara 1 og lesara 2 að vera sem jöfnust.
+
+Aðalmarkmiðið er sanngjörn greiðsla: ef hver umsókn tekur jafnlangan tíma, líka biðin á fundum, ætti
+greiðsla á umsókn að vera sem jöfnust meðal reyndra fagráðsmanna. Nýir fá aðeins minna á umsókn, því
+þeir eru sjaldnar ritstjórar og bera því minni ábyrgð.
+
+## Jafnari greiðsla á umsókn
+
+```{r}
+#| label: tbl-roles
+#| tbl-cap: "Greiðslur í tillögu starfsmanna og eftir tilfærslu hlutverka (bil yfir fagráðsmenn)."
+#| eval: !expr have_roles
+assignment_summary(list(`Tillaga starfsmanna` = panel, `Endurúthlutun hlutverka` = reassigned)) %>%
+  select(-`Lesari 1`, -`Mesti munur lesara 1 og 2`, -`Ritstjóri á fleiri en einni umsókn á sama fundi`) %>%
+  knitr::kable()
+```
+
+::: {.panel-tabset}
+
+#### Fyrir
+
+```{r}
+#| label: fig-pay-roles-before
+#| fig-cap: "Greiðslur í tillögu starfsmanna. Merkið sýnir samtals og greiðslu á umsókn, í þúsundum króna."
+#| fig-height: 6
+plot_pay(counts)
+```
+
+#### Eftir
+
+```{r}
+#| label: fig-pay-roles
+#| fig-cap: "Greiðslur eftir endurúthlutun hlutverka. Merkið sýnir samtals og greiðslu á umsókn, í þúsundum króna."
+#| fig-height: 6
+#| eval: !expr have_roles
+plot_pay(counts_roles)
+```
+
+:::
+
+Fjöldi umsókna hvers fagráðsmanns breytist ekki, svo heildargreiðslan fylgir enn álaginu. En greiðsla
+á umsókn verður nær jöfn, því ritstjórahlutverkunum er dreift eftir álagi: sá sem hefur fáar
+umsóknir, og fær því meira af grunngjaldinu á hverja, fær færri ritstjórahlutverk. Í leiðinni er
+líka bestað hver er lesari 1 og hver lesari 2, svo allir fái meira rými til að ræða umsóknirnar.
+Lesari 1 fær yfirleitt meira að segja en lesari 2, því helstu punktarnir hafa oft þegar verið
+nefndir þegar kemur að lesara 2.
+
+## Rými í umræðunni {#sec-voice}
+
+@tbl-voice sýnir hve stórt hlutfall af umsóknum hvers fagráðsmanns er í hverju hlutverki, sem bil frá
+þeim lægsta til þess hæsta. Eftir endurúthlutun dregst bilið saman í öllum hlutverkum, mest hjá
+lesara 1 og lesara 2: enginn er lengur alltaf síðastur að tala, og allir fá að tala næstir á eftir
+ritstjóranum á um það bil helmingi lesaraumsókna sinna. Ritstjórahlutfallið jafnast líka, en síður,
+því nýir fagráðsmenn eru sjaldnar ritstjórar og því er dreift þannig að greiðsla á umsókn verði jöfn.
+
+```{r}
+#| label: tbl-voice
+#| tbl-cap: "Hlutfall umsókna hvers fagráðsmanns í hverju hlutverki: lægst–hæst yfir fagráðsmenn, og miðgildi í sviga."
+#| eval: !expr have_roles
+role_range <- function(counts) {
+  pct <- function(x) sprintf("%.0f %%", 100 * x)
+  counts %>%
+    group_by(member) %>% mutate(share = n / sum(n)) %>% ungroup() %>%
+    group_by(role) %>%
+    summarise(bil = sprintf("%s–%s (%s)", pct(min(share)), pct(max(share)), pct(median(share))),
+              .groups = "drop") %>%
+    mutate(role = tr(as.character(role)))
+}
+left_join(rename(role_range(counts), Hlutverk = role, Fyrir = bil),
+          rename(role_range(counts_roles), Hlutverk = role, Eftir = bil), by = "Hlutverk") %>%
+  knitr::kable()
+```
+
+::: {.panel-tabset}
+
+#### Fyrir
+
+```{r}
+#| label: fig-roles-before
+#| fig-cap: "Hlutverk hvers fagráðsmanns í tillögu starfsmanna."
+#| fig-height: 6
+plot_roles(counts)
+```
+
+#### Eftir
+
+```{r}
+#| label: fig-roles-after
+#| fig-cap: "Hlutverk hvers fagráðsmanns eftir endurúthlutun hlutverka."
+#| fig-height: 6
+#| eval: !expr have_roles
+plot_roles(counts_roles)
+```
+
+:::
