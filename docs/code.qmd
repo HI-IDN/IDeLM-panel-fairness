@@ -30,8 +30,6 @@ Stillingar líkansins eru í `code/models/panel_model.yml`.
 
 Bestunarlíkanið er `code/models/panel_model.py`:
 
-```{python}
-#| eval: false
-#| echo: true
+```{embed}
 #| file: ../code/models/panel_model.py
 ```
