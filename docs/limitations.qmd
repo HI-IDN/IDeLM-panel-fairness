@@ -77,62 +77,75 @@ skref.
 
 ## Næstu skref
 
+Næstu skref eru hugsuð sem verkefni fyrir nemendur í sumarverkefni með styrk úr Nýsköpunarsjóði
+námsmanna (NSN), með aðstoð upplýsingatæknideildar TÞS. Þeim er raðað í þemu, og við hvern lið er
+gróft mat á því hversu flókinn hann er í framkvæmd:
+
+* *lítið*: stilling eða einföld skorða í núverandi líkani, eða keyrsla á því sem þegar er í kóða;
+* *miðlungs*: nýr hluti líkansins eða ný gögn sem þarf að safna;
+* *mikið*: nýtt líkan, nýjar aðferðir eða tenging við kerfi sjóðsins.
+
 ### Sanngirni í líkaninu {#sec-next-fairness}
 
 Óháð rýni á þrepamarkfallinu (@sec-model) benti á eftirfarandi rannsóknarspurningar. Þær sem merktar
-eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið keyrðar á sviðsmyndunum.
+eru *í kóða* eru útfærðar í líkaninu en hafa ekki verið keyrðar á sviðsmyndunum.
 
-* **`leximin`** (*í kóða*). Í stað þess að verja aðeins þann verst setta og lágmarka svo heildarbið má verja
-  næstverst setta, þann þar á eftir o.s.frv. (`leximin`), eða nota vegið hámark yfir raðaða
-  byrði [@ogryczak2003]. Það má stytta eftir nokkur stig. Fyrir hvert stig ætti að birta verðið á
-  sanngirninni: hversu mikil heildarbið bætist við.
-* **Svigrúm í fyrsta þrepi** (*í kóða*). Leyfa nokkrum fundum fleiri en lágmarkið í þrepi 1, eða besta byrðina
-  $\alpha \cdot$ fundir + bið beint, svo $\alpha$ vegi í raun fundi á móti bið.
-* **Pareto-framlína.** Markmiðin þrjú, fjöldi funda, mesta byrði og heildarbið, togast á. Í stað
-  þess að festa röð þeirra fyrir fram má rekja framlínuna: þau plön þar sem ekki er hægt að bæta
-  eitt markmið án þess að annað versni, t.d. með því að herða skorður á einu markmiði í skrefum
-  (e. *ε-constraint*) og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji sjálf
-  punkt á henni og sjái hvað hver kostur kostar.
-* **Enginn verr settur en í tillögu starfsmanna** (*í kóða*). Þrep 0 lágmarkar summu
+#### Markfallið
+
+* **`leximin`** (*í kóða; lítið*). Í stað þess að verja aðeins þann verst setta og lágmarka svo
+  heildarbið má verja næstverst setta, þann þar á eftir o.s.frv. (`leximin`), eða nota vegið hámark
+  yfir raðaða byrði [@ogryczak2003]. Það má stytta eftir nokkur stig. Fyrir hvert stig ætti að
+  birta verðið á sanngirninni: hversu mikil heildarbið bætist við.
+* **Svigrúm í fyrsta þrepi** (*í kóða; lítið*). Leyfa nokkrum fundum fleiri en lágmarkið í þrepi 1,
+  eða besta byrðina $\alpha \cdot$ fundir + bið beint, svo $\alpha$ vegi í raun fundi á móti bið.
+* **Enginn verr settur en í tillögu starfsmanna** (*í kóða; lítið*). Þrep 0 lágmarkar summu
   þeirrar byrði sem er umfram byrðina í tillögu starfsmanna. Aðeins ef sú summa verður 0 er tryggt
   að enginn sé verr settur; annars er umframbyrðin eins lítil og reglurnar leyfa. Birta ætti hve
   margir eru betur settir og hve margir verr.
-* **Skipta vandanum upp** (*röðun innan funda í kóða*). Fyrst fundir, svo röð innan hvers fundar,
-  sem er einfalt verkefni á einni vél fyrir hvern fund og er nú leyst nákvæmlega. Eftir stendur að
-  velja fundina. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön yfir mögulega
-  samsetningu funda (e. *set partitioning*, *column generation*) gefið sterk neðri mörk og lokað
-  bilinu.
-* **Sanngirnismælikvarðar í hverri niðurstöðu** (*í kóða*). Gini-stuðull eða hlutfall hæstu og lægstu byrði,
-  fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður miðað við `lexsum`.
-* **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir** (*$\alpha_r$ í kóða*). Líkanið les nú
-  $\alpha_r$ fyrir hvern og einn. Eftir er að spyrja fagráðsmenn og leyfa
-  þeim líka að velja markgildi eigin umsókna á fund.
-* **Byrði á fund.** Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og í APAP
-  (@sec-fairness-relative).
-* **Bil eftir að vanhæfur bregður sér út.** Líkanið telur hve oft vanhæfur fagráðsmaður þarf að
-  bregða sér út, en tryggir ekki bil á eftir. Ef hann á sjálfur næstu umsókn á dagskrá þarf fundurinn
-  að bíða eftir honum. Bæta mætti við skorðu um að hans næsta umsókn komi ekki strax á eftir þeirri
-  sem hann er vanhæfur í, heldur að minnsta kosti einni umsókn síðar.
-* **Óvissa.** Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða traust bestun),
-  og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
-* **Á milli lotna** (*byrði úr fyrri lotum í kóða*). Bera byrðarstöðu fagráðsmanna á milli lotna, og prófa einfalda víxlreglu (sá
-  sem beið síðast fer fyrr næst) á móti bestun.
-* **Hlutverk og fundaskipan saman.** Endurúthlutun hlutverka (@sec-roles) greiðir nú meira þeim sem
-  bíða lengi á umsókn. Undir þrepamarkfallinu eiga þeir sem mæta sjaldan *að* bíða lengur, svo slík
-  greiðsla vinnur að hluta gegn dagskránni. Betra er að greiða fyrir þá byrði sem eftir stendur umfram
-  meðaltal, sem nú er hægt (*í kóða*), og prófa hvort það jafni greiðslu á tíma.
-* **Opinn lausnari.** Endurskrifa líkanið fyrir HiGHS eða SCIP. Mælikvarðarnir eru þegar reiknaðir
-  úr dagskránni sjálfri, svo hægt er að bera saman lausnara.
+* **Pareto-framlína** (*miðlungs*). Markmiðin þrjú, fjöldi funda, mesta byrði og heildarbið,
+  togast á. Í stað þess að festa röð þeirra fyrir fram má rekja framlínuna: þau plön þar sem ekki er
+  hægt að bæta eitt markmið án þess að annað versni, t.d. með því að herða skorður á einu markmiði í
+  skrefum (e. *ε-constraint*) og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji
+  sjálf punkt á henni og sjái hvað hver kostur kostar.
+
+#### Mælikvarðar
+
+* **Sanngirnismælikvarðar í hverri niðurstöðu** (*í kóða; lítið*). Gini-stuðull eða hlutfall hæstu
+  og lægstu byrði, fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður
+  miðað við `lexsum`.
+* **Byrði á fund** (*lítið*). Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og
+  í APAP (@sec-fairness-relative).
+
+#### Fagráðsmenn og dagskrá
+
+* **Bil eftir að vanhæfur bregður sér út** (*lítið*). Líkanið telur hve oft vanhæfur fagráðsmaður
+  þarf að bregða sér út, en tryggir ekki bil á eftir. Ef hann á sjálfur næstu umsókn á dagskrá þarf
+  fundurinn að bíða eftir honum. Bæta mætti við skorðu um að hans næsta umsókn komi ekki strax á
+  eftir þeirri sem hann er vanhæfur í, heldur að minnsta kosti einni umsókn síðar.
+* **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir** (*$\alpha_r$ í kóða; miðlungs*). Líkanið
+  les nú $\alpha_r$ fyrir hvern og einn. Eftir er að spyrja fagráðsmenn og leyfa þeim líka að velja
+  markgildi eigin umsókna á fund.
+* **Á milli lotna** (*byrði úr fyrri lotum í kóða; miðlungs*). Bera byrðarstöðu fagráðsmanna á
+  milli lotna, og prófa einfalda víxlreglu (sá sem beið síðast fer fyrr næst) á móti bestun.
+* **Hlutverk og fundaskipan saman** (*í kóða; miðlungs*). Endurúthlutun hlutverka (@sec-roles)
+  greiðir nú meira þeim sem bíða lengi á umsókn. Undir þrepamarkfallinu eiga þeir sem mæta sjaldan
+  *að* bíða lengur, svo slík greiðsla vinnur að hluta gegn dagskránni. Betra er að greiða fyrir þá
+  byrði sem eftir stendur umfram meðaltal, sem nú er hægt, og prófa hvort það jafni greiðslu á
+  tíma.
+* **Óvissa** (*mikið*). Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða
+  traust bestun), og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
+
+#### Lausnaraðferðir
+
+* **Skipta vandanum upp** (*röðun innan funda í kóða; mikið*). Fyrst fundir, svo röð innan hvers
+  fundar, sem er einfalt verkefni á einni vél fyrir hvern fund og er nú leyst nákvæmlega. Eftir
+  stendur að velja fundina. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön
+  yfir mögulega samsetningu funda (e. *set partitioning*, *column generation*) gefið sterk neðri
+  mörk og lokað bilinu.
+* **Opinn lausnari** (*mikið*). Endurskrifa líkanið fyrir HiGHS eða SCIP. Mælikvarðarnir eru þegar
+  reiknaðir úr dagskránni sjálfri, svo hægt er að bera saman lausnara.
 
 ### Verklag og innleiðing
-
-Liðirnir hér að neðan eru hugsaðir sem verkefni fyrir nemendur í sumarverkefni með styrk úr
-Nýsköpunarsjóði námsmanna (NSN), með aðstoð upplýsingatæknideildar TÞS. Þeim er raðað í þemu, og
-við hvern lið er gróft mat á því hversu flókinn hann er í framkvæmd:
-
-* *lítið*: stilling eða einföld skorða í núverandi líkani;
-* *miðlungs*: nýr hluti líkansins eða ný gögn sem þarf að safna;
-* *mikið*: nýtt líkan, nýjar aðferðir eða tenging við kerfi sjóðsins.
 
 #### Pörun og hlutverk
 
