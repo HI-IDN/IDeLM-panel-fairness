@@ -392,7 +392,9 @@ class PanelScheduleModel:
         pairs = [(r, m) for r in data.members for m in self.meetings_of[r]]
         self.a = {(r, m): self.m.addVar(vtype=GRB.BINARY, name=f'a[{r},{m}]') for r, m in pairs}
         self.leave = {(r, m): self.m.addVar(lb=0, name=f'leave[{r},{m}]') for r, m in pairs}
-        self.z = self.m.addVar(lb=0, name='z')
+        # With 'lexburden' z bounds burdens that may be negative (credits carried over from earlier
+        # rounds), so it must be free to go below 0.
+        self.z = self.m.addVar(lb=-GRB.INFINITY if self.fairness == 'lexburden' else 0, name='z')
 
     def _placed(self, p, m):
         """1 if proposal p is in meeting m (linear expression)."""
@@ -869,8 +871,12 @@ class PanelScheduleModel:
                 raise RuntimeError(f'No solution found at level {name} (status {self.m.Status}).')
             value = held.getValue()
             gap = self.m.MIPGap if self.m.IsMIP else 0.0
-            reached.append({'level': name, 'value': value, 'bound': self.m.ObjBound, 'gap': gap})
-            print(f"level {name}: value {value:.3f}, bound {self.m.ObjBound:.3f}, gap {gap:.1%}")
+            # value is the held expression; objective, bound and gap are the solver's, which for the
+            # fairness steps include a tiny tie-break on waiting.
+            reached.append({'level': name, 'value': value, 'objective': self.m.ObjVal,
+                            'bound': self.m.ObjBound, 'gap': gap})
+            print(f"level {name}: value {value:.3f}, objective {self.m.ObjVal:.4f}, "
+                  f"bound {self.m.ObjBound:.4f}, gap {gap:.1%}")
             # Gurobi accepts binaries within 1e-5 of 0 or 1, so a held value can come back a little
             # below the true one (6.99998 for 7). Holding it that tightly can make the next step
             # infeasible, so hold with a tolerance well above that, but below any real difference.
@@ -915,7 +921,7 @@ class PanelScheduleModel:
                                'burden_per_proposal', 'carry'],
                    'coi_present': ['application', 'member', 'meeting'],
                    'fairness': ['metric', 'value'],
-                   'levels': ['level', 'value', 'bound', 'gap']}
+                   'levels': ['level', 'value', 'objective', 'bound', 'gap']}
         for name, fields in columns.items():
             if name == 'fairness':
                 rows = [{'metric': k, 'value': v} for k, v in self.solution['fairness'].items()]

@@ -152,8 +152,9 @@ meetings: the solutions are the best found, not proven optimal. Splitting the pr
 `<prefix>_members.csv` (per member: proposals, meetings, slots, waiting, burden, carry),
 `<prefix>_fairness.csv` (largest and mean burden, Gini coefficient, all burdens largest first,
 total waiting and meetings, the rank correlation of meetings and waiting, which is positive when
-frequent attenders also wait more, and the number of such pairs), `<prefix>_levels.csv` (value,
-bound and gap of each step: with large gaps, a later step only improves on an earlier step's best
+frequent attenders also wait more, and the number of such pairs), `<prefix>_levels.csv` (per
+step the held value, and the solver's objective, bound and gap, which for the fairness steps include
+a tiny tie-break on waiting: with large gaps, a later step only improves on an earlier step's best
 found solution, not its optimum) and
 `<prefix>_coi_present.csv`. The log prints the value and bound of each step.
 
