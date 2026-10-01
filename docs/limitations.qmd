@@ -106,6 +106,10 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   þeim líka að velja markgildi eigin umsókna á fund.
 * **Byrði á fund.** Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og í APAP
   (@sec-fairness-relative).
+* **Bil eftir að vanhæfur bregður sér út.** Líkanið telur hve oft vanhæfur fagráðsmaður þarf að
+  bregða sér út, en tryggir ekki bil á eftir. Ef hann á sjálfur næstu umsókn á dagskrá þarf fundurinn
+  að bíða eftir honum. Bæta mætti við skorðu um að hans næsta umsókn komi ekki strax á eftir þeirri
+  sem hann er vanhæfur í, heldur að minnsta kosti einni umsókn síðar.
 * **Óvissa.** Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða traust bestun),
   og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
 * **Á milli lotna** (*byrði úr fyrri lotum í kóða*). Bera byrðarstöðu fagráðsmanna á milli lotna, og prófa einfalda víxlreglu (sá
