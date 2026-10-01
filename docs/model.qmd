@@ -225,15 +225,6 @@ lotu nú. $C_r$ má vera neikvætt.
 Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
 námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er skráð með niðurstöðunum.
 
-::: {.callout-note}
-## Fyrra markfall
-
-Fyrri útgáfur líkansins notuðu eitt vegið markfall: mestu byrði *á umsókn* (dagskrárliðir setnir, eigin umsóknir meðtaldar,
-auk $\alpha_r$ á fund, deilt með $n_r$), að viðbættri meðalbyrði með lítilli vigt og sömu refsiliðum
-og í þrepi 1. Það umbunaði ekki beint tíðri mætingu og sá sem mætti oft beið líka oft lengi. Allar
-niðurstöður í greinargerðinni eru nú með þrepamarkfallinu.
-:::
-
 **Fyrirvarar við þrepamarkfallið**
 
 * **Í `lexburden` er aðeins sá verst setti varinn.** Þrep 2 heldur mestu byrðinni niðri, en neðan hennar
@@ -254,7 +245,7 @@ niðurstöður í greinargerðinni eru nú með þrepamarkfallinu.
   leitarinnar. Bilið í hverju þrepi er skráð og ætti að fylgja niðurstöðunum. Bilið stafar af vali
   funda, ekki röðun innan þeirra (@sec-limitations).
 * **Mælikvarðar eru reiknaðir úr dagskránni**, ekki úr breytum líkansins, svo þeir sýna hvað planið
-  gerir í raun. Í fyrri útgáfu var tilkynnt byrði of há um $n_r$, því eigin umsóknir voru taldar með.
+  gerir í raun.
 
 **Stillingar**
 
@@ -265,17 +256,17 @@ Stillingarnar eru lesnar úr `code/models/panel_model.yml`, sömu skrá og líka
 #| tbl-cap: "Stillingar líkansins."
 tibble(
   Færibreyta = c("Kostnaður við að mæta á fund", "Mesti fjöldi umsókna á fundi",
-                 "Vigt heildarbyrði (fyrra markfall)", "Refsing fyrir vanhæfan viðstaddan", "Tímamörk bestunar",
+                 "Refsing fyrir vanhæfan viðstaddan", "Tímamörk bestunar",
                  "Fundir sem fagráðsmenn komast ekki á", "Mest umsóknir á fagráðsmann á fundi",
                  "Mjúkt hámark umsókna á fagráðsmann á fundi", "Vigt umsókna yfir mjúku hámarki",
                  "Allir mæta á fyrsta fund með eina umsókn", "Markgildi á fund, reyndir",
                  "Markgildi á fund, nýir", "Vigt fráviks frá markgildi",
                  "Refsing fyrir frestun af næsta fundi", "Mest hlutfall ritstjóra hjá nýjum (kafli 6)"),
-  Tákn = c("$\\alpha_r$", "$\\bar K$", "", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_r$", "$t_r$",
+  Tákn = c("$\\alpha_r$", "$\\bar K$", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_r$", "$t_r$",
            "$g$", "$q$", "$\\rho$"),
   Gildi = c(if (is.null(config$alpha_file)) paste(num(config$alpha), "dagskrárliðir fyrir alla")
             else paste(num(config$alpha), "dagskrárliðir, nema þeir sem eru í", config$alpha_file), num(config$max_per_meeting),
-            num(config$total_weight), num(config$coi_penalty), paste(num(config$time_limit), "sek."),
+            num(config$coi_penalty), paste(num(config$time_limit), "sek."),
             if (is.null(config$unavailable)) "engir skráðir ($U_r = \\emptyset$)" else config$unavailable,
             if (is.null(config$max_per_member)) "ekkert hámark" else num(config$max_per_member),
             if (is.null(config$soft_max_per_member)) "ekkert" else num(config$soft_max_per_member),

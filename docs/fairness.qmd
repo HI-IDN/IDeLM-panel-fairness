@@ -7,13 +7,6 @@ source("../code/panel_schedule.R", chdir = TRUE)
 held <- held_meetings(panel)
 worst <- held %>% group_by(member) %>% summarise(waiting = sum(waiting), .groups = "drop") %>%
   arrange(desc(waiting))
-num <- function(x) format(round(x, 2), decimal.mark = ",", nsmall = 2)
-# Spearman correlation of meetings attended and waiting in the stepwise results (scenarios 1 and 2).
-# The earlier objective (burden per proposal) gave 0.71 and 0.64; those runs are no longer kept.
-rho_new <- sapply(c("current", "free"), function(s) {
-  m <- read.csv(file.path("data", paste0(s, "_members.csv")))
-  cor(m$meetings, m$waiting, method = "spearman")
-})
 ```
 
 ## Hvað gerðist á fyrstu tveimur fundunum
@@ -130,14 +123,10 @@ Allir mælikvarðarnir eru reiknaðir úr dagskránni sjálfri.
 Fagráðsmenn hafa ekki allir jafnmargar umsóknir. Spurningin er hvort byrðin eigi að vera jöfn **í
 heild** eða jöfn **á hverja umsókn** (eða á hvern fund).
 
-Fyrsta útgáfa líkansins bar byrði saman á hverja umsókn: byrði fagráðsmanns deilt með fjölda umsókna
-hans, og líkanið lágmarkaði hana hjá þeim sem verst var settur. Það leit sanngjarnt út, en faldi
-gallann sem greinargerðin byrjaði á. Sá sem hefur margar umsóknir þarf að mæta á marga fundi, og þegar
-biðinni er deilt með mörgum umsóknum virðist hún lítil, jafnvel þótt hann sitji lengi á hverjum
-fundi. Í þeim niðurstöðum biðu þeir mest sem mættu oftast: fylgni (Spearman) milli fjölda funda og
-biðpunkta var 0,71 í sviðsmynd 1 og 0,64 í sviðsmynd 2. Með þrepamarkfallinu er hún
-`r num(rho_new[["current"]])` og `r num(rho_new[["free"]])`: gallinn hverfur ekki, því þrepamarkfallið
-ver aðeins þann verst setta (@sec-scenarios).
+Ef byrði er borin saman á hverja umsókn, þ.e. byrði fagráðsmanns deilt með fjölda umsókna hans,
+lítur það sanngjarnt út en felur gallann sem greinargerðin byrjaði á. Sá sem hefur margar umsóknir
+þarf að mæta á marga fundi, og þegar biðinni er deilt með mörgum umsóknum virðist hún lítil, jafnvel
+þótt hann sitji lengi á hverjum fundi. Þá bíða þeir mest sem mæta oftast.
 
 Líkanið ber nú saman **heildarbyrði**: $\alpha_r$ fyrir hvern fund sem mætt er á, auk biðpunkta,
 óháð fjölda umsókna (@eq-burden). Eigin umsóknir teljast ekki með, því þær eru launuð vinna; það
