@@ -2,7 +2,9 @@
 Who reviews which proposal, and in which role: the first of the three decisions (see the book).
 
 The meeting of each proposal is taken as given (from an agenda, e.g. the staff's meetings with a
-fair order), and meetings that have been held keep their reviewers and roles. Two modes:
+fair order), and meetings that have been held keep their reviewers and roles, as does the next
+meeting (--keep-roles M3), whose roles have been announced. Nobody is editor on more than a share
+max_editor_share (2/3) of their proposals. Two modes:
 
     roles   Keep the three members on each proposal, but choose which of them is the editor,
             and which reader speaks second (reader 1) and last (reader 2).
@@ -10,18 +12,32 @@ fair order), and meetings that have been held keep their reviewers and roles. Tw
             proposals (in time order).
     assign  Assume every member can review every proposal. Choose all three members and the editor,
             except members with a conflict of interest, who may never review the proposal.
+            At most two of the three are new members, so every proposal has an experienced one.
             New members follow the same editor rules as in 'roles'.
 
 Pay (see the book): base fee f0 plus fE per editor role and fL per reader role. Assuming every
 proposal takes the same time, including waiting in the meeting, fair pay means equal pay per
 proposal. Objectives:
 
-    roles   minimise the spread (max - min) of pay per proposal, in thousand ISK;
+    roles   minimise the spread (max - min) of pay per proposal, in thousand ISK; or, with
+            --pay-per presence, of pay per agenda slot the member sits through (own proposals and
+            waiting, from the agenda). Waiting is unpaid, so members who sit longer then get more
+            editor roles, which pay more; or, with --pay-per fit, of pay per proposal plus the
+            waiting above the regression parabola of waiting on meetings: the members the plan
+            treats worse than the others (unlucky) are paid for that excess as for proposals; or,
+            with --pay-per mean, so that pay per proposal rises in proportion to how far a member's
+            waiting per proposal is above the mean (50% above the mean: 50% more per proposal); or,
+            with --pay-per burden, of pay per proposal plus the unpaid burden (alpha per meeting
+            attended plus waiting) above the mean burden: the schedule's own measure, so members
+            who wait long because they attend rarely (as the stepwise schedule intends) are not
+            paid again for it;
     assign  minimise the spread of the number of proposals and of editor roles per member;
 
-and in both, with smaller weights, give everyone similar room in the discussion (for each member,
-reader 1 and reader 2 roles as equal as possible; reader 1 speaks second, reader 2 last) and avoid a
-member being editor on several proposals in the same meeting (editor roles spread over the round).
+and in both, with smaller weights, give everyone similar room in the discussion and avoid a member
+being editor on several proposals in the same meeting (editor roles spread over the round). Room in
+the discussion: the editor takes 3 parts, reader 1 (speaks second) 2 and reader 2 (speaks last) 1;
+the spread of room per proposal over all members is kept small (total room in 'assign', where the
+load is equal anyway).
 
 Usage (from code/):
     python -m models.role_model ../data/tdf/panel.csv --mode roles \
@@ -33,12 +49,78 @@ import math
 import os
 from collections import defaultdict
 
+import numpy
+
 import yaml
 from gurobipy import GRB, Model, quicksum  # pylint: disable=no-name-in-module
 
-from models.panel_model import read_agenda, read_new_members, read_panel
+from models.panel_model import member_measures, read_agenda, read_alpha, read_new_members, read_panel
 
 PAY = {'start': 38000, 'editor': 23000, 'reader': 15000}  # ISK, as in code/panel_workload.R
+
+
+def presence(data, agenda):
+    """Agenda slots each member sits through over the round: in every meeting they attend, up to
+    and including the slot of their last own proposal (own proposals plus waiting)."""
+    leave = defaultdict(int)
+    for p, (m, k) in agenda.items():
+        for r in data.reviewers.get(p, ()):
+            leave[r, m] = max(leave[r, m], k)
+    total = defaultdict(int)
+    for (r, _), k in leave.items():
+        total[r] += k
+    return total
+
+
+def excess_waiting(data, agenda):
+    """Waiting above the least-squares parabola of waiting on meetings attended, per member (0 for
+    members on or below it). The parabola is how the agenda shares waiting between those who
+    attend often and those who attend rarely; members above it are the unlucky ones."""
+    leave, own = defaultdict(int), defaultdict(int)
+    for p, (m, k) in agenda.items():
+        for r in data.reviewers.get(p, ()):
+            leave[r, m] = max(leave[r, m], k)
+            own[r, m] += 1
+    meetings, waiting = defaultdict(int), defaultdict(int)
+    for (r, m), k in leave.items():
+        meetings[r] += 1
+        waiting[r] += k - own[r, m]
+    members = sorted(meetings)
+    xs = [meetings[r] for r in members]
+    ys = [waiting[r] for r in members]
+    coef = numpy.polyfit(xs, ys, deg=min(2, len(set(xs)) - 1))
+    return {r: max(0.0, waiting[r] - numpy.polyval(coef, meetings[r])) for r in members}
+
+
+def above_mean(data, agenda, exclude=()):
+    """How far each member's waiting per own proposal is above the mean over members, relative to
+    that mean (0.5: 50% above; 0 for members at or below the mean). Members in exclude (new members,
+    who wait longer by design and are left out of the pay spread) don't count towards the mean."""
+    leave, own = defaultdict(int), defaultdict(int)
+    for p, (m, k) in agenda.items():
+        for r in data.reviewers.get(p, ()):
+            leave[r, m] = max(leave[r, m], k)
+            own[r, m] += 1
+    waiting, proposals = defaultdict(int), defaultdict(int)
+    for (r, m), k in leave.items():
+        waiting[r] += k - own[r, m]
+        proposals[r] += own[r, m]
+    rate = {r: waiting[r] / proposals[r] for r in waiting}
+    counted = [v for r, v in rate.items() if r not in exclude] or list(rate.values())
+    mean = sum(counted) / len(counted) if counted else 0
+    if mean == 0:  # no one waits: no one is above the mean
+        return {r: 0.0 for r in rate}
+    return {r: max(0.0, v / mean - 1) for r, v in rate.items()}
+
+
+def above_mean_burden(data, agenda, alpha, exclude=()):
+    """Unpaid burden (alpha * meetings + waiting, in slots) above the mean over members not in
+    exclude, per member (0 at or below the mean)."""
+    burden = {row['member']: row['burden'] for row in member_measures(data, agenda, alpha)
+              if row['meetings']}
+    counted = [b for r, b in burden.items() if r not in exclude] or list(burden.values())
+    mean = sum(counted) / len(counted) if counted else 0
+    return {r: max(0.0, b - mean) for r, b in burden.items()}
 
 
 def time_order(data, agenda):
@@ -56,7 +138,9 @@ class RoleModel:
     """
 
     def __init__(self, data, agenda, mode, new_members=(), new_editor_share=0.15, max_per_member=6,
-                 spread_weight=0.0, voice_weight=0.1, time_limit=300, pay=PAY, from_scratch=False):
+                 spread_weight=0.0, voice_weight=0.1, time_limit=300, pay=PAY, from_scratch=False,
+                 max_new_per_proposal=2, pay_per='proposal', keep_roles=(), max_editor_share=None,
+                 alpha=2.0):  # alpha: a number or {member: value}
         self.data, self.agenda, self.mode = data, agenda, mode
         self.pay = pay
         self.m = Model('Roles')
@@ -67,7 +151,10 @@ class RoleModel:
         # From scratch nothing is fixed and meetings are not known yet, so rules that depend on the
         # meeting of a proposal (per-meeting limit, midpoint of a new member) are left to the
         # scheduling model that runs afterwards.
-        held = set() if from_scratch else set(data.fixed_position)
+        # Proposals whose reviewers and roles are settled: held meetings, and meetings whose roles
+        # have been announced (keep_roles, e.g. the next meeting, by the staff's plan).
+        held = set() if from_scratch else set(data.fixed_position) | {
+            p for p in data.reviewers if data.current.get(p) in set(keep_roles)}
         meeting = {p: agenda[p][0] for p in proposals}
 
         # Who may review p: the current three ('roles'), or anyone without a conflict ('assign').
@@ -84,6 +171,7 @@ class RoleModel:
         self.u = {(p, r): self.m.addVar(vtype=GRB.BINARY, name=f'u[{p},{r}]')
                   for p in proposals for r in candidates[p]}
 
+        self.new_members = set(new_members)
         for p in proposals:
             self.m.addConstr(quicksum(self.y[p, r] for r in candidates[p]) == 1, name=f'one_editor[{p}]')
             self.m.addConstr(quicksum(self.u[p, r] for r in candidates[p]) == 1, name=f'one_reader1[{p}]')
@@ -95,6 +183,10 @@ class RoleModel:
             if mode == 'roles' or p in held:
                 for r in candidates[p]:
                     self.z[p, r].LB = 1
+            elif max_new_per_proposal is not None:
+                # At least one experienced member on every proposal (where reviewers can change).
+                self.m.addConstr(quicksum(self.z[p, r] for r in candidates[p] if r in self.new_members)
+                                 <= max_new_per_proposal, name=f'new_per_proposal[{p}]')
             if p in held:  # held meetings keep their editor
                 editor = data.reviewers[p][0]
                 for r in candidates[p]:
@@ -107,6 +199,18 @@ class RoleModel:
         load = {r: quicksum(self.z[p, r] for p in proposals if (p, r) in self.z) for r in members}
         editors = {r: quicksum(self.y[p, r] for p in proposals if (p, r) in self.y) for r in members}
         self.load, self.editors = load, editors
+
+        # Nobody is editor on more than max_editor_share of their proposals (settled roles count, and
+        # may exceed it on their own).
+        # Only the settled roles' own excess over the cap is allowed: if the settled roles are already
+        # within it, the open proposals must keep the member within it too.
+        if max_editor_share:
+            for r in members:
+                settled = [p for p in held if p in proposals and r in data.reviewers[p]]
+                settled_editor = sum(1 for p in settled if data.reviewers[p][0] == r)
+                excess = max(0.0, settled_editor - max_editor_share * len(settled))
+                self.m.addConstr(editors[r] <= max_editor_share * load[r] + excess,
+                                 name=f'max_editor_share[{r}]')
 
         # At most max_per_member own proposals in a meeting (only matters when reviewers can change).
         by_meeting = defaultdict(list)
@@ -124,7 +228,6 @@ class RoleModel:
         # new_editor_share of their proposals as editor.
         # Their meetings are taken from the current plan, also in 'assign' mode where their proposals
         # can change. The share applies to the proposals they end up with (load is a variable there).
-        self.new_members = set(new_members)
         for r in self.new_members:
             current = [p for p in proposals if r in data.reviewers[p]]
             their_meetings = sorted({meeting[p] for p in current}, key=lambda m: int(m[1:]))
@@ -169,16 +272,39 @@ class RoleModel:
                         self.m.addConstr(self.y[p, r] + self.first[p] <= 1, name=f'first_new[{p},{r}]')
                 self.m.addConstr(quicksum(both) == 1, name=f'first_once[{r}]')
 
-        voice_gap = self.m.addVar(lb=0, name='voice_gap')
+        # Room in the discussion: editor 3, reader 1 2, reader 2 1, so room = load + 2 editors +
+        # reader 1. Per proposal when the load is fixed ('roles'), in total otherwise.
+        room_hi, room_lo = self.m.addVar(lb=0, name='room_hi'), self.m.addVar(lb=0, name='room_lo')
         for r in members:
-            self.m.addConstr(voice_gap >= reader1[r] - reader2[r], name=f'voice_hi[{r}]')
-            self.m.addConstr(voice_gap >= reader2[r] - reader1[r], name=f'voice_lo[{r}]')
+            room = load[r] + 2 * editors[r] + reader1[r]
+            if mode == 'roles':
+                n_r = len([p for p in proposals if r in candidates[p]])
+                if not n_r:
+                    continue
+                room = room / n_r
+            self.m.addConstr(room_hi >= room, name=f'room_hi[{r}]')
+            self.m.addConstr(room_lo <= room, name=f'room_lo[{r}]')
+        voice_gap = room_hi - room_lo
 
         if mode == 'roles':
-            # Pay per proposal (thousand ISK) is linear in the editor count, as the load is fixed.
+            # Pay per proposal, or per slot sat through (thousand ISK), is linear in the editor
+            # count, as the load and the agenda are fixed.
             n = {r: len([p for p in proposals if r in candidates[p]]) for r in members}
+            if pay_per == 'proposal':
+                per = n
+            elif pay_per == 'presence':
+                per = presence(data, agenda)
+            elif pay_per == 'mean':  # pay per proposal up in proportion to the excess
+                above = above_mean(data, agenda, exclude=self.new_members)
+                per = {r: n[r] * (1 + above.get(r, 0.0)) for r in members}
+            elif pay_per == 'burden':  # own proposals plus unpaid burden above the mean, paid alike
+                above = above_mean_burden(data, agenda, alpha, exclude=self.new_members)
+                per = {r: n[r] + above.get(r, 0.0) for r in members}
+            else:  # fit: own proposals plus the unlucky waiting, paid alike
+                above = excess_waiting(data, agenda)
+                per = {r: n[r] + above.get(r, 0.0) for r in members}
             per_prop = {r: (pay['start'] + pay['reader'] * n[r] + (pay['editor'] - pay['reader']) * editors[r])
-                        / (1000 * n[r]) for r in members if n[r]}
+                        / (1000 * per[r]) for r in members if per.get(r)}
             hi, lo = self.m.addVar(lb=0, name='pay_hi'), self.m.addVar(lb=0, name='pay_lo')
             # Equal pay per proposal among experienced members; new members edit less by design.
             for r, q in per_prop.items():
@@ -224,18 +350,37 @@ def main():
     parser.add_argument('--time-limit', type=float, default=300)
     parser.add_argument('--from-scratch', action='store_true',
                         help='nothing is fixed, not even held meetings (with --mode assign)')
+    parser.add_argument('--pay-per', choices=['proposal', 'presence', 'fit', 'mean', 'burden'], default='proposal',
+                        help="with --mode roles: equal pay per proposal, per agenda slot sat through "
+                             "('presence'), or per proposal plus waiting above the regression parabola "
+                             "of waiting on meetings ('fit'), or rising in proportion to waiting per proposal "
+                             "above the mean ('mean'), or per proposal plus unpaid burden (alpha * meetings + "
+                             "waiting) above the mean ('burden'); the last four reward waiting with editor roles")
+    parser.add_argument('--keep-roles', nargs='*', default=[],
+                        help='meetings whose roles are already announced and stay as they are (e.g. M3); '
+                             'held meetings always do')
+    parser.add_argument('--alpha', type=float, help="with --pay-per burden: cost of attending a meeting, in "
+                                                      "slots; use the schedule's value")
+    parser.add_argument('--alpha-file', help="with --pay-per burden: CSV (member, alpha), as for the schedule")
     parser.add_argument('--out', required=True, help='output prefix; writes <out>_panel.csv')
     args = parser.parse_args()
 
     with open(args.config, encoding='utf-8') as f:
         config = yaml.safe_load(f)
+    # As in models/panel_model.py, so --pay-per burden can use the schedule's own alpha.
+    for name in ('alpha', 'alpha_file'):
+        if getattr(args, name) is not None:
+            config[name] = getattr(args, name)
     data = read_panel(args.panel)
     agenda = read_agenda(args.agenda)
     new = read_new_members(config['members'])
     model = RoleModel(data, agenda, args.mode, new_members=new,
                       new_editor_share=config.get('new_editor_share', 0.15),
                       max_per_member=config.get('max_per_member') or 99, time_limit=args.time_limit,
-                      from_scratch=args.from_scratch)
+                      from_scratch=args.from_scratch, pay_per=args.pay_per,
+                      max_new_per_proposal=config.get('max_new_per_proposal', 2),
+                      keep_roles=args.keep_roles, max_editor_share=config.get('max_editor_share'),
+                      alpha=read_alpha(config.get('alpha_file'), config['alpha'], data.members))
     rows = model.solve()
     os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     # Written in the format of panel.csv, so it can be scheduled by models/panel_model.py. From
