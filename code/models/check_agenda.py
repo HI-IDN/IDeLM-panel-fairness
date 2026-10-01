@@ -121,12 +121,13 @@ def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_
 
 def conflicts_present(data, agenda):
     """(proposal, member, meeting) where a member with a conflict of interest is still in the
-    meeting when the proposal comes up, i.e. has an own proposal later in it."""
+    meeting when the proposal comes up, i.e. has an own proposal at that slot or later (as in the
+    model, which also counts a member who reviews the proposal they are conflicted on)."""
     leave = Counter()
     for p, m, k in agenda:
         for r in data.reviewers.get(p, ()):
             leave[r, m] = max(leave[r, m], k)
-    return [(p, r, m) for p, m, k in agenda for r in data.coi.get(p, []) if leave[r, m] > k]
+    return [(p, r, m) for p, m, k in agenda for r in data.coi.get(p, []) if leave[r, m] >= k]
 
 
 def main():
