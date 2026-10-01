@@ -2,7 +2,7 @@
 
 ## Í stuttu máli
 
-*Anesthetist's Peel Assignment Problem* (APAP) snýst um það hver fær að fara fyrstur heim. Í hópi
+*Anesthetist's Peel Assignment Problem* (APAP) [@apap] snýst um það hver fær að fara fyrstur heim. Í hópi
 svæfingalækna á barnaspítala í Norður-Ameríku eru á hverjum virkum degi nokkrir sérfræðingar án fastrar
 kvöldvaktar. Þeir eru á staðnum meðan skurðstofur þeirra eru í gangi og þegar vinnu þeirra lýkur
 mega þeir fara. Ekki er hægt að vita fyrir fram hversu lengi aðgerð tekur, svo hópurinn kemur sér

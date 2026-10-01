@@ -70,7 +70,7 @@ skref.
   einn kemst ekki á; engir slíkir eru enn skráðir.
 * **Frestun vegna manneklu.** Ef umsókn er frestað um fund er hún færð handvirkt og líkanið keyrt
   aftur; það gerist ekki sjálfkrafa.
-* **Leyfi lausnarans.** Líkanið er leyst með Gurobi undir akademísku leyfi, sem má aðeins nota
+* **Leyfi lausnarans.** Líkanið er leyst með Gurobi [@gurobi] undir akademísku leyfi, sem má aðeins nota
   í rannsóknum og kennslu (@sec-model). TÞS gæti ekki keyrt það sjálft með því leyfi. Hlutverk
   NSN-verkefnis væri m.a. að endurskrifa líkanið fyrir opinn lausnara, t.d. SCIP [@scip], sem
   krefst ekki leyfis til að keyra.
@@ -105,7 +105,7 @@ eru *í kóða* eru útfærðar í líkaninu en hafa ekki verið keyrðar á svi
 * **Pareto-framlína** (*miðlungs*). Markmiðin þrjú, fjöldi funda, mesta byrði og heildarbið,
   togast á. Í stað þess að festa röð þeirra fyrir fram má rekja framlínuna: þau plön þar sem ekki er
   hægt að bæta eitt markmið án þess að annað versni, t.d. með því að herða skorður á einu markmiði í
-  skrefum (e. *ε-constraint*) og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji
+  skrefum (e. *ε-constraint*) [@haimes1971] og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji
   sjálf punkt á henni og sjái hvað hver kostur kostar.
 
 #### Mælikvarðar
@@ -132,17 +132,17 @@ eru *í kóða* eru útfærðar í líkaninu en hafa ekki verið keyrðar á svi
   *að* bíða lengur, svo slík greiðsla vinnur að hluta gegn dagskránni. Betra er að greiða fyrir þá
   byrði sem eftir stendur umfram meðaltal, sem nú er hægt, og prófa hvort það jafni greiðslu á
   tíma.
-* **Óvissa** (*mikið*). Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða
-  traust bestun), og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
+* **Óvissa** (*mikið*). Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk [@birge2011] eða
+  traust bestun [@bertsimas2004]), og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
 
 #### Lausnaraðferðir
 
 * **Skipta vandanum upp** (*röðun innan funda í kóða; mikið*). Fyrst fundir, svo röð innan hvers
   fundar, sem er einfalt verkefni á einni vél fyrir hvern fund og er nú leyst nákvæmlega. Eftir
   stendur að velja fundina. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön
-  yfir mögulega samsetningu funda (e. *set partitioning*, *column generation*) gefið sterk neðri
+  yfir mögulega samsetningu funda (e. *set partitioning*, *column generation*) [@barnhart1998] gefið sterk neðri
   mörk og lokað bilinu.
-* **Opinn lausnari** (*mikið*). Endurskrifa líkanið fyrir HiGHS eða SCIP. Mælikvarðarnir eru þegar
+* **Opinn lausnari** (*mikið*). Endurskrifa líkanið fyrir HiGHS [@highs] eða SCIP [@scip]. Mælikvarðarnir eru þegar
   reiknaðir úr dagskránni sjálfri, svo hægt er að bera saman lausnara.
 
 ### Verklag og innleiðing

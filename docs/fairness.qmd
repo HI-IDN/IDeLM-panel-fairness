@@ -107,13 +107,13 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
 * **Fundir sem mætt er á** og **byrði**, $\alpha_r$ á hvern fund auk biðpunkta (@eq-burden). Líkanið
   heldur mestu byrðinni niðri.
-* **Fylgni funda og biðar** (Spearman) yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
+* **Fylgni funda og biðar** (Spearman) [@spearman1904] yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
   oftast bíða líka mest, sem er einmitt það sem sanngjörn dagskrá á að forðast.
 * **Öfug pör:** sá sem mætir á fleiri fundi ætti að fá að fara fyrr af þeim og bíða því minna
   samtals. Berum alla fagráðsmenn saman tvo og tvo. Ef A mætir á fleiri fundi en B *og* bíður
   samt lengur samtals, þá er A verr settur á báða vegu og parið er *öfugt*. Talið er hve mörg
   slík pör eru; í sanngjarnri dagskrá ættu þau að vera fá.
-* **Gini-stuðull byrðar:** einn tölustafur á bilinu 0 til 1 um hversu ójafnt byrðin dreifist; 0 þýðir
+* **Gini-stuðull byrðar** [@gini1912]: einn tölustafur á bilinu 0 til 1 um hversu ójafnt byrðin dreifist; 0 þýðir
   að allir bera jafnt.
 * **Raðaður byrðarvigur:** byrði allra fagráðsmanna, raðað frá þeim sem ber mest til þess sem ber
   minnst. Tvö plön eru borin saman sæti fyrir sæti. Fyrst er litið á þann sem ber mest í hvoru

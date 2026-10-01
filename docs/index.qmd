@@ -2,7 +2,7 @@
 
 ## Hvers vegna þessi greinargerð
 
-Ég hef setið í fagráði Tækniþróunarsjóðs (TÞS) í nokkur ár og haft bæði gagn og gaman af
+Ég hef setið í fagráði Tækniþróunarsjóðs (TÞS) [@rannis] í nokkur ár og haft bæði gagn og gaman af
 starfinu. Fyrst sat ég í fagráði Vaxtar árið 2015. Þá var rýnin tvíblind og fagráðsfundir haldnir
 á staðnum í höfuðstöðvum Rannís á Laugavegi. Ég kom svo aftur í fagráðið vorið 2023.
 
@@ -22,7 +22,7 @@ Að mörgu leyti kann ég betur við fyrirkomulag Fræs, þar sem fundir eru stu
 haldnir í hádeginu.
 
 Þegar ég hugsa um þetta rifjast upp fyrir mér verkefni sem ég vann að fyrir nokkrum árum,
-*Anesthetist's Peel Assignment Problem* (APAP). Þar var viðfangsefnið í grunninn einfalt: hver fær
+*Anesthetist's Peel Assignment Problem* (APAP) [@apap]. Þar var viðfangsefnið í grunninn einfalt: hver fær
 að fara fyrstur heim og hvernig má tryggja að það sé sanngjarnt yfir tíma. Niðurstöðurnar voru
 aldrei birtar vegna skorts á gögnum. Vandamál fagráðsins er að mörgu leyti af sama meiði, en hér
 eru gögnin til staðar.
@@ -96,5 +96,5 @@ umræðunni, ekki aðeins svipaðan fjölda umsókna.
 * @sec-assign spyr hvað ef: hversu jafnt álagið gæti verið ef allir væru jafnhæfir og lotan skipulögð frá grunni.
 * @sec-limitations dregur saman forsendur, takmarkanir og næstu skref.
 
-Allt er endurgeranlegt úr kóðasafninu: Python fyrir gagnavinnslu og líkön og R (ggplot2) fyrir
+Allt er endurgeranlegt úr kóðasafninu [@panelfairness]: Python [@python] fyrir gagnavinnslu og líkön og R [@rcore; @ggplot2] fyrir
 töflur og myndir. Raunveruleg nöfn fara aldrei af tölvu höfundar.
