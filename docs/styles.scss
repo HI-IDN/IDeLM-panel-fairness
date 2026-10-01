@@ -1,0 +1,71 @@
+/*-- scss:defaults --*/
+// Callouts in the HÍ palette (theme/_tokens.scss); the theme leaves them at the
+// Bootstrap colours.
+$callout-color-note: #10099F;
+$callout-color-tip: #2DD2C0;
+$callout-color-warning: #FAC55B;
+$callout-color-caution: #FFA05F;
+$callout-color-important: #FC8484;
+
+/*-- scss:rules --*/
+// Layout of the HÍ logo and project name in the navbar, and of the page footer.
+.navbar .navbar-logo {
+  max-height: 44px;
+  padding-right: 1rem;
+}
+
+.navbar .navbar-brand {
+  align-items: center;
+  display: flex;
+}
+
+.navbar .navbar-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.navbar .navbar-brand-logo {
+  flex-shrink: 0;
+}
+
+@media (max-width: 991.98px) {
+  .navbar .navbar-logo {
+    max-height: 30px;
+    padding-right: 0.5rem;
+  }
+
+  .navbar .navbar-title {
+    font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// Project name centred in the navbar on wide screens; the logo stays on the left.
+@media (min-width: 992px) {
+  .navbar .navbar-brand:not(.navbar-brand-logo) {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.navbar .nav-link .bi {
+  font-size: 1.5rem;
+}
+
+.nav-footer {
+  align-items: center;
+  border-top: 4px solid $hi-accent;
+  padding: 0.75rem 1.5rem;
+}
+
+.nav-footer p {
+  margin: 0;
+}
+
+.nav-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
