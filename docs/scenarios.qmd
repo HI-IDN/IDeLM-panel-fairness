@@ -40,7 +40,7 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    fresta á seinni fund, eins og við manneklu, en það kostar í markfallinu. Seinni fundir (M4–M9)
    eru óskorðaðir: líkanið má raða umsóknum á þá upp á nýtt, þar á meðal umsóknum sem eru ekki enn
    komnar á fund. Fjögur afbrigði eru borin saman, sem eru ólík aðeins í markfallinu:
-   a. **`lexburden`:** þrepamarkfallið eins og það er sett fram í @sec-model.
+   a. **`lexburden`:** þrepamarkfallið, eins og því er lýst í kaflanum um líkanið.
    b. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
@@ -52,7 +52,7 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    grunni, með sömu skorðum og í sviðsmynd 2a, þar á meðal að allir mæti á fyrsta fund með eina
    umsókn hver. Þetta sýnir hvernig betra upphafsplan hefði getað litið út.
 
-Munurinn á 1 og 2b sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; 2a–2d sýna
+Munurinn á 1 og 2a sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; 2a–2d sýna
 hvaða máli markfallið skiptir; sviðsmynd 4 sýnir hvað hefði unnist með því að besta frá upphafi
 lotunnar. Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
