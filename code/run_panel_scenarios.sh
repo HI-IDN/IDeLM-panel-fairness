@@ -80,4 +80,4 @@ roles roles_presence_free --mode roles --pay-per presence --agenda "$R/free_agen
 # members editing only from the middle of the round.
 roles assign --mode assign --from-scratch --agenda "$R/current_agenda.csv" --time-limit 300
 PANEL="$R/assign_panel.csv" run assign_schedule --from-scratch --new-editor-from M5   --start "$R/assign_start_agenda.csv" --time-limit 1800
-PANEL="$R/assign_panel.csv" check assign_schedule --from-scratch --max-per-member 5
+PANEL="$R/assign_panel.csv" check assign_schedule --from-scratch --max-per-member 5 --new-editor-from M5
