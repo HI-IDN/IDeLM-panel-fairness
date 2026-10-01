@@ -129,7 +129,8 @@ Two further options apply to all the step modes:
   α slots of waiting; a slack of one or two lets the later steps do that.
 * `--no-worse-than <agenda.csv>` adds a step 0 that makes the total excess of each member's burden
   over their burden in a reference plan (e.g. the staff's meetings, scenario `current`) as small as
-  possible: zero when nobody needs to be worse off. The log lists anyone who still is.
+  possible: zero when nobody needs to be worse off. The log lists anyone who still is. The
+  comparison is of this round only; `--carry` does not enter it.
 
 Each step is held with a small tolerance (10⁻⁴, relative), since Gurobi accepts binaries within
 10⁻⁵ of 0 or 1 and a tighter hold can make the next step infeasible. Step 1 is held as one weighted

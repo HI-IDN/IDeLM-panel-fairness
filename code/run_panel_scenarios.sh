@@ -74,9 +74,10 @@ run scratch --from-scratch --start "$R/free_max4_agenda.csv" --time-limit 1800
 check scratch --from-scratch --max-per-member 5 --first-meeting-rule
 # Chapter 6: who of the three is editor, on the staff's reviewers. Equal pay per proposal on the
 # staff's meetings, and pay per slot sat through (which rewards waiting) on those and on scenario 2.
-roles roles --mode roles --agenda "$R/current_agenda.csv" --time-limit 300
-roles roles_presence --mode roles --pay-per presence --agenda "$R/current_agenda.csv" --time-limit 300
-roles roles_presence_free --mode roles --pay-per presence --agenda "$R/free_agenda.csv" --time-limit 300
+# The roles of M3, the next meeting, have been announced and are kept.
+roles roles --mode roles --keep-roles M3 --agenda "$R/current_agenda.csv" --time-limit 300
+roles roles_presence --mode roles --pay-per presence --keep-roles M3 --agenda "$R/current_agenda.csv" --time-limit 300
+roles roles_presence_free --mode roles --pay-per presence --keep-roles M3 --agenda "$R/free_agenda.csv" --time-limit 300
 # Chapter 7: everyone can review every proposal. Reviewers and roles from scratch (at most two
 # new members on a proposal), then meetings and order from scratch for that assignment, with new
 # members editing only from the middle of the round.

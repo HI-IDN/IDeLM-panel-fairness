@@ -310,8 +310,9 @@ class PanelScheduleModel:
                             A first step makes the total excess over it as small as possible, so
                             nobody is worse off than in that plan where the rules allow it
         carry:              {member: burden carried over from earlier rounds}, added to each
-                            member's burden in the fairness steps (lexburden, leximin) and the
-                            reference step
+                            member's burden in the fairness steps (lexburden, leximin). Not in
+                            the reference step: that compares this round with a plan for the
+                            same round, so a carry would cancel out
         """
         self.data = data
         self.alpha = alpha if isinstance(alpha, dict) else {r: alpha for r in data.members}
@@ -622,11 +623,11 @@ class PanelScheduleModel:
         """Commitment (alpha per meeting attended) plus waiting (slot of the last proposal)."""
         return quicksum(self.alpha[r] * self.a[r, m] + self.leave[r, m] for m in self.meetings_of[r])
 
-    def unpaid(self, r):
+    def unpaid(self, r, carry=True):
         """The burden the fairness steps compare: alpha per meeting attended plus waiting (proposals
-        of others sat through), plus what is carried over from earlier rounds. Own proposals are
-        paid work and are not counted."""
-        return (self.burden(r) - len(self.data.proposals_of(r))) + self.carry.get(r, 0.0)
+        of others sat through), plus what is carried over from earlier rounds (unless carry is
+        False). Own proposals are paid work and are not counted."""
+        return (self.burden(r) - len(self.data.proposals_of(r))) + (self.carry.get(r, 0.0) if carry else 0.0)
 
     def _ordered_levels(self):
         """Leximin by Ogryczak's ordered min-max: step k minimises the sum of the k largest burdens,
@@ -791,7 +792,8 @@ class PanelScheduleModel:
                     if r not in self.reference_burden:
                         continue
                     e = self.m.addVar(lb=0, name=f'excess_reference[{r}]')
-                    self.m.addConstr(e >= self.unpaid(r) - self.reference_burden[r] - self.carry.get(r, 0.0),
+                    # This round only: the reference plan is for the same round and has no carry.
+                    self.m.addConstr(e >= self.unpaid(r, carry=False) - self.reference_burden[r],
                                      name=f'excess_reference[{r}]')
                     excess.append(e)
                 excess = quicksum(excess)
