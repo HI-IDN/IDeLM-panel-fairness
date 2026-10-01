@@ -2,7 +2,7 @@
 # Read by the model and by the book (docs/model.qmd), which shows them as a table.
 # Command-line options override these values.
 
-alpha: 4              # cost of attending one meeting, in slots (same for every member)
+alpha: 2              # cost of attending one meeting, in slots (same for every member)
 max_per_meeting: 15   # most proposals one meeting can handle
 total_weight: 0.01    # weight of the total burden next to the worst-off member's burden
 coi_penalty: 1.0      # objective penalty each time a conflicted member is present

@@ -188,7 +188,7 @@ Read by both models and shown as a table in the book; command-line options overr
 
 | Setting | Value | Meaning |
 |---|---|---|
-| `alpha` | 4 (final runs: 2 via `--alpha`) | cost of attending a meeting, in slots |
+| `alpha` | 2 | cost of attending a meeting, in slots (chosen from an experiment with 0–4) |
 | `max_per_meeting` | 15 | most proposals in a meeting |
 | `max_per_member` / `soft_max_per_member` | 5 / 4 | hard limit and soft cap on own proposals in a meeting |
 | `soft_max_weight` | 0.5 | cost per proposal above the soft cap |
