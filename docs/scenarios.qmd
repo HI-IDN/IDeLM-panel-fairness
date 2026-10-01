@@ -71,7 +71,7 @@ if (!have_results) {
 
 ```{r}
 #| label: tbl-scenarios
-#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er tímamörk lausnarans; bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn."
+#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er tímamörk lausnarans; bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað."
 #| eval: !expr have_results
 solver <- read_solver_info(results)
 results_table <- summary_table(runs) %>%
@@ -93,8 +93,19 @@ display_table <- results_table %>%
   select(-Sviðsmynd) %>%
   mutate(`Dreifing funda` = "", .after = `Fundir sem mætt er á (bil)`) %>%
   mutate(`Dreifing biðpunkta` = "", .after = `Biðpunktar samtals`)
+# Bold the best (lowest) value in each column where lower is better.
+bold_best <- function(x) {
+  text <- format(round(x, 2), decimal.mark = ",", trim = TRUE)
+  best <- !is.na(x) & round(x, 2) == min(round(x, 2), na.rm = TRUE)
+  ifelse(best, paste0("<b>", text, "</b>"), text)
+}
+best_columns <- c("Mesta byrði", "Fundir samtals", "Biðpunktar samtals", "Fylgni funda og biðar",
+                  "Vanhæfir viðstaddir")
+display_table <- display_table %>% mutate(across(all_of(best_columns), bold_best))
+right_aligned <- names(display_table) %in% best_columns | sapply(display_table, is.numeric)
 display_table %>%
-  knitr::kable(format = "html", digits = 2, format.args = list(decimal.mark = ","), escape = FALSE) %>%
+  knitr::kable(format = "html", digits = 2, format.args = list(decimal.mark = ","), escape = FALSE,
+               align = ifelse(right_aligned, "r", "l")) %>%
   kableExtra::column_spec(which(names(display_table) == "Dreifing funda"), image = meetings_hist) %>%
   kableExtra::column_spec(which(names(display_table) == "Dreifing biðpunkta"), image = waiting_hist)
 ```
