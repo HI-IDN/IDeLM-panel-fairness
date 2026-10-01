@@ -55,7 +55,8 @@ skref.
 * **Gagnsæi.** Þriggja þrepa bestun, sem veltur á tímamörkum, er erfitt fyrir fagráðsmenn að
   sannreyna sjálfir. Einfaldar, birtar reglur (hámark, regla um að sá sem beið síðast fari fyrr
   næst) gætu sannfært betur, og líkanið mætti nota til að sýna hvað þær kosta.
-* **Óskir um fundi.** $\alpha_r$ er það sama fyrir alla. Óskir fagráðsmanna um umsóknir eru
+* **Óskir um fundi.** Líkanið getur haft sérstakt $\alpha_r$ fyrir hvern fagráðsmann, en í þessari
+  bók er það það sama fyrir alla, því ekki hefur verið spurt um mat þeirra. Óskir fagráðsmanna um umsóknir eru
   þegar merktar í kerfi TÞS (*vil ekki*, *sama*, *vil gjarnan*) og eiga heima í pöruninni. Við það
   mætti bæta óskum um fundi: hvaða vikudagar henta hverjum og einum, og hvort viðkomandi vilji frekar
   mæta sjaldnar og sitja lengur eða oftar og styttra ($\alpha_r$). Sama á við um fundi sem hver og
@@ -79,9 +80,12 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   byrði [@ogryczak2003]. Það má stytta eftir nokkur stig. Fyrir hvert stig ætti að birta verðið á
   sanngirninni: hversu mikil heildarbið bætist við.
 * **Svigrúm í fyrsta þrepi** (*í kóða*). Leyfa nokkrum fundum fleiri en lágmarkið í þrepi 1, eða besta byrðina
-  $\alpha \cdot$ fundir + bið beint, svo $\alpha$ vegi í raun fundi á móti bið. Rekja má
-  Pareto-framlínuna milli fjölda funda, mestu byrði og heildarbiðar og leyfa hagaðilum að velja
-  punkt á henni.
+  $\alpha \cdot$ fundir + bið beint, svo $\alpha$ vegi í raun fundi á móti bið.
+* **Pareto-framlína.** Markmiðin þrjú, fjöldi funda, mesta byrði og heildarbið, togast á. Í stað
+  þess að festa röð þeirra fyrir fram má rekja framlínuna: þau plön þar sem ekki er hægt að bæta
+  eitt markmið án þess að annað versni, t.d. með því að herða skorður á einu markmiði í skrefum
+  (e. *ε-constraint*) og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji sjálf
+  punkt á henni og sjái hvað hver kostur kostar.
 * **Enginn verr settur en í tillögu starfsmanna** (*í kóða*). Skorða sem tryggir að byrði hvers fagráðsmanns sé
   ekki meiri en í tillögu starfsmanna, og birta hve margir eru betur settir.
 * **Skipta vandanum upp.** Fyrst fundir, svo röð innan hvers fundar, sem er einfalt verkefni á einni
@@ -89,8 +93,9 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   (e. *set partitioning*, *branch-and-price*) lokað bilinu.
 * **Sanngirnismælikvarðar í hverri niðurstöðu** (*í kóða*). Gini-stuðull eða hlutfall hæstu og lægstu byrði,
   fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður miðað við `lexsum`.
-* **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir.** Líkanið styður þegar sérstakt $\alpha_r$
-  fyrir hvern og einn.
+* **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir** (*$\alpha_r$ í kóða*). Líkanið les nú
+  $\alpha_r$ fyrir hvern og einn úr skrá (`alpha_file`). Eftir er að spyrja fagráðsmenn og leyfa
+  þeim líka að velja markgildi eigin umsókna á fund.
 * **Byrði á fund.** Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og í APAP
   (@sec-fairness-relative).
 * **Óvissa.** Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða traust bestun),

@@ -266,7 +266,8 @@ tibble(
                  "Refsing fyrir frestun af næsta fundi", "Mest hlutfall ritstjóra hjá nýjum (kafli 6)"),
   Tákn = c("$\\alpha_r$", "$\\bar K$", "", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_r$", "$t_r$",
            "$g$", "$q$", "$\\rho$"),
-  Gildi = c(paste(num(config$alpha), "dagskrárliðir fyrir alla"), num(config$max_per_meeting),
+  Gildi = c(if (is.null(config$alpha_file)) paste(num(config$alpha), "dagskrárliðir fyrir alla")
+            else paste(num(config$alpha), "dagskrárliðir, nema þeir sem eru í", config$alpha_file), num(config$max_per_meeting),
             num(config$total_weight), num(config$coi_penalty), paste(num(config$time_limit), "sek."),
             if (is.null(config$unavailable)) "engir skráðir ($U_r = \\emptyset$)" else config$unavailable,
             if (is.null(config$max_per_member)) "ekkert hámark" else num(config$max_per_member),
