@@ -367,14 +367,17 @@ class PanelScheduleModel:
     def _allowed(self, p):
         """Meetings a proposal may go to. Meetings one of its members can't attend are left out
         (not held ones: they already happened). A proposal fixed to a meeting not yet held that one
-        of its members can't attend has nowhere to go, so that is reported as an error rather than
-        left as an infeasible model."""
+        of its members can't attend, or that is before its not_before meeting, has nowhere to go, so
+        that is reported as an error rather than left as an infeasible or invalid model."""
         away = {m for r in self.data.reviewers[p] for m in self.data.unavailable.get(r, ())} - self.held
         if p in self.fixed_meeting:
             m = self.fixed_meeting[p]
             if m in away:
                 absent = [r for r in self.data.reviewers[p] if m in self.data.unavailable.get(r, ())]
                 raise ValueError(f'{p} is fixed to {m}, which {", ".join(absent)} cannot attend')
+            first = self.not_before.get(p)
+            if first and m not in self.held and self.data.meetings.index(m) < self.data.meetings.index(first):
+                raise ValueError(f'{p} is fixed to {m}, before {first} where it may first go')
             return [m]
         open_meetings = [m for m in self.data.meetings
                          if m not in self.closed and m != self.next_meeting and m not in away]
