@@ -1,6 +1,6 @@
 # Kóði {.unnumbered #sec-code}
 
-Allur kóði bókarinnar og líkananna er opinn á GitHub:
+Allur kóði greinargerðarinnar og líkananna er opinn á GitHub:
 <https://github.com/HI-IDN/IDeLM-panel-fairness>. Þar er líka lýst hvernig á að setja upp og
 keyra hann. Hér er aðeins sagt í stuttu máli hvernig safnið er byggt upp.
 
@@ -12,19 +12,19 @@ safnið. Kerfi TÞS gæti skilað sömu skrá beint.
 **Líkönin** eru skrifuð í Python og leyst með Gurobi:
 
 * fundalíkanið ákveður á hvaða fundi hver umsókn er tekin fyrir og í hvaða röð (@sec-model), og
-  stillingar þess eru í sérstakri skrá sem bókin les líka;
+  stillingar þess eru í sérstakri skrá sem greinargerðin les líka;
 * hlutverkalíkanið ákveður hver er ritstjóri og hvor lesaranna talar á undan, eða úthlutar öllum
   umsóknum frá grunni (@sec-roles, @sec-assign);
 * sérstakt eftirlit fer yfir hverja dagskrá og staðfestir að hún fylgi reglum sinnar sviðsmyndar;
 * sérstakt forrit raðar hverjum fundi dagskrár nákvæmlega, án þess að færa umsóknir á milli funda,
   og ber saman við gefna röð.
 
-**Keyrslurnar.** Ein skrifta keyrir allar sviðsmyndir bókarinnar í röð, þar sem hver byrjar á
-lausn þeirrar á undan. Önnur skrifta afritar niðurstöðurnar, dulkóðaðar, á þann stað sem bókin les
+**Keyrslurnar.** Ein skrifta keyrir allar sviðsmyndir greinargerðarinnar í röð, þar sem hver byrjar á
+lausn þeirrar á undan. Önnur skrifta afritar niðurstöðurnar, dulkóðaðar, á þann stað sem greinargerðin les
 þær. Keyrsluskrár Gurobi fara ekki í safnið, því þær geyma upplýsingar um leyfið.
 
 **Myndir og töflur** eru gerðar í R með ggplot2: ein skrá fyrir gögnin (@sec-data) og önnur fyrir
 niðurstöður líkananna.
 
-**Bókin sjálf** er skrifuð í Quarto. Hún er byggð og birt sjálfkrafa á GitHub Pages í hvert sinn
+**Greinargerðin sjálf** er skrifuð í Quarto. Hún er byggð og birt sjálfkrafa á GitHub Pages í hvert sinn
 sem breyting er sett á aðalgreinina.

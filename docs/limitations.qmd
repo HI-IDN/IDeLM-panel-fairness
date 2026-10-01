@@ -34,7 +34,7 @@ skref.
   þrepamarkfallinu er hvert þrep fest við það sem fannst, svo seinni þrep byggja á ónákvæmu gildi.
   Munur á sviðsmyndum getur því að hluta stafað af leitinni. Fundir eftir næsta fund eru innbyrðis
   skiptanlegir, sem gerir erfitt að loka bilinu. Röðunin innan funda er þó ekki orsökin. Með fundina
-  fasta má finna bestu röð hvers fundar nákvæmlega (`order_meetings.py`). Í dagskrám bókarinnar var
+  fasta má finna bestu röð hvers fundar nákvæmlega (`order_meetings.py`). Í dagskrám greinargerðarinnar var
   röðunin þegar sú besta, eða innan 1–2 % af henni, án þess að neinn sæti lengur, og mesta byrðin
   breyttist hvergi. Bilið liggur því í vali funda og sanngirnisþrepunum.
 * **Mæta oft, fara snemma, aðeins efst.** `lexburden` umbunar tíðri mætingu með því að leyfa
@@ -60,7 +60,7 @@ skref.
   sannreyna sjálfir. Einfaldar, birtar reglur (hámark, regla um að sá sem beið síðast fari fyrr
   næst) gætu sannfært betur, og líkanið mætti nota til að sýna hvað þær kosta.
 * **Óskir um fundi.** Líkanið getur haft sérstakt $\alpha_r$ fyrir hvern fagráðsmann, en í þessari
-  bók er það það sama fyrir alla, því ekki hefur verið spurt um mat þeirra. Óskir fagráðsmanna um umsóknir eru
+  greinargerð er það það sama fyrir alla, því ekki hefur verið spurt um mat þeirra. Óskir fagráðsmanna um umsóknir eru
   þegar merktar í kerfi TÞS (*vil ekki*, *sama*, *vil gjarnan*) og eiga heima í pöruninni. Við það
   mætti bæta óskum um fundi: hvaða vikudagar henta hverjum og einum, og hvort viðkomandi vilji frekar
   mæta sjaldnar og sitja lengur eða oftar og styttra ($\alpha_r$). Sama á við um fundi sem hver og

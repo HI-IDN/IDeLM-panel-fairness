@@ -135,7 +135,7 @@ markfallsins. Þegar nýjar keyrslur koma þarf að geyma gömlu tölurnar sérs
 proposal) eða breyta textanum. -->
 Fyrsta útgáfa líkansins bar byrði saman á hverja umsókn: byrði fagráðsmanns deilt með fjölda umsókna
 hans, og líkanið lágmarkaði hana hjá þeim sem verst var settur. Það leit sanngjarnt út, en faldi
-gallann sem bókin byrjaði á. Sá sem hefur margar umsóknir þarf að mæta á marga fundi, og þegar
+gallann sem greinargerðin byrjaði á. Sá sem hefur margar umsóknir þarf að mæta á marga fundi, og þegar
 biðinni er deilt með mörgum umsóknum virðist hún lítil, jafnvel þótt hann sitji lengi á hverjum
 fundi. Í þeim niðurstöðum biðu þeir mest sem mættu oftast: fylgni (Spearman) milli fjölda funda og
 biðpunkta var `r num(rho_old[["current"]])` í sviðsmynd 1 og `r num(rho_old[["free"]])` í sviðsmynd 2.
@@ -154,7 +154,7 @@ mætir á einum fundi fleiri en annar má bíða $\alpha_r$ dagskrárliðum skem
   fyrr fyrir vikið.
 * Með byrði **á umsókn** fær sá sem les mikið afslátt af biðinni, sem var gallinn hér að ofan.
 
-Þessi bók velur heildarbyrði. Byrði á fund er eðlilegur samanburður sem vert er að skoða
+Þessi greinargerð velur heildarbyrði. Byrði á fund er eðlilegur samanburður sem vert er að skoða
 (@sec-limitations).
 
 ## Tímabilið
@@ -187,4 +187,4 @@ sitja meðvitað lengri fundi, svo þeir fái að hlusta á umræður reyndari f
 aðferðafræðina við úrvinnslu umsókna. Í líkaninu má gera það með lægra $\alpha_r$ eða minni vigt á
 bið hjá nýjum fagráðsmönnum.
 
-Þessi bók byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.
+Þessi greinargerð byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.

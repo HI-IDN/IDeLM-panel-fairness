@@ -33,7 +33,7 @@ sífellt mikilvægara eftir því sem umsóknum fjölgar og álagið vex.
 
 ## Frumgerð
 
-Þessi bók er frumgerð (e. *proof of concept*). Hún sýnir, á einni umsóknarlotu af raunverulegum
+Þessi greinargerð er frumgerð (e. *proof of concept*). Hún sýnir, á einni umsóknarlotu af raunverulegum
 (dulkóðuðum) gögnum, að hægt er að gera fundaskipan sanngjarnari með gagnsæju líkani. Tillaga mín
 er að TÞS taki verkefnið áfram sem **sumarverkefni nemenda** með styrk úr Nýsköpunarsjóði
 námsmanna (NSN): nemendur þróa líkanið og verkfærin áfram og með aðstoð upplýsingatæknideildar

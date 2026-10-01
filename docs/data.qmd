@@ -29,7 +29,7 @@ Gögnin koma úr tveimur áttum: núverandi tillögu að fundaskipan í kerfi T�
 hvaða fundi, ritstjóri, lesarar og vanhæfi) og dagskrá þeirra `r n_held` funda sem þegar hafa
 verið haldnir, sem hefur verið sent með tölvupósti.
 
-Allt í þessari bók er dulkóðað:
+Allt í þessari greinargerð er dulkóðað:
 
 * fagráðsmenn eru `R01`–`R`r nrow(members)`` og umsóknir `A001`–`A`r nrow(panel)``, úthlutað í
   slembiröð;
