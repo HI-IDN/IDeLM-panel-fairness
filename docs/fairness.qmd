@@ -109,8 +109,10 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   heldur mestu byrðinni niðri.
 * **Fylgni funda og biðar** (Spearman) yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
   oftast bíða líka mest, sem er einmitt það sem sanngjörn dagskrá á að forðast.
-* **Öfug pör:** pör fagráðsmanna þar sem sá sem mætir oftar bíður líka lengur samtals. Í sanngjarnri
-  dagskrá ættu þau að vera fá.
+* **Öfug pör:** sá sem mætir á fleiri fundi ætti að fá að fara fyrr af þeim og bíða því minna
+  samtals. Berum alla fagráðsmenn saman tvo og tvo. Ef A mætir á fleiri fundi en B *og* bíður
+  samt lengur samtals, þá er A verr settur á báða vegu og parið er *öfugt*. Talið er hve mörg
+  slík pör eru; í sanngjarnri dagskrá ættu þau að vera fá.
 * **Gini-stuðull byrðar** og **raðaður byrðarvigur**, stærsta byrði fyrst. Tvö plön eru borin saman
   með leximin-röð: fyrsta sætið þar sem vigrarnir eru ólíkir ræður.
 
