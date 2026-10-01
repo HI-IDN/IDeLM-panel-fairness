@@ -204,10 +204,10 @@ við tvö þrep á undan öllum hinum. Fyrst eru refsiliðirnir fyrir reglurnar 
 (vanhæfur viðstaddur, frestun) og festir. Síðan kemur þrep 0:
 
 $$
-\min \;\; \underbrace{\sum_r \big(B_r - B_r^{\text{við}}\big)^+}_{\text{byrði umfram viðmiðunarplan}} ,
+\min \;\; \underbrace{\sum_r \big(B_r - B_r^{0}\big)^+}_{\text{byrði umfram viðmiðunarplan}} ,
 $$
 
-þar sem $B_r^{\text{við}}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu, reiknuð úr dagskrá þess
+þar sem $B_r^{0}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu, reiknuð úr dagskrá þess
 með sama $\alpha_r$ og óstýfð. Ef reglurnar leyfa er gildið 0 og enginn er verr settur en þar;
 annars er umframbyrðin eins lítil og hægt er. Byrði úr fyrri lotum (hér að neðan) er ekki með í
 þessum samanburði, því viðmiðunarplanið er fyrir sömu lotu. Reglurnar koma fyrst því þrep 0 er
