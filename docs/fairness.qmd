@@ -113,8 +113,15 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   samtals. Berum alla fagráðsmenn saman tvo og tvo. Ef A mætir á fleiri fundi en B *og* bíður
   samt lengur samtals, þá er A verr settur á báða vegu og parið er *öfugt*. Talið er hve mörg
   slík pör eru; í sanngjarnri dagskrá ættu þau að vera fá.
-* **Gini-stuðull byrðar** og **raðaður byrðarvigur**, stærsta byrði fyrst. Tvö plön eru borin saman
-  með leximin-röð: fyrsta sætið þar sem vigrarnir eru ólíkir ræður.
+* **Gini-stuðull byrðar:** einn tölustafur á bilinu 0 til 1 um hversu ójafnt byrðin dreifist; 0 þýðir
+  að allir bera jafnt.
+* **Raðaður byrðarvigur:** byrði allra fagráðsmanna, raðað frá þeim sem ber mest til þess sem ber
+  minnst. Tvö plön eru borin saman sæti fyrir sæti. Fyrst er litið á þann sem ber mest í hvoru
+  plani: það plan þar sem hann ber minna er sanngjarnara. Ef þeir bera jafnt er litið á þann sem ber
+  næstmest, og svo koll af kolli. Þetta kallast *leximin*-röð (stytting á *lexicographic maximin*,
+  eins og orðaröð í orðabók). Dæmi: plan með byrðina (10, 8, 3) er sanngjarnara en (10, 9, 1), því
+  þeir sem bera mest bera jafnt (10) en sá sem ber næstmest ber minna (8 á móti 9), þótt sá sem ber
+  minnst beri meira í fyrra planinu.
 
 Allir mælikvarðarnir eru reiknaðir úr dagskránni sjálfri.
 

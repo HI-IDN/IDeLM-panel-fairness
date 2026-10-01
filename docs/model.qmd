@@ -185,7 +185,8 @@ Fjórar viðbætur taka á fyrirvörunum hér að neðan. Engin þeirra hefur en
 sviðsmyndunum.
 
 `leximin` kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; `leximin` ver líka þann næstverst setta, þann
-þar á eftir o.s.frv. Það er útfært með raðaðri lágmörkun hámarks [e. *ordered min-max*, @ogryczak2003]:
+þar á eftir o.s.frv. Þetta er sama leximin-röð og lýst var í kaflanum um sanngirni: fyrst er
+byrði þess sem ber mest gerð sem minnst, svo byrði þess sem ber næstmest, og svo koll af kolli. Það er útfært með raðaðri lágmörkun hámarks [e. *ordered min-max*, @ogryczak2003]:
 í undirþrepi $k$ er summa $k$ stærstu byrðanna gerð sem minnst og síðan fest,
 
 $$
