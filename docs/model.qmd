@@ -46,7 +46,8 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 * $U_r \subseteq M$: fundir sem fagráðsmaður $r$ kemst ekki á.
 * $V_p \subseteq R$: fagráðsmenn sem eru vanhæfir í umsókn $p$.
 * $m^*$: næsti fundur, og $N \subseteq P$: umsóknir sem eru auglýstar á hann.
-* $\bar k$: mesti fjöldi eigin umsókna sem fagráðsmaður má hafa á einum fundi.
+* $\bar k$: mesti fjöldi eigin umsókna sem fagráðsmaður má hafa á einum fundi, og $\bar k_s \le \bar k$
+  mjúkt hámark sem kostar að fara yfir.
 * $t_r$: markgildi fyrir fjölda eigin umsókna á hverjum fundi sem fagráðsmaður $r$ mætir á
   (t.d. `r num(config$target_experienced)` fyrir reynda og `r num(config$target_new)` fyrir nýja).
 
@@ -58,10 +59,11 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 * $a_{rm} \in \{0,1\}$: fagráðsmaður $r$ þarf að mæta á fund $m$.
 * $\ell_{rm} \ge 0$: dagskrárliðurinn eftir sem fagráðsmaður $r$ má fara af fundi $m$ (0 ef hann
   mætir ekki).
-* $z \ge 0$: mesta byrði á umsókn meðal allra fagráðsmanna.
+* $z \ge 0$: mesta byrði meðal allra fagráðsmanna (skref 2 hér að neðan).
 * $v_{prm} \in \{0,1\}$: vanhæfur fagráðsmaður $r$ er viðstaddur þegar umsókn $p$ er tekin fyrir á
   fundi $m$ (frávik frá mjúku skorðunni).
 * $d_{rm} \ge 0$: frávik fagráðsmanns $r$ frá markgildi sínu á fundi $m$.
+* $o_{rm} \ge 0$: fjöldi eigin umsókna fagráðsmanns $r$ á fundi $m$ umfram mjúka hámarkið $\bar k_s$.
 
 **Skorður**
 
@@ -79,7 +81,8 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 | Fagráðsmaður situr þar til síðasta umsókn hans er afgreidd (ein skorða fyrir hverja umsókn hans) | $\ell_{rm} \ge \sum_{k} k\, x_{pmk} \quad \forall r,\ p \in P_r,\ m$ |
 | Vanhæfur fagráðsmaður er farinn áður en umsóknin er tekin fyrir (mjúk skorða) | $\sum_{k} k\, x_{pmk} \ge \ell_{rm} + 1 - (\bar K + 1)\left(1 - \sum_{k} x_{pmk} + v_{prm}\right) \quad \forall p,\ r \in V_p,\ m$ |
 | Fjöldi eigin umsókna á fundi er nálægt markgildi (mjúk skorða) | $d_{rm} \ge \left\lvert\, \sum_{p \in P_r} \sum_{k} x_{pmk} - t_r\, a_{rm} \right\rvert \quad \forall r,\ m$ |
-| $z$ er byrði á umsókn hjá verst setta fagráðsmanninum | $B_r \le z \, n_r \quad \forall r$ |
+| Fjöldi eigin umsókna yfir mjúku hámarki $\bar k_s$ | $o_{rm} \ge \sum_{p \in P_r} \sum_{k} x_{pmk} - \bar k_s \quad \forall r,\ m \ne m_1$ |
+| $z$ er byrði verst setta fagráðsmannsins | $B_r \le z \quad \forall r$ |
 
 Skorðurnar um mætingu og setu eru settar fyrir hverja umsókn $p$ fagráðsmanns sérstaklega. Þar sem
 hver umsókn er tekin fyrir einu sinni er $\sum_k x_{pmk} \in \{0, 1\}$, svo $a_{rm}$ helst
@@ -87,11 +90,21 @@ tvíundarbreyta þótt fagráðsmaður hafi margar umsóknir á sama fundi. Sama
 $\bar k \, a_{rm} \ge \sum_{p \in P_r} \sum_k x_{pmk}$, er líka rétt en gefur veikari slökun, og því
 gengur lausnaranum verr að loka bilinu.
 
-Byrði fagráðsmanns $r$ yfir lotuna er binding auk biðar:
+**Bið og byrði**
+
+Fagráðsmaður $r$ situr samtals $\sum_m \ell_{rm}$ dagskrárliði yfir lotuna, þar af $n_r$ með eigin
+umsóknir. Bið hans, $w_r$, eru biðpunktarnir úr @sec-fairness: umsóknir annarra sem hann situr undir.
+Byrði hans, $B_r$, er binding auk biðar:
 
 $$
-B_r = \sum_{m \in M} \left( \alpha_r \, a_{rm} + \ell_{rm} \right).
-$$
+w_r = \underbrace{\sum_{m \in M} \ell_{rm}}_{\text{dagskrárliðir setnir}} - \underbrace{n_r}_{\text{eigin umsóknir}},
+\qquad
+B_r = \alpha_r \underbrace{\sum_{m \in M} a_{rm}}_{\text{fundir sem mætt er á}} \;+\; \underbrace{w_r}_{\text{bið}} .
+$$ {#eq-burden}
+
+Eigin umsóknir teljast ekki til byrðar. Þær eru launuð vinna, og sá sem les fleiri umsóknir á ekki
+að fá fleiri ólaunaðar stundir á fundum fyrir vikið. Byrðin er heldur ekki deilt með fjölda umsókna,
+sjá @sec-fairness-relative.
 
 **Greiðslur**
 
@@ -113,31 +126,88 @@ Greiðsla á umsókn er því á bilinu $f_L$ (eingöngu lesari) til $f_E$ (eing
 viðbættum hlut grunngjaldsins, $f_0 / n_r$. Greiðslan $G_r$ ræðst eingöngu af hlutverkum og breytist
 því ekki með fundaskipan.
 
-**Markfall**
+**Markfall í þrepum**
+
+Markmiðin eru ólík að eðli og vega ekki jafnt, svo líkanið er leyst í þremur þrepum (e.
+*lexicographic optimisation*). Hvert þrep er bestað, gildið sem náðist er fest sem skorða, og svo er
+næsta þrep bestað. Seinna þrep getur því aldrei keypt sér betra gildi með því að gera fyrra þrep verra.
+
+*Þrep 1: fundir.* Fyrst eru fundir sem mæta þarf á sem fæstir, að teknu tilliti til reglnanna:
 
 $$
 \begin{aligned}
-\min \;\; & \underbrace{z}_{\text{verst setti fagráðsmaðurinn}}
-\;+\; w \, \underbrace{\frac{1}{|R|} \sum_{r \in R} B_r}_{\text{meðalbyrði}}
-\;+\; c \, \underbrace{\sum_{p, r, m} v_{prm}}_{\text{vanhæfur bregður sér út}} \\
-& \;+\; g \, \underbrace{\frac{1}{|R|} \sum_{r, m} d_{rm}}_{\text{frávik frá markgildi}}
+F_1 = \min \;\; & \underbrace{\sum_{r, m} a_{rm}}_{\text{fundir sem mætt er á}}
 \;+\; q \, \underbrace{\sum_{p \in N} \Big(1 - \sum_k x_{p m^* k}\Big)}_{\text{frestað af næsta fundi}}
+\;+\; c \, \underbrace{\sum_{p, r, m} v_{prm}}_{\text{vanhæfur bregður sér út}} \\
+& \;+\; g \, \underbrace{\sum_{r, m} d_{rm}}_{\text{frávik frá markgildi}}
+\;+\; s \, \underbrace{\sum_{r, m} o_{rm}}_{\text{yfir mjúku hámarki}}
 \end{aligned}
+$$
+
+*Þrep 2: verst setti fagráðsmaðurinn.* Með þrep 1 fast er mesta byrðin gerð sem minnst:
+
+$$
+F_2 = \min \;\; \underbrace{z}_{\text{mesta byrði}}
+\;+\; \varepsilon \, \underbrace{\sum_{r} w_r}_{\text{heildarbið}}
+\qquad \text{þ.a.} \quad F_1\text{-liðirnir} \le F_1^*, \quad B_r \le z \;\; \forall r .
+$$
+
+*Þrep 3: heildarbið.* Með þrep 1 og 2 föst er heildarbiðin gerð sem minnst:
+
+$$
+\min \;\; \underbrace{\sum_{r} w_r}_{\text{heildarbið}}
+\;-\; \lambda \, \underbrace{\sum_{r \in R^{\text{nýr}}} \sum_{m \in M^{\text{fyrri}}} \Big(\ell_{rm} - \sum_{p \in P_r} \sum_k x_{pmk}\Big)}_{\text{nýir sitja lengur fyrri hluta lotunnar}}
+\qquad \text{þ.a.} \quad F_1\text{-liðirnir} \le F_1^*, \quad z \le F_2^* .
 $$
 
 Á mannamáli:
 
-* **Verst setti fagráðsmaðurinn** ræður mestu. $z$ er byrði á umsókn hjá þeim sem verst er
-  settur, og líkanið gerir hana eins litla og hægt er. Hinir mega vera betur settir; það er ekki
-  refsað fyrir að einhver sleppi vel.
-* **Meðalbyrði**, með lítilli vigt $w$, gerir út um jafntefli. Án hennar gæti líkanið látið alla
-  aðra bíða að óþörfu, svo lengi sem enginn fer upp fyrir þann verst setta.
-* **Vanhæfur bregður sér út**: hvert skipti sem vanhæfur fagráðsmaður á enn eftir eigin umsókn
-  þegar umsóknin sem hann er vanhæfur í er tekin fyrir, og þarf því að fara út og koma inn aftur
-  (vigt $c$). Að vera á sama fundi er í lagi ef hann er farinn áður.
-* **Frávik frá markgildi** (vigt $g$, aðeins í sviðsmynd 4) heldur fjölda eigin umsókna á hverjum
-  fundi nálægt markgildi fagráðsmannsins.
-* **Frestað af næsta fundi** (vigt $q$) kostar, svo umsókn sé aðeins frestað ef þörf krefur.
+* **Fundir sem mætt er á** (þrep 1) eru fyrsta forgangsmál: kvöld sem fagráðsmaður þarf ekki að
+  mæta er frjálst kvöld. Í sama þrepi eru reglurnar sem eiga að halda fundunum skynsamlegum:
+  **frestun** af næsta fundi kostar $q$ fyrir hverja umsókn, **vanhæfur sem bregður sér út** kostar
+  $c$, **frávik frá markgildi** (fjöldi eigin umsókna á fundi nálægt $t_r$) kostar $g$ og hver
+  umsókn **yfir mjúka hámarkinu** $\bar k_s$ kostar $s$.
+* **Mesta byrði** (þrep 2) er sanngirnisþrepið. Þar sem byrðin er $\alpha_r$ á hvern fund auk biðar
+  má fagráðsmaður sem mætir á einum fundi fleiri bíða $\alpha_r$ dagskrárliðum skemur en hinn, og
+  þeir sem mæta oft fá því að fara fyrr. **Heildarbið** með örlítilli vigt $\varepsilon$ velur á milli
+  jafngóðra lausna.
+* **Heildarbið** (þrep 3) nýtir það svigrúm sem eftir er: enginn bíður að óþörfu, svo lengi sem
+  enginn fer upp fyrir mestu byrðina úr þrepi 2. Nýir fagráðsmenn ($R^{\text{nýr}}$) fá lítinn
+  **afslátt** $\lambda$ fyrir að sitja lengur á fyrri helmingi lotunnar ($M^{\text{fyrri}}$), því þeir
+  læra af umræðunni hvort sem er.
+
+Í kóðanum heitir þetta markfall `lexburden`. Til samanburðar er `lexsum`, sem sleppir þrepi 2: fæstir
+fundir og síðan minnsta heildarbið, hver sem ber hana. Munurinn á þeim tveimur er verðið á
+sanngirninni.
+
+::: {.callout-note}
+## Fyrra markfall
+
+Fyrri útgáfur líkansins, og niðurstöðurnar sem nú eru í @sec-scenarios, @sec-roles og @sec-assign,
+notuðu eitt vegið markfall: mestu byrði *á umsókn* (dagskrárliðir setnir, eigin umsóknir meðtaldar,
+auk $\alpha_r$ á fund, deilt með $n_r$), að viðbættri meðalbyrði með lítilli vigt og sömu refsiliðum
+og í þrepi 1. Það umbunaði ekki beint tíðri mætingu og sá sem mætti oft beið líka oft lengi. Þær
+niðurstöður verða endurnýjaðar með þrepamarkfallinu.
+:::
+
+**Fyrirvarar við þrepamarkfallið**
+
+* **Aðeins sá verst setti er varinn.** Þrep 2 heldur mestu byrðinni niðri, en neðan hennar
+  lágmarkar þrep 3 aðeins heildarbið. Það er sama aðferð og olli upphaflega vandanum: sá sem mætir
+  oft getur enn beðið lengur en sá sem mætir sjaldan, svo lengi sem hvorugur er sá verst setti. Á
+  litlum tilbúnum dæmum helmingaði þrepamarkfallið um það bil fjölda slíkra para miðað við `lexsum`,
+  en *leximin*, sem ver næstverst setta, þann þar á eftir o.s.frv., fækkaði þeim enn frekar.
+* **Sanngirni sem fæst ókeypis er ekki alltaf tekin.** Í nokkrum tilbúnum dæmum var til önnur lausn
+  með sömu heildarbið þar sem næstverst settu fagráðsmennirnir voru betur settir.
+* **Þrep 1 ræður fjölda funda áður en $\alpha$ hefur nokkuð að segja.** $\alpha$ vegur fundi á móti
+  bið í þrepi 2, en þá er fjöldi funda þegar festur. Í raun metur þrep 1 einn fund meira en hvaða
+  bið sem er. Hámarkið $\bar k$ og markgildin $t_r$ halda aftur af því, en $\alpha$ hefur minni áhrif
+  en ætla mætti.
+* **Þrep 1 er vegin summa**, ekki hreinn fjöldi funda: seinni þrep geta ekki skipt einum fundi
+  fyrir eitt skipti sem vanhæfur bregður sér út, því summan er fest í heild.
+* **Bil í hverju þrepi.** Hvert þrep fær hluta tímamarkanna og er fest við bestu lausn sem fannst,
+  ekki sannað besta gildi. Með 50–90 % bili er „lagskipt sanngjarnt“ því að hluta eiginleiki
+  leitarinnar. Bilið í hverju þrepi er skráð og ætti að fylgja niðurstöðunum.
 
 **Stillingar**
 
@@ -148,17 +218,20 @@ Stillingarnar eru lesnar úr `code/models/panel_model.yml`, sömu skrá og líka
 #| tbl-cap: "Stillingar líkansins."
 tibble(
   Færibreyta = c("Kostnaður við að mæta á fund", "Mesti fjöldi umsókna á fundi",
-                 "Vigt heildarbyrði", "Refsing fyrir vanhæfan viðstaddan", "Tímamörk bestunar",
+                 "Vigt heildarbyrði (fyrra markfall)", "Refsing fyrir vanhæfan viðstaddan", "Tímamörk bestunar",
                  "Fundir sem fagráðsmenn komast ekki á", "Mest umsóknir á fagráðsmann á fundi",
+                 "Mjúkt hámark umsókna á fagráðsmann á fundi", "Vigt umsókna yfir mjúku hámarki",
                  "Allir mæta á fyrsta fund með eina umsókn", "Markgildi á fund, reyndir",
                  "Markgildi á fund, nýir", "Vigt fráviks frá markgildi",
                  "Refsing fyrir frestun af næsta fundi", "Mest hlutfall ritstjóra hjá nýjum (kafli 6)"),
-  Tákn = c("$\\alpha_r$", "$\\bar K$", "$w$", "$c$", "", "$U_r$", "$\\bar k$", "", "$t_r$", "$t_r$",
+  Tákn = c("$\\alpha_r$", "$\\bar K$", "", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_r$", "$t_r$",
            "$g$", "$q$", "$\\rho$"),
   Gildi = c(paste(num(config$alpha), "dagskrárliðir fyrir alla"), num(config$max_per_meeting),
             num(config$total_weight), num(config$coi_penalty), paste(num(config$time_limit), "sek."),
             if (is.null(config$unavailable)) "engir skráðir ($U_r = \\emptyset$)" else config$unavailable,
             if (is.null(config$max_per_member)) "ekkert hámark" else num(config$max_per_member),
+            if (is.null(config$soft_max_per_member)) "ekkert" else num(config$soft_max_per_member),
+            num(config$soft_max_weight),
             if (isTRUE(config$first_meeting_rule)) "já" else "nei",
             paste(num(config$target_experienced), "umsóknir"), paste(num(config$target_new), "umsóknir"),
             num(config$target_weight), num(config$postpone_penalty),

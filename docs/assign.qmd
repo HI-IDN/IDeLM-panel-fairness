@@ -23,6 +23,12 @@ if (have_schedule) {
 }
 ```
 
+::: {.callout-warning}
+## Niðurstöður með fyrra markfalli
+Niðurstöðurnar í þessum kafla eru úr keyrslum með fyrra markfallinu (byrði á umsókn, $\alpha = 4$), ekki
+þrepamarkfallinu sem lýst er í @sec-model. Þær verða endurnýjaðar þegar nýjar keyrslur liggja fyrir.
+:::
+
 Hvað ef allir fagráðsmenn væru jafnhæfir til að fjalla um allar umsóknir, og lotan væri skipulögð
 frá grunni? Þá mætti skipta álaginu jafnt, svo enginn beri áberandi meira en aðrir. Þetta er
 einföldun: í raun skipta hæfni, fyrri yfirferð og óskir fagráðsmanna máli. Samanburðurinn sýnir

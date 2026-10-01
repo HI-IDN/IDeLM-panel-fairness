@@ -30,11 +30,29 @@ skref.
   fagráðsmann sem fjallar um hana, og styttri ef umsóknin hefur komið áður. Líkanið myndi þá
   mæla bið í tíma frekar en í fjölda umsókna.
 * **Bil í lausn.** Bestaðar dagskrár eru þær bestu sem fundust innan tímamarka, ekki sannaðar
-  bestu lausnir. Fundir eftir næsta fund eru innbyrðis skiptanlegir, sem gerir erfitt að loka
-  bilinu; að brjóta samhverfu eða skipta vandanum upp (fyrst fundir, svo röð) myndi hjálpa.
-* **Mæta oft, fara snemma.** Líkanið umbunar ekki enn beint tíðri mætingu með því að leyfa
-  viðkomandi að fara fyrr. Að mæla byrði á hvern fund sem mætt er á, eða hærra $\alpha$, myndi ýta
-  dagskránni í þá átt.
+  bestu lausnir. Í sviðsmyndum þar sem umsóknir eru færðar á milli funda er bilið 50–90 %, og í
+  þrepamarkfallinu er hvert þrep fest við það sem fannst, svo seinni þrep byggja á ónákvæmu gildi.
+  Munur á sviðsmyndum getur því að hluta stafað af leitinni. Fundir eftir næsta fund eru innbyrðis
+  skiptanlegir, sem gerir erfitt að loka bilinu.
+* **Mæta oft, fara snemma, aðeins efst.** Þrepamarkfallið umbunar tíðri mætingu með því að leyfa
+  viðkomandi að fara fyrr, en aðeins þar sem mesta byrðin bindur. Neðan hennar lágmarkar líkanið
+  heildarbið, og þá getur sá sem mætir oft enn beðið lengur en sá sem mætir sjaldan (@sec-model).
+* **Enginn verr settur en áður er ekki tryggt.** Markmiðið er að enginn bíði lengur en í
+  tillögu starfsmanna, en líkanið framfylgir því ekki fyrir hvern og einn.
+* **Lítil umbun fyrir tíða mætingu.** Með markgildi á fund og hámarki á fagráðsmann er fjöldi funda
+  nánast ákveðinn áður en sanngirnin kemst að, og með $\alpha = 2$ og 4–7 biðpunkta á fund munar ekki
+  miklu á biðinni hjá þeim sem mætir á 9 fundi og þeim sem mætir á 5.
+* **Gildismat höfundar.** $\alpha$, markgildin og hámörkin eru valin af höfundi, ekki fengin frá
+  fagráðsmönnum. Sama á við um valið á heildarbyrði frekar en byrði á fund (@sec-fairness-relative).
+* **Föst áætlun.** Líkanið gerir ráð fyrir að allir mæti og að allt fari eftir dagskrá. Forföll,
+  frestanir og vanhæfi sem kemur fram seint eru ekki í líkaninu.
+* **Rýni dagskrár er ekki tæmandi.** Hver dagskrá er yfirfarin með sjálfstæðu forriti
+  (`check_agenda.py`), en það athugar aðeins hluta reglnanna: ekki fyrsta fund, vanhæfi, fundi sem
+  fagráðsmaður kemst ekki á né umsóknir sem eiga að haldast á sínum fundi. Mælikvarðarnir eru
+  sumir reiknaðir úr breytum líkansins frekar en úr dagskránni sjálfri.
+* **Gagnsæi.** Þriggja þrepa bestun, sem veltur á tímamörkum, er erfitt fyrir fagráðsmenn að
+  sannreyna sjálfir. Einfaldar, birtar reglur (hámark, regla um að sá sem beið síðast fari fyrr
+  næst) gætu sannfært betur, og líkanið mætti nota til að sýna hvað þær kosta.
 * **Óskir um fundi.** $\alpha_r$ er það sama fyrir alla. Óskir fagráðsmanna um umsóknir eru
   þegar merktar í kerfi TÞS (*vil ekki*, *sama*, *vil gjarnan*) og eiga heima í pöruninni. Við það
   mætti bæta óskum um fundi: hvaða vikudagar henta hverjum og einum, og hvort viðkomandi vilji frekar
@@ -48,6 +66,43 @@ skref.
   krefst ekki leyfis til að keyra.
 
 ## Næstu skref
+
+### Sanngirni í líkaninu {#sec-next-fairness}
+
+Óháð rýni á þrepamarkfallinu (@sec-model) benti á eftirfarandi rannsóknarspurningar. Sumar þeirra
+eru þegar í vinnslu í kóðanum; niðurstöður úr þeim eru ekki komnar í bókina.
+
+* **Leximin.** Í stað þess að verja aðeins þann verst setta og lágmarka svo heildarbið má verja
+  næstverst setta, þann þar á eftir o.s.frv. (*leximin*), eða nota vegið hámark yfir raðaða
+  byrði (Ogryczak). Það má stytta eftir nokkur stig. Fyrir hvert stig ætti að birta verðið á
+  sanngirninni: hversu mikil heildarbið bætist við.
+* **Svigrúm í fyrsta þrepi.** Leyfa nokkrum fundum fleiri en lágmarkið í þrepi 1, eða besta byrðina
+  $\alpha \cdot$ fundir + bið beint, svo $\alpha$ vegi í raun fundi á móti bið. Rekja má
+  Pareto-framlínuna milli fjölda funda, mestu byrði og heildarbiðar og leyfa hagaðilum að velja
+  punkt á henni.
+* **Enginn verr settur en í tillögu starfsmanna.** Skorða sem tryggir að byrði hvers fagráðsmanns sé
+  ekki meiri en í tillögu starfsmanna, og birta hve margir eru betur settir.
+* **Skipta vandanum upp.** Fyrst fundir, svo röð innan hvers fundar, sem er einfalt verkefni á einni
+  vél fyrir hvern fund. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön
+  (e. *set partitioning*, *branch-and-price*) lokað bilinu.
+* **Sanngirnismælikvarðar í hverri niðurstöðu.** Gini-stuðull eða hlutfall hæstu og lægstu byrði,
+  fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður miðað við `lexsum`.
+* **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir.** Líkanið styður þegar sérstakt $\alpha_r$
+  fyrir hvern og einn.
+* **Byrði á fund.** Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og í APAP
+  (@sec-fairness-relative).
+* **Óvissa.** Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk eða traust bestun),
+  og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
+* **Á milli lotna.** Bera byrðarstöðu fagráðsmanna á milli lotna, og prófa einfalda víxlreglu (sá
+  sem beið síðast fer fyrr næst) á móti bestun.
+* **Hlutverk og fundaskipan saman.** Endurúthlutun hlutverka (@sec-roles) greiðir nú meira þeim sem
+  bíða lengi á umsókn. Undir þrepamarkfallinu eiga þeir sem mæta sjaldan *að* bíða lengur, svo slík
+  greiðsla vinnur að hluta gegn dagskránni. Betra er að greiða fyrir þá byrði sem eftir stendur umfram
+  sanngjarnt mark.
+* **Opinn lausnari og óháð sannprófun.** Endurskrifa líkanið fyrir HiGHS eða SCIP og reikna alla
+  mælikvarða úr dagskránni sjálfri, ekki úr breytum líkansins.
+
+### Verklag og innleiðing
 
 * **Pörun fagráðsmanna og umsókna.** Fyrsta ákvörðunin (@sec-model) er tekin sem gefin í þessari
   frumgerð. Næsta skref er að besta hana líka: velja fagráðsmenn sem eru hæfir til að meta hverja

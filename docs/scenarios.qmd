@@ -25,12 +25,18 @@ if (have_plan) {
 Í þessum kafla er úthlutun ritstjóra og lesara eins og í tillögu starfsmanna; líkanið í @sec-model
 ákveður aðeins á hvaða fundi hver umsókn er tekin fyrir og í hvaða röð.
 
+::: {.callout-warning}
+## Niðurstöður með fyrra markfalli
+Niðurstöðurnar í þessum kafla eru úr keyrslum með fyrra markfallinu (byrði á umsókn, $\alpha = 4$), ekki
+þrepamarkfallinu sem lýst er í @sec-model. Þær verða endurnýjaðar þegar nýjar keyrslur liggja fyrir. Sviðsmynd 4 (markgildi á fund) fellur þá út, því markgildin eru nú hluti af fyrsta þrepi, og „Versta byrði á umsókn“ verður mesta byrði (@eq-burden).
+:::
+
 ## Sviðsmyndir
 
 Núverandi tillaga starfsmanna TÞS að fundaskipan (hvaða umsókn er á hvaða fundi) er grunnurinn. Í
-öllum sviðsmyndum nema 5 eru M1 og M2 festir eins og þeir voru. Í öllum sviðsmyndum hefur enginn
-fagráðsmaður fleiri en $\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi, sem er
-það mesta í tillögu starfsmanna.
+öllum sviðsmyndum nema 5 eru M1 og M2 festir eins og þeir voru. Á fundum sem eru ekki búnir hefur enginn fagráðsmaður fleiri en
+$\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi. Sviðsmynd 1 er undantekning:
+hún heldur fundum starfsmanna, og þar er einn fagráðsmaður með 6 umsóknir á M3.
 
 1. **Tillaga starfsmanna, sanngjörn röð:** sama fundasamsetning, en líkanið raðar umsóknum
    innbyrðis á hverjum fundi á sanngjarnan hátt.

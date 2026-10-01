@@ -26,6 +26,12 @@ Aðalmarkmiðið er sanngjörn greiðsla: ef hver umsókn tekur jafnlangan tíma
 greiðsla á umsókn að vera sem jöfnust meðal reyndra fagráðsmanna. Nýir fá aðeins minna á umsókn, því
 þeir eru sjaldnar ritstjórar og bera því minni ábyrgð.
 
+::: {.callout-warning}
+## Niðurstöður með fyrra markfalli
+Niðurstöðurnar í þessum kafla eru úr keyrslum með fyrra markfallinu (byrði á umsókn, $\alpha = 4$), ekki
+þrepamarkfallinu sem lýst er í @sec-model. Þær verða endurnýjaðar þegar nýjar keyrslur liggja fyrir. Endurúthlutun hlutverka byggir á dagskránni úr sviðsmynd 1 og breytist með henni.
+:::
+
 ## Jafnari greiðsla á umsókn
 
 ```{r}

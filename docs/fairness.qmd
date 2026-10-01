@@ -7,6 +7,13 @@ source("../code/panel_schedule.R", chdir = TRUE)
 held <- held_meetings(panel)
 worst <- held %>% group_by(member) %>% summarise(waiting = sum(waiting), .groups = "drop") %>%
   arrange(desc(waiting))
+num <- function(x) format(round(x, 2), decimal.mark = ",", nsmall = 2)
+# Spearman correlation of meetings attended and waiting in the results of the earlier objective
+# (burden per proposal), the signature of the defect the stepwise objective addresses.
+rho_old <- sapply(c("current", "free"), function(s) {
+  m <- read.csv(file.path("data", paste0(s, "_members.csv")))
+  cor(m$meetings, m$waiting, method = "spearman")
+})
 ```
 
 ## Hvað gerðist á fyrstu tveimur fundunum
@@ -62,8 +69,9 @@ dagskrárliðum (tíma einnar umsóknar).
 * **Lágt** $\alpha_r$ þýðir að það er ódýrt að mæta: líkanið dreifir umsóknum hans og hann fer
   snemma.
 
-Í bili fá allir fagráðsmenn sama $\alpha$. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
-þeirra.
+Í bili fá allir fagráðsmenn sama $\alpha$, `r yaml::read_yaml("../code/models/panel_model.yml")$alpha` dagskrárliði. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
+þeirra. Í núverandi útgáfu líkansins hefur $\alpha_r$ minni áhrif en þetta gefur til kynna, því
+fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 
 ## Fundir sem fagráðsmaður kemst ekki á
 
@@ -93,13 +101,42 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   á áður en síðasta umsókn hans er tekin fyrir. Biðpunktarnir safnast upp yfir lotuna.
 * **Biðpunktar á fund og á umsókn:** biðpunktar deilt með fjölda funda sem mætt er á, og með
   fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
-* **Fundir sem mætt er á** og **byrði á umsókn** (binding auk biðar), sem líkanið jafnar.
+* **Fundir sem mætt er á** og **byrði**, $\alpha_r$ á hvern fund auk biðpunkta (@eq-burden). Líkanið
+  heldur mestu byrðinni niðri.
+* **Fylgni funda og biðar** (Spearman) yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
+  oftast bíða líka mest, sem er einmitt það sem sanngjörn dagskrá á að forðast.
 
-## Sanngjarnt miðað við hvað?
+## Sanngjarnt miðað við hvað? {#sec-fairness-relative}
 
-Fagráðsmenn hafa ekki allir jafnmargar umsóknir og sá sem hefur 20 umsóknir getur ekki búist við
-jafnstuttum kvöldum og sá sem hefur 10. Byrði er því borin saman **á hverja umsókn**: byrði
-fagráðsmanns deilt með fjölda umsókna hans. Líkanið lágmarkar byrði á umsókn hjá þeim sem verst er settur.
+Fagráðsmenn hafa ekki allir jafnmargar umsóknir. Spurningin er hvort byrðin eigi að vera jöfn **í
+heild** eða jöfn **á hverja umsókn** (eða á hvern fund).
+
+<!-- Endurnýja: fylgnin hér að neðan er reiknuð úr docs/data/, sem enn geymir niðurstöður fyrra
+markfallsins. Þegar nýjar keyrslur koma þarf að geyma gömlu tölurnar sérstaklega (t.d. lexsum eða
+proposal) eða breyta textanum. -->
+Fyrsta útgáfa líkansins bar byrði saman á hverja umsókn: byrði fagráðsmanns deilt með fjölda umsókna
+hans, og líkanið lágmarkaði hana hjá þeim sem verst var settur. Það leit sanngjarnt út, en faldi
+gallann sem bókin byrjaði á. Sá sem hefur margar umsóknir þarf að mæta á marga fundi, og þegar
+biðinni er deilt með mörgum umsóknum virðist hún lítil, jafnvel þótt hann sitji lengi á hverjum
+fundi. Í þeim niðurstöðum biðu þeir mest sem mættu oftast: fylgni (Spearman) milli fjölda funda og
+biðpunkta var `r num(rho_old[["current"]])` í sviðsmynd 1 og `r num(rho_old[["free"]])` í sviðsmynd 2.
+
+Líkanið ber nú saman **heildarbyrði**: $\alpha_r$ fyrir hvern fund sem mætt er á, auk biðpunkta,
+óháð fjölda umsókna (@eq-burden). Eigin umsóknir teljast ekki með, því þær eru launuð vinna; það
+sem er ólaunað er bindingin og biðin. Afleiðingin er sú sem @sec-fairness lagði upp með: sá sem
+mætir á einum fundi fleiri en annar má bíða $\alpha_r$ dagskrárliðum skemur yfir lotuna.
+
+Þetta er gildismat, ekki stærðfræðileg niðurstaða:
+
+* Með **heildarbyrði** hafa fagráðsmaður með 23 umsóknir og fagráðsmaður með 10 sama þak. Sá fyrri
+  mætir oftar og má því bíða minna á hverjum fundi.
+* Með byrði **á hvern fund** sem mætt er á, eins og í APAP þar sem stig eru reiknuð á hvern vinnudag
+  (@sec-apap), væri hvert fundarkvöld metið eins hjá öllum, en sá sem mætir oft fengi ekki að fara
+  fyrr fyrir vikið.
+* Með byrði **á umsókn** fær sá sem les mikið afslátt af biðinni, sem var gallinn hér að ofan.
+
+Þessi bók velur heildarbyrði. Byrði á fund er eðlilegur samanburður sem vert er að skoða
+(@sec-limitations).
 
 ## Tímabilið
 
