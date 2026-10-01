@@ -72,13 +72,13 @@ og eftir hann:
 | Hlutverk | Á fundinum | Eftir fundinn |
 |---|---|---|
 | Ritstjóri | Rifjar upp umsóknina og talar mest | Skrifar samantekt á umræðum fagráðsins sem uppbyggilega endurgjöf til umsækjenda (fær hærri greiðslu en lesari) |
-| Lesari 1 | Talar næstur | Les samantekt ritstjórans og staðfestir að hann sé sammála |
-| Lesari 2 | Talar síðastur; hefur yfirleitt litlu við að bæta þar sem flest hefur þegar komið fram | Les samantekt ritstjórans og staðfestir að hann sé sammála |
+| 1. lesari | Talar næstur | Les samantekt ritstjórans og staðfestir að hann sé sammála |
+| 2. lesari | Talar síðastur; hefur yfirleitt litlu við að bæta þar sem flest hefur þegar komið fram | Les samantekt ritstjórans og staðfestir að hann sé sammála |
 
 Þrátt fyrir heitið ritstýrir ritstjórinn ekki umsókninni: hlutverk hans er að skrifa samantektina,
 sem báðir lesarar fara svo yfir og samþykkja. Hvað *vinnu* varðar er fagráðsmaður því annaðhvort
 ritstjóri eða lesari, og ritstjórahlutverkið er betur greitt. Hvað *orðið á fundinum* varðar er
-röðin ritstjóri, lesari 1, lesari 2. Sanngjörn úthlutun gefur öllum fagráðsmönnum svipað rými í
+röðin ritstjóri, 1. lesari, 2. lesari. Sanngjörn úthlutun gefur öllum fagráðsmönnum svipað rými í
 umræðunni, ekki aðeins svipaðan fjölda umsókna.
 
 ## Uppbygging

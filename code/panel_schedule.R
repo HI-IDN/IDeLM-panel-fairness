@@ -210,8 +210,8 @@ assignment_summary <- function(panels) {
            Ritstjórahlutverk = span(table$Editor),
            `Greiðsla (þús. kr.)` = span(pay$Pay / 1000),
            `Greiðsla á umsókn (þús. kr.)` = span(pay$per_proposal / 1000, 1),
-           `Lesari 1` = span(reader$`Reader 1`),
-           `Mesti munur lesara 1 og 2` = max(abs(reader$`Reader 1` - reader$`Reader 2`)),
+           `1. lesari` = span(reader$`Reader 1`),
+           `Mesti munur 1. og 2. lesara` = max(abs(reader$`Reader 1` - reader$`Reader 2`)),
            `Ritstjóri á fleiri en einni umsókn á sama fundi` = bunched)
   }))
 }

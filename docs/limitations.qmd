@@ -16,7 +16,7 @@ skref.
   fagráðsmaður sem hefur setið árum saman í Sprota er varla nýgræðingur þótt hann sé nýr í
   Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin í sviðsmynd 4 ber að lesa með
   það í huga.
-* **Lesari 1 og lesari 2 fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
+* **1. lesari og 2. lesari fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
   yfirlitinu ráði því hver talar næstur á fundi.
 * **Greiðslur** eru reiknaðar út frá hlutverkum (grunngjald, ritstjóri, lesari), ekki út frá
   raunverulegum greiðslum.
@@ -145,7 +145,7 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
 * **Lagskipt eða allsherjarlíkan.** Kanna í NSN-verkefni hvort betra sé að besta ákvarðanirnar
   þrjár lagskipt eða í einu allsherjarlíkani, og hvort allsherjarlíkanið sé nógu létt í keyrslu.
 * **Pörun, hlutverk og röðun saman.** Endurúthlutun hlutverka (@sec-roles) jafnar nú þegar
-  ritstjóra-, lesara 1- og lesara 2-hlutverk, í stað þess að stafrófið ráði röð lesara; það er
+  ritstjóra-, 1. lesara- og 2. lesarahlutverk, í stað þess að stafrófið ráði röð lesara; það er
   innbyggt í líkanið og væri auðvelt að bæta við sem eftirvinnslu hvaða úthlutunar sem er. Vanhæfi
   er hörð skorða í pöruninni (vanhæfur fjallar aldrei um umsókn) en mjúk í röðuninni (vanhæfur á
   helst ekki að vera viðstaddur). Óskir fagráðsmanna um umsóknir eiga heima í pöruninni og eru ekki

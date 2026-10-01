@@ -13,8 +13,8 @@ library(tidyverse)
 role_labels <- c(editor = "Editor", reader1 = "Reader 1", reader2 = "Reader 2")
 
 # Figures are in Icelandic (the book is written for the fund); data keys stay in English.
-is_labels <- c("Editor" = "Ritstjóri", "Reader" = "Lesari", "Reader 1" = "Lesari 1",
-               "Reader 2" = "Lesari 2", "Total" = "Samtals", "Start fee" = "Grunngjald",
+is_labels <- c("Editor" = "Ritstjóri", "Reader" = "Lesari", "Reader 1" = "1. lesari",
+               "Reader 2" = "2. lesari", "Total" = "Samtals", "Start fee" = "Grunngjald",
                "Unassigned" = "Óúthlutað")
 tr <- function(x) unname(ifelse(x %in% names(is_labels), is_labels[x], x))
 num_is <- function(x, digits = 1) format(round(x, digits), nsmall = digits, decimal.mark = ",")
@@ -115,7 +115,7 @@ plot_roles <- function(counts) {
                       name = NULL) +
     scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
     labs(title = "Hlutverk hvers fagráðsmanns",
-         subtitle = "Ritstjóri talar fyrst, lesari 1 næstur og lesari 2 síðastur",
+         subtitle = "Ritstjóri talar fyrst, 1. lesari næstur og 2. lesari síðastur",
          x = "Umsóknir", y = NULL) +
     theme_panel
 }

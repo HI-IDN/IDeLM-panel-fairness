@@ -168,7 +168,7 @@ Fagráðið breytist frá ári til árs, svo eðlilegt tímabil er ein lota. Fyr
 Fundaskipanin er seinni ákvörðunin af tveimur. Sú fyrri, hver er ritstjóri og hverjir lesarar á
 hverri umsókn, hefur sínar eigin sanngirnisspurningar (@sec-data):
 
-* svipað heildarálag og jafn fjöldi ritstjóra-, lesara 1- og lesara 2-hlutverka, svo allir fái
+* svipað heildarálag og jafn fjöldi ritstjóra-, 1. lesara- og 2. lesarahlutverka, svo allir fái
   svipað rými í umræðunni;
 * **nýir fagráðsmenn** með takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
   þeirra seinna í lotunni, eftir að þeir hafa fyrst verið lesarar.
