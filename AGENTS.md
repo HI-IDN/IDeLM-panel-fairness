@@ -46,6 +46,8 @@ fairness for anaesthetists is
 ## Git
 
 * Work on a branch and merge to `main` through a pull request.
+* Never put links to Claude Code sessions (`https://claude.ai/code/session_...`) in commit messages,
+  pull requests or comments: no `Claude-Session:` trailer and no session link in PR descriptions.
 
 ## Data layout
 
