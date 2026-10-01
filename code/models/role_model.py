@@ -101,7 +101,9 @@ def above_mean(data, agenda):
         waiting[r] += k - own[r, m]
         proposals[r] += own[r, m]
     rate = {r: waiting[r] / proposals[r] for r in waiting}
-    mean = sum(rate.values()) / len(rate)
+    mean = sum(rate.values()) / len(rate) if rate else 0
+    if mean == 0:  # no one waits: no one is above the mean
+        return {r: 0.0 for r in rate}
     return {r: max(0.0, v / mean - 1) for r, v in rate.items()}
 
 

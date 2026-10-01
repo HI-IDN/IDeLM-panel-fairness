@@ -38,7 +38,7 @@ roles() {  # roles <name> <role model options...>: reviewers and roles (models/r
   local name=$1; shift
   wanted "$name" || return 0
   echo "$(date +%H:%M) $name: start"
-  if python -m models.role_model "$P" "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
+  if python -m models.role_model "${PANEL:-$P}" "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
     echo "$(date +%H:%M) $name: $(grep -E '^objective' "$R/$name.log")"
   else
     echo "$(date +%H:%M) $name: FAILED (see $R/$name.log)"
