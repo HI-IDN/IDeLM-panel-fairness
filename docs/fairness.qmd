@@ -69,8 +69,8 @@ dagskrárliðum (tíma einnar umsóknar).
 * **Lágt** $\alpha_r$ þýðir að það er ódýrt að mæta: líkanið dreifir umsóknum hans og hann fer
   snemma.
 
-Líkanið les $\alpha_r$ fyrir hvern og einn úr skrá (`alpha_file` í `panel_model.yml`); þeir sem
-eru ekki í skránni fá sjálfgefið gildi. Í bili fá allir fagráðsmenn sama $\alpha$, `r yaml::read_yaml("../code/models/panel_model.yml")$alpha` dagskrárliði. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
+Líkanið les $\alpha_r$ fyrir hvern og einn; þeir sem
+hafa ekki eigið gildi fá sjálfgefið gildi. Í bili fá allir fagráðsmenn sama $\alpha$, `r yaml::read_yaml("../code/models/panel_model.yml")$alpha` dagskrárliði. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
 þeirra. Í núverandi útgáfu líkansins hefur $\alpha_r$ minni áhrif en þetta gefur til kynna, því
 fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 

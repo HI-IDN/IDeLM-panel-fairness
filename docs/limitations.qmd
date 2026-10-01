@@ -102,7 +102,7 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
 * **Sanngirnismælikvarðar í hverri niðurstöðu** (*í kóða*). Gini-stuðull eða hlutfall hæstu og lægstu byrði,
   fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður miðað við `lexsum`.
 * **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir** (*$\alpha_r$ í kóða*). Líkanið les nú
-  $\alpha_r$ fyrir hvern og einn úr skrá (`alpha_file`). Eftir er að spyrja fagráðsmenn og leyfa
+  $\alpha_r$ fyrir hvern og einn. Eftir er að spyrja fagráðsmenn og leyfa
   þeim líka að velja markgildi eigin umsókna á fund.
 * **Byrði á fund.** Bera saman heildarbyrði og byrði á hvern fund sem mætt er á, eins og í APAP
   (@sec-fairness-relative).
