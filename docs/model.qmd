@@ -199,8 +199,9 @@ ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep, svo þe
 stærstu byrðarnar eru festar, og þrep 3 sér um hinar. Með 0 eru undirþrepin jafnmörg fagráðsmönnum,
 og hvert þeirra er sérstök bestun.
 
-*Enginn verr settur* (`--no-worse-than`). Með viðmiðunarplani, t.d. tillögu starfsmanna, bætist við
-þrep 0 á undan öllum hinum:
+*Enginn verr settur* (`--no-worse-than`). Með viðmiðunarplani, t.d. tillögu starfsmanna, bætast
+við tvö þrep á undan öllum hinum. Fyrst eru refsiliðirnir fyrir reglurnar einir gerðir sem minnstir
+(vanhæfur viðstaddur, frestun) og festir. Síðan kemur þrep 0:
 
 $$
 \min \;\; \underbrace{\sum_r \big(B_r - B_r^{\text{við}}\big)^+}_{\text{byrði umfram viðmiðunarplan}} ,
@@ -209,7 +210,9 @@ $$
 þar sem $B_r^{\text{við}}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu, reiknuð úr dagskrá þess
 með sama $\alpha_r$ og óstýfð. Ef reglurnar leyfa er gildið 0 og enginn er verr settur en þar;
 annars er umframbyrðin eins lítil og hægt er. Byrði úr fyrri lotum (hér að neðan) er ekki með í
-þessum samanburði, því viðmiðunarplanið er fyrir sömu lotu.
+þessum samanburði, því viðmiðunarplanið er fyrir sömu lotu. Reglurnar koma fyrst því þrep 0 er
+fest eftir það; annars gæti líkanið keypt minni byrði með því að láta vanhæfa bregða sér út. Lausnin
+byrjar á viðmiðunarplaninu sjálfu, sem hefur enga umframbyrði þar sem það heldur reglurnar.
 
 *Svigrúm í þrepi 1* (`meetings_slack`). Þrep 1 er fest við gildi sitt *að viðbættu* svigrúmi. Þá má
 seinna þrep bæta við fundi þar sem það sparar a.m.k. $\alpha$ dagskrárliði af bið, og $\alpha$ fer
