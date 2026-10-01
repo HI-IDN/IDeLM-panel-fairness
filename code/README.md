@@ -194,6 +194,26 @@ early (held meetings excepted). It also prints,
 without counting them as problems, the conflicted members present and the fairness measures of
 the agenda. `run_panel_scenarios.sh` runs it after every schedule.
 
+## Exact order within meetings (`models/order_meetings.py`)
+
+Keeps every proposal of an agenda in its meeting and orders each meeting not yet held exactly, by
+dynamic programming over the set of proposals already discussed (at most 2¹⁵ states; about a second
+for a whole round). Per meeting it finds the fewest conflicted members present and then the least
+total waiting, with nobody staying longer than in the given agenda, so no burden goes up; and,
+as a lower bound, the least total waiting with nothing held. It writes the reordered
+`<prefix>_agenda.csv` and `<prefix>_order.csv` (per meeting: conflicted present and waiting, given
+and best, and the bound). It calls no solver; it reuses the readers and measures of `panel_model.py`.
+
+```bash
+python -m models.order_meetings ../data/tdf/panel.csv ../data/tdf/results/free_agenda.csv \
+  --out ../data/tdf/results/free_ordered
+```
+
+On the book's agendas of the single-objective model (`../docs/data/`), the order was already best
+or within 1–2 % of best given the meetings (`free` 513 → 508 waiting, `scratch` 477 → 470,
+`current` and `free_max4` unchanged): the solver's gap lies almost wholly in the choice of
+meetings and the fairness steps, not in the order.
+
 ## Running
 
 Requires Python 3.10+ with `requirements.txt` and a Gurobi licence (an academic licence is free;
