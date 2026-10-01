@@ -176,7 +176,9 @@ $$
 * **Heildarbið** (þrep 3) nýtir það svigrúm sem eftir er: enginn bíður að óþörfu, svo lengi sem
   enginn fer upp fyrir mestu byrðina úr þrepi 2. Nýir fagráðsmenn ($R^n$) fá lítinn
   **afslátt** $\lambda$ fyrir að sitja lengur á fyrri helmingi lotunnar ($M^{\text{fyrri}}$), því þeir
-  læra af umræðunni hvort sem er.
+  læra af umræðunni hvort sem er. Fyrri helmingur lotunnar, $M^{\text{fyrri}}$, eru fundirnir á
+  undan M5, sama fundi og nýir fagráðsmenn mega fyrst vera ritstjórar á (@sec-assign). Á meðan eru
+  þeir aðeins lesarar og læra af umræðunni.
 
 Í kóðanum heitir þetta markfall `lexburden`. Til samanburðar er `lexsum`, sem sleppir þrepi 2: fæstir
 fundir og síðan minnsta heildarbið, hver sem ber hana. Munurinn á þeim tveimur er verðið á
