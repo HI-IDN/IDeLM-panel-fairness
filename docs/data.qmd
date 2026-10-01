@@ -79,12 +79,27 @@ knitr::kable(mutate(spread, Role = tr(Role)), col.names = c("Hlutverk", "Minnst"
 plot_members(counts)
 ```
 
+::: {.panel-tabset}
+
+## Fjöldi
+
 ```{r}
 #| label: fig-spread
 #| fig-cap: "Dreifing milli fagráðsmanna: ritstjóri, lesari (lesari 1 og 2 sameinaðir) og samtals."
 #| fig-height: 3.2
 plot_spread(counts)
 ```
+
+## Hlutfall
+
+```{r}
+#| label: fig-spread-share
+#| fig-cap: "Hlutfall ritstjóra- og lesarahlutverka af umsóknum hvers fagráðsmanns."
+#| fig-height: 2.6
+plot_spread(counts, share = TRUE)
+```
+
+:::
 
 ## Greiðslur
 
@@ -98,7 +113,7 @@ og 2 fá það sama).
 #| fig-height: 6
 pay <- pay_table(counts)
 q <- quantile(pay$per_proposal / 1000, c(0.25, 0.5, 0.75))
-plot_pay(counts)
+plot_pay(counts, split_readers = FALSE)
 ```
 
 ```{r}

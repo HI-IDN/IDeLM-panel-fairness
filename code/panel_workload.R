@@ -120,16 +120,23 @@ plot_roles <- function(counts) {
     theme_panel
 }
 
-plot_spread <- function(counts) {
-  # Editor, reader (1 and 2 merged) and each member's total (any role).
+plot_spread <- function(counts, share = FALSE) {
+  # Editor, reader (1 and 2 merged) and each member's total (any role). With share = TRUE, each
+  # role as a share of the member's own proposals instead (the total is then always 100 %).
   counts <- merge_readers(counts)
   totals <- counts %>% group_by(member) %>% summarise(n = sum(n), .groups = "drop") %>%
     mutate(role = "Total")
-  counts <- bind_rows(counts %>% mutate(role = as.character(role)), totals) %>%
-    mutate(role = factor(role, levels = c("Editor", "Reader", "Total")))
+  if (share) {
+    counts <- counts %>% left_join(select(totals, member, total = n), by = "member") %>%
+      mutate(n = 100 * n / total, role = factor(as.character(role), levels = c("Editor", "Reader")))
+  } else {
+    counts <- bind_rows(counts %>% mutate(role = as.character(role)), totals) %>%
+      mutate(role = factor(role, levels = c("Editor", "Reader", "Total")))
+  }
   spread <- counts %>% group_by(role) %>%
     summarise(min = min(n), max = max(n), median = median(n), .groups = "drop") %>%
     mutate(y = as.numeric(fct_rev(role)))
+  label <- if (share) "bil %.0f–%.0f %%, miðgildi %.0f %%" else "bil %g–%g, miðgildi %g"
 
   ggplot(counts, aes(x = n, y = fct_rev(role), colour = role)) +
     geom_linerange(data = spread, aes(xmin = min, xmax = max, y = fct_rev(role)),
@@ -139,21 +146,24 @@ plot_spread <- function(counts) {
     geom_segment(data = spread, aes(x = median, xend = median, y = y - 0.3, yend = y + 0.3),
                  inherit.aes = FALSE, linewidth = 1.4, colour = "black") +
     geom_text(data = spread, aes(x = max, y = fct_rev(role),
-                                 label = sprintf("bil %d–%d, miðgildi %g", min, max, median)),
+                                 label = sprintf(label, min, max, median)),
               inherit.aes = FALSE, hjust = -0.1, size = 3.4, colour = "black") +
     scale_colour_manual(values = role_colours, guide = "none") +
-    scale_x_continuous(breaks = seq(0, 30, 4), expand = expansion(mult = c(0.02, 0.4))) +
+    (if (share) scale_x_continuous(breaks = seq(0, 100, 20), labels = function(x) paste(x, "%"),
+                                   expand = expansion(mult = c(0.02, 0.4)))
+     else scale_x_continuous(breaks = seq(0, 30, 4), expand = expansion(mult = c(0.02, 0.4)))) +
     expand_limits(x = 0) +
     scale_y_discrete(labels = tr) +
-    labs(title = "Dreifing umsókna á fagráðsmenn, eftir hlutverki",
+    labs(title = if (share) "Hlutfall hlutverka af umsóknum hvers fagráðsmanns"
+                 else "Dreifing umsókna á fagráðsmenn, eftir hlutverki",
          subtitle = "Hver punktur er einn fagráðsmaður; grátt band = bil, svart strik = miðgildi",
-         x = "Umsóknir", y = NULL) +
+         x = if (share) "Hlutfall af eigin umsóknum" else "Umsóknir", y = NULL) +
     theme_panel
 }
 
 # Pay per round (ISK): a start fee per member, plus a fee per proposal by role.
 pay_rates <- c(start = 38000, editor = 23000, reader = 15000)
-pay_colours <- c("Start fee" = "grey60", "Editor" = "#2a78d6", "Reader 1" = "#eb6834",
+pay_colours <- c("Start fee" = "grey60", "Editor" = "#2a78d6", "Reader" = "#eb6834", "Reader 1" = "#eb6834",
                  "Reader 2" = "#1baf7a")
 
 pay_table <- function(counts, rates = pay_rates) {
@@ -165,17 +175,21 @@ pay_table <- function(counts, rates = pay_rates) {
     arrange(desc(Pay))
 }
 
-plot_pay <- function(counts, rates = pay_rates) {
+plot_pay <- function(counts, rates = pay_rates, split_readers = TRUE) {
   pay <- pay_table(counts, rates)
-  # Reader pay is split into reader 1 and reader 2 (same rate), to show how the roles are shared.
+  # Reader pay, optionally split into reader 1 and reader 2 (same rate) to show how the roles are
+  # shared.
   readers <- counts %>%
     filter(role %in% c("Reader 1", "Reader 2")) %>%
-    transmute(member, part = as.character(role), isk = n * rates[["reader"]])
+    mutate(role = if (split_readers) as.character(role) else "Reader") %>%
+    group_by(member, role) %>% summarise(n = sum(n), .groups = "drop") %>%
+    transmute(member, part = role, isk = n * rates[["reader"]])
+  colours <- pay_colours[c("Start fee", "Editor", if (split_readers) c("Reader 1", "Reader 2") else "Reader")]
   parts <- pay %>%
     select(member, `Start fee`, Editor) %>%
     pivot_longer(-member, names_to = "part", values_to = "isk") %>%
     bind_rows(readers) %>%
-    mutate(part = factor(part, levels = rev(names(pay_colours))),
+    mutate(part = factor(part, levels = rev(names(colours))),
            member = factor(member, levels = rev(pay$member)))
   median_pay <- median(pay$Pay)
 
@@ -190,12 +204,12 @@ plot_pay <- function(counts, rates = pay_rates) {
                                               num_is(per_proposal / 1000))),
               inherit.aes = FALSE, hjust = 0, nudge_x = 3, size = 3, colour = "grey30",
               fill = "white", linewidth = 0, label.padding = unit(1, "pt")) +
-    scale_fill_manual(values = pay_colours, breaks = names(pay_colours), labels = tr, name = NULL) +
+    scale_fill_manual(values = colours, breaks = names(colours), labels = tr, name = NULL) +
     scale_x_continuous(expand = expansion(mult = c(0, 0.15)), labels = scales::comma) +
     scale_y_discrete(expand = expansion(add = c(0.6, 1.4))) +
     labs(title = "Laun hvers fagráðsmanns í þessari umsóknarlotu",
          subtitle = sprintf(paste("Grunngjald %s + %s á hvert ritstjórahlutverk + %s á hvert",
-                                  "lesarahlutverk (lesari 1 eða 2), í þús. kr.
+                                  "lesarahlutverk, í þús. kr.
 Merki: samtals (á umsókn)"),
                             rates[["start"]] / 1000, rates[["editor"]] / 1000, rates[["reader"]] / 1000),
          x = "Þúsundir króna", y = NULL) +
