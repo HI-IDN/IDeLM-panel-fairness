@@ -18,7 +18,7 @@ import re
 
 RESULTS = '../data/tdf/results'
 OUT = '../docs/data'
-SCENARIOS = ['current', 'free', 'free_max4', 'scratch', 'assign_schedule']
+SCENARIOS = ['current', 'free', 'free_sum', 'free_leximin', 'free_noworse', 'free_max4', 'scratch', 'assign_schedule']
 
 # File suffix -> columns to keep.
 COLUMNS = {

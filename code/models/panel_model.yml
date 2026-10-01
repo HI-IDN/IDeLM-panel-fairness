@@ -32,7 +32,7 @@ pair_limit: 6         # soft limit on own proposals in two consecutive meetings
 pair_weight: 0.5      # weight of the average excess over pair_limit, per member
 
 # Role models (models/role_model.py)
-new_editor_share: 0.15 # new members: no editor role before the midpoint of their meetings, then at most this share
+new_editor_share: 0.15 # new members: at most this share as editor (and in assign mode none before the midpoint of their proposals)
 max_new_per_proposal: 2  # most new members among the three on a proposal (at least one experienced)
 max_editor_share: 0.667  # nobody is editor on more than 2/3 of their proposals
 postpone_penalty: 0.5  # objective penalty for each proposal postponed from the next meeting

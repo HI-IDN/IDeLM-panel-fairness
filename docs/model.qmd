@@ -178,14 +178,14 @@ ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem r
 | Þrír fagráðsmenn á hverja umsókn | $\sum_{r} z_{pr} = 3 \quad \forall p$ |
 | Ritstjórinn er einn af þeim þremur | $y_{pr} \le z_{pr} \quad \forall p, r$ |
 | Vanhæfur fagráðsmaður fjallar aldrei um umsóknina | $z_{pr} = 0 \quad \forall p,\ r \in V_p$ |
-| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin funda | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á fundi fyrir miðbik } r$ |
+| Nýr fagráðsmaður er ekki ritstjóri fyrir miðbik eigin umsókna (ekki í endurúthlutun hlutverka) | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á undan miðumsókn } r \text{ í tímaröð}$ |
 | Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^{\text{nýr}}$ |
 
 **Endurúthlutun hlutverka** (@sec-roles): sömu þrír fagráðsmenn eru á hverri umsókn
 ($z_{pr}$ er fast), en líkanið velur hver þeirra er ritstjóri og hver er lesari 1 (talar næstur;
-$u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er lesari 2. Nýr fagráðsmaður er ekki
-ritstjóri á fyrri helmingi sinna eigin funda, og eftir það á mest hlutfallinu $\rho$ af umsóknum
-sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn). Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
+$u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er lesari 2. Starfsmenn völdu þá þrjá,
+svo miðbiksreglan á ekki við hér: nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af
+umsóknum sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn). Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum.
 
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um

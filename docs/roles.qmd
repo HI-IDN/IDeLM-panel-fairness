@@ -13,9 +13,8 @@ if (have_roles) {
 ```
 
 Hér eru sömu fagráðsmenn á hverri umsókn og í tillögu starfsmanna, og fundir sem eru búnir eru
-óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Nýir
-fagráðsmenn eru ekki ritstjórar á fyrri helmingi sinna eigin funda. Miðbikið getur því verið seinna
-en í miðri lotunni ef fundir þeirra dreifast á seinni hlutann. Eftir það eru þeir ritstjórar á mest
+óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Starfsmenn
+völdu þessa þrjá, svo nýir fagráðsmenn mega vera ritstjórar hvenær sem er í lotunni, en þó á mest
 `r scales::percent(yaml::read_yaml("../code/models/panel_model.yml")$new_editor_share)` umsókna sinna.
 Líkanið velur líka hver er lesari 1, sem talar næstur á eftir ritstjóranum, og hver er lesari 2,
 sem talar síðastur. Í tillögu starfsmanna ræður stafrófið því (@sec-data). Hér er það notað sem
