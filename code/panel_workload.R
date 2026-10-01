@@ -91,10 +91,9 @@ plot_members <- function(counts) {
                linewidth = 0.6) +
     geom_label(data = medians, aes(x = x, y = n_members + 0.9, label = label), inherit.aes = FALSE,
                size = 3.4, colour = "black", fill = "white", linewidth = 0) +
-    geom_label(data = totals, aes(x = total, y = member,
-                                  label = sprintf("%d (%.0f%%)", total, 100 * editor_share)),
-              inherit.aes = FALSE, hjust = 0, nudge_x = 0.3, size = 3.2, colour = "grey30",
-              fill = "white", linewidth = 0, label.padding = unit(1, "pt")) +
+    geom_text(data = totals, aes(x = total, y = member,
+                                 label = sprintf("%d (%.0f%%)", total, 100 * editor_share)),
+              inherit.aes = FALSE, hjust = 0, nudge_x = 0.3, size = 3.2, colour = "grey30") +
     scale_fill_manual(values = role_colours, breaks = c("Editor", "Reader"), labels = tr, name = NULL) +
     scale_x_continuous(expand = expansion(mult = c(0, 0.14))) +
     scale_y_discrete(expand = expansion(add = c(0.6, 1.4))) +
