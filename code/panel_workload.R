@@ -199,11 +199,10 @@ plot_pay <- function(counts, rates = pay_rates, split_readers = TRUE) {
     annotate("label", x = median_pay / 1000, y = nrow(pay) + 0.9,
              label = sprintf("miðgildi %s", format(median_pay / 1000, big.mark = ".", decimal.mark = ",")),
              size = 3.4, fill = "white", linewidth = 0) +
-    geom_label(data = pay, aes(x = Pay / 1000, y = member,
+    geom_text(data = pay, aes(x = Pay / 1000, y = member,
                               label = sprintf("%s (%s)", format(Pay / 1000, big.mark = ".", decimal.mark = ","),
                                               num_is(per_proposal / 1000))),
-              inherit.aes = FALSE, hjust = 0, nudge_x = 3, size = 3, colour = "grey30",
-              fill = "white", linewidth = 0, label.padding = unit(1, "pt")) +
+              inherit.aes = FALSE, hjust = 0, nudge_x = 3, size = 3, colour = "grey30") +
     scale_fill_manual(values = colours, breaks = names(colours), labels = tr, name = NULL) +
     scale_x_continuous(expand = expansion(mult = c(0, 0.15)), labels = scales::comma) +
     scale_y_discrete(expand = expansion(add = c(0.6, 1.4))) +
