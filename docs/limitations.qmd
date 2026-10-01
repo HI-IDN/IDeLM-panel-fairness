@@ -18,6 +18,9 @@ skref.
   það í huga.
 * **1. lesari og 2. lesari fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
   yfirlitinu ráði því hver talar næstur á fundi.
+* **Aðeins eitt fagráð.** Sumir fagráðsmenn sitja í fleiri en einu fagráði samhliða, t.d. bæði í
+  Sprota og Vexti. Lítið álag í einu fagráði getur því stafað af því að viðkomandi er að vinna fyrir
+  annað fagráð á sama tíma. Þessi greinargerð hefur enga vitneskju um stöðuna í öðrum fagráðum.
 * **Greiðslur** eru reiknaðar út frá hlutverkum (grunngjald, ritstjóri, lesari), ekki út frá
   raunverulegum greiðslum.
 
