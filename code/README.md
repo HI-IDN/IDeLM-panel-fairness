@@ -112,7 +112,8 @@ the steps before reached (`lexburden`):
 3. **The least total waiting**, with a tiny reward for new members waiting early in the round,
    when they sit longer to learn anyway. "Early" ends at `new_editor_from` in `panel_model.yml`
    (M5), the same meeting from which `--new-editor-from` lets new members be editor: they are
-   only readers until then.
+   only readers until then. This holds without `--new-editor-from` too, so with `--more-meetings`
+   (15 meetings) early is still M1–M4, not the first half of the meetings.
 
 Step 2 protects only the member with the largest burden; everyone below it is left to step 3, which
 favours whoever is quickest to serve, and that is how the original model came to make frequent
