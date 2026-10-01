@@ -184,7 +184,7 @@ sanngirninni.
 Fjórar viðbætur taka á fyrirvörunum hér að neðan. Engin þeirra hefur enn verið keyrð á öllum
 sviðsmyndunum.
 
-*Leximin* (`leximin`) kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; leximin ver líka þann næstverst setta, þann
+`leximin` kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; `leximin` ver líka þann næstverst setta, þann
 þar á eftir o.s.frv. Það er útfært með raðaðri lágmörkun hámarks [e. *ordered min-max*, @ogryczak2003]:
 í undirþrepi $k$ er summa $k$ stærstu byrðanna gerð sem minnst og síðan fest,
 
@@ -194,7 +194,7 @@ $$
 $$
 
 Í bestu lausn er markfallsgildið summa $k$ stærstu byrðanna, hvert sem gildi hjálparbreytunnar $t_k$ er. Undirþrep 1 er það sama og þrep 2 hér að
-ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep, svo þetta er *stýfð* leximin: þrjár
+ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep, svo þetta er *stýfð* `leximin`: þrjár
 stærstu byrðarnar eru festar, og þrep 3 sér um hinar. Með 0 eru undirþrepin jafnmörg fagráðsmönnum,
 og hvert þeirra er sérstök bestun.
 
@@ -215,7 +215,7 @@ seinna þrep bæta við fundi þar sem það sparar a.m.k. $\alpha$ dagskrárli�
 að vega fundi á móti bið. Sjálfgefið svigrúm er `r num(config$meetings_slack %||% 0)`.
 
 *Byrði úr fyrri lotum* (`--carry`). Byrði sem fagráðsmaður ber með sér úr fyrri lotum, $C_r$, er
-bætt við $B_r$ í sanngirnisþrepunum (þrepi 2 eða leximin), svo sá sem bar þungt í fyrra fær léttari
+bætt við $B_r$ í sanngirnisþrepunum (þrepi 2 eða `leximin`), svo sá sem bar þungt í fyrra fær léttari
 lotu nú. $C_r$ má vera neikvætt.
 
 Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
@@ -237,9 +237,9 @@ niðurstöður verða endurnýjaðar með þrepamarkfallinu.
   lágmarkar þrep 3 aðeins heildarbið. Það er sama aðferð og olli upphaflega vandanum: sá sem mætir
   oft getur enn beðið lengur en sá sem mætir sjaldan, svo lengi sem hvorugur er sá verst setti. Á
   litlum tilbúnum dæmum helmingaði þrepamarkfallið um það bil fjölda slíkra para miðað við `lexsum`,
-  en leximin fækkaði þeim enn frekar. Því er mælt með leximin.
+  en `leximin` fækkaði þeim enn frekar. Því er mælt með `leximin`.
 * **Sanngirni sem fæst ókeypis er ekki alltaf tekin.** Í nokkrum tilbúnum dæmum var til önnur lausn
-  með sömu heildarbið þar sem næstverst settu fagráðsmennirnir voru betur settir. Leximin tekur hana.
+  með sömu heildarbið þar sem næstverst settu fagráðsmennirnir voru betur settir. `leximin` tekur hana.
 * **Þrep 1 ræður fjölda funda áður en $\alpha$ hefur nokkuð að segja.** $\alpha$ vegur fundi á móti
   bið í þrepi 2, en þá er fjöldi funda þegar festur. Í raun metur þrep 1 einn fund meira en hvaða
   bið sem er. Hámarkið $\bar k$ og markgildin $t_r$ halda aftur af því, en $\alpha$ hefur minni áhrif

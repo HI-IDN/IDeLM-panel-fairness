@@ -39,7 +39,7 @@ skref.
   breyttist hvergi. Bilið liggur því í vali funda og sanngirnisþrepunum.
 * **Mæta oft, fara snemma, aðeins efst.** `lexburden` umbunar tíðri mætingu með því að leyfa
   viðkomandi að fara fyrr, en aðeins þar sem mesta byrðin bindur. Neðan hennar lágmarkar líkanið
-  heildarbið, og þá getur sá sem mætir oft enn beðið lengur en sá sem mætir sjaldan. Leximin tekur á
+  heildarbið, og þá getur sá sem mætir oft enn beðið lengur en sá sem mætir sjaldan. `leximin` tekur á
   þessu (@sec-model) en hefur ekki verið keyrt á sviðsmyndunum.
 * **Enginn verr settur en áður.** Markmiðið er að enginn beri meiri byrði en í tillögu starfsmanna.
   Líkanið getur nú framfylgt því með viðmiðunarplani (@sec-model), en reglurnar leyfa það ekki alltaf
@@ -79,8 +79,8 @@ skref.
 Óháð rýni á þrepamarkfallinu (@sec-model) benti á eftirfarandi rannsóknarspurningar. Þær sem merktar
 eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið keyrðar á sviðsmyndunum.
 
-* **Leximin** (*í kóða*). Í stað þess að verja aðeins þann verst setta og lágmarka svo heildarbið má verja
-  næstverst setta, þann þar á eftir o.s.frv. (*leximin*), eða nota vegið hámark yfir raðaða
+* **`leximin`** (*í kóða*). Í stað þess að verja aðeins þann verst setta og lágmarka svo heildarbið má verja
+  næstverst setta, þann þar á eftir o.s.frv. (`leximin`), eða nota vegið hámark yfir raðaða
   byrði [@ogryczak2003]. Það má stytta eftir nokkur stig. Fyrir hvert stig ætti að birta verðið á
   sanngirninni: hversu mikil heildarbið bætist við.
 * **Svigrúm í fyrsta þrepi** (*í kóða*). Leyfa nokkrum fundum fleiri en lágmarkið í þrepi 1, eða besta byrðina

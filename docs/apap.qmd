@@ -57,11 +57,11 @@ Líkanið í @sec-model tekur hugmyndina úr APAP en ekki aðferðina óbreytta:
 | Aðferð | Vikmörk í kringum sameiginlegt mark; sem flestir innan þeirra | Mesta byrði gerð sem minnst, síðan heildarbið |
 | Bætur fyrir skyldur | Föst regla: sá sem var á vakt í nótt fer fyrstur, sá sem er á vakt síðastur | Óbeint, í gegnum $\alpha$ á hvern fund |
 | Röð markmiða | Jöfnuður fyrst, svo hagkvæmni | Fæstir fundir fyrst, svo jöfnuður, svo heildarbið |
-| Hverjir eru varðir | Allir: hver læknir utan vikmarka kostar | Í `lexburden` aðeins sá verst setti; með leximin nokkrir þeir verst settu í röð, eða allir |
+| Hverjir eru varðir | Allir: hver læknir utan vikmarka kostar | Í `lexburden` aðeins sá verst setti; með `leximin` nokkrir þeir verst settu í röð, eða allir |
 | Tímabil | Viku fyrir viku, stigasaga borin áfram | Ein lota; byrði úr fyrri lotum má bera áfram (`--carry`) |
 
 Þrennt má flytja betur yfir frá APAP. Í fyrsta lagi telur hver einstaklingur í jöfnuðinum, ekki
-aðeins sá verst setti; leximin færir líkanið í þá átt. Í öðru lagi kemur jöfnuður á undan hagkvæmni. Í þriðja lagi er einföld og
+aðeins sá verst setti; `leximin` færir líkanið í þá átt. Í öðru lagi kemur jöfnuður á undan hagkvæmni. Í þriðja lagi er einföld og
 gagnsæ regla, eins og að sá sem var síðastur síðast fari fyrr næst, auðveldari að útskýra en
 niðurstaða bestunar; slík regla er til í líkaninu sem tilraun en ekki notuð. Vikmörkin sjálf eru ekki
 nauðsynleg, og útgáfa þeirra í þessu líkani getur ýkt biðina (@sec-limitations).
