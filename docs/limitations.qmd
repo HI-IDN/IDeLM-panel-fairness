@@ -33,7 +33,10 @@ skref.
   bestu lausnir. Í sviðsmyndum þar sem umsóknir eru færðar á milli funda er bilið 50–90 %, og í
   þrepamarkfallinu er hvert þrep fest við það sem fannst, svo seinni þrep byggja á ónákvæmu gildi.
   Munur á sviðsmyndum getur því að hluta stafað af leitinni. Fundir eftir næsta fund eru innbyrðis
-  skiptanlegir, sem gerir erfitt að loka bilinu.
+  skiptanlegir, sem gerir erfitt að loka bilinu. Röðunin innan funda er þó ekki orsökin. Með fundina
+  fasta má finna bestu röð hvers fundar nákvæmlega (`order_meetings.py`). Í dagskrám bókarinnar var
+  röðunin þegar sú besta, eða innan 1–2 % af henni, án þess að neinn sæti lengur, og mesta byrðin
+  breyttist hvergi. Bilið liggur því í vali funda og sanngirnisþrepunum.
 * **Mæta oft, fara snemma, aðeins efst.** `lexburden` umbunar tíðri mætingu með því að leyfa
   viðkomandi að fara fyrr, en aðeins þar sem mesta byrðin bindur. Neðan hennar lágmarkar líkanið
   heildarbið, og þá getur sá sem mætir oft enn beðið lengur en sá sem mætir sjaldan. Leximin tekur á
@@ -52,6 +55,7 @@ skref.
   reiknar líka alla mælikvarða úr dagskránni sjálfri. Það athugar fyrsta fund, umsóknir sem eiga að
   haldast á sínum fundi, fundi sem fagráðsmaður kemst ekki á og fyrsta fund nýrra ritstjóra, og
   telur vanhæfa viðstadda á sama hátt og líkanið. Það athugar ekki hvort dagskráin sé sú besta.
+  Hvort röðun innan funda sé sú besta má kanna sérstaklega með `order_meetings.py`.
 * **Gagnsæi.** Þriggja þrepa bestun, sem veltur á tímamörkum, er erfitt fyrir fagráðsmenn að
   sannreyna sjálfir. Einfaldar, birtar reglur (hámark, regla um að sá sem beið síðast fari fyrr
   næst) gætu sannfært betur, og líkanið mætti nota til að sýna hvað þær kosta.
@@ -90,9 +94,11 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   þeirrar byrði sem er umfram byrðina í tillögu starfsmanna. Aðeins ef sú summa verður 0 er tryggt
   að enginn sé verr settur; annars er umframbyrðin eins lítil og reglurnar leyfa. Birta ætti hve
   margir eru betur settir og hve margir verr.
-* **Skipta vandanum upp.** Fyrst fundir, svo röð innan hvers fundar, sem er einfalt verkefni á einni
-  vél fyrir hvern fund. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön
-  (e. *set partitioning*, *branch-and-price*) lokað bilinu.
+* **Skipta vandanum upp** (*röðun innan funda í kóða*). Fyrst fundir, svo röð innan hvers fundar,
+  sem er einfalt verkefni á einni vél fyrir hvern fund og er nú leyst nákvæmlega. Eftir stendur að
+  velja fundina. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön yfir mögulega
+  samsetningu funda (e. *set partitioning*, *column generation*) gefið sterk neðri mörk og lokað
+  bilinu.
 * **Sanngirnismælikvarðar í hverri niðurstöðu** (*í kóða*). Gini-stuðull eða hlutfall hæstu og lægstu byrði,
   fylgni funda og biðar sem einkenni gallans, raðaður byrðarvigur og kostnaður miðað við `lexsum`.
 * **$\alpha_r$ og álag sem fagráðsmenn velja sjálfir** (*$\alpha_r$ í kóða*). Líkanið les nú

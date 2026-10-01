@@ -15,7 +15,9 @@ safnið. Kerfi TÞS gæti skilað sömu skrá beint.
   stillingar þess eru í sérstakri skrá sem bókin les líka;
 * hlutverkalíkanið ákveður hver er ritstjóri og hvor lesaranna talar á undan, eða úthlutar öllum
   umsóknum frá grunni (@sec-roles, @sec-assign);
-* sérstakt eftirlit fer yfir hverja dagskrá og staðfestir að hún fylgi reglum sinnar sviðsmyndar.
+* sérstakt eftirlit fer yfir hverja dagskrá og staðfestir að hún fylgi reglum sinnar sviðsmyndar;
+* sérstakt forrit raðar hverjum fundi dagskrár nákvæmlega, án þess að færa umsóknir á milli funda,
+  og ber saman við gefna röð.
 
 **Keyrslurnar.** Ein skrifta keyrir allar sviðsmyndir bókarinnar í röð, þar sem hver byrjar á
 lausn þeirrar á undan. Önnur skrifta afritar niðurstöðurnar, dulkóðaðar, á þann stað sem bókin les

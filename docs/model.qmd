@@ -248,7 +248,8 @@ niðurstöður verða endurnýjaðar með þrepamarkfallinu.
   fyrir eitt skipti sem vanhæfur bregður sér út, því summan er fest í heild.
 * **Bil í hverju þrepi.** Hvert þrep fær hluta tímamarkanna og er fest við bestu lausn sem fannst,
   ekki sannað besta gildi. Með 50–90 % bili er „lagskipt sanngjarnt“ því að hluta eiginleiki
-  leitarinnar. Bilið í hverju þrepi er skráð og ætti að fylgja niðurstöðunum.
+  leitarinnar. Bilið í hverju þrepi er skráð og ætti að fylgja niðurstöðunum. Bilið stafar af vali
+  funda, ekki röðun innan þeirra (@sec-limitations).
 * **Mælikvarðar eru reiknaðir úr dagskránni**, ekki úr breytum líkansins, svo þeir sýna hvað planið
   gerir í raun. Í fyrri útgáfu var tilkynnt byrði of há um $n_r$, því eigin umsóknir voru taldar með.
 
