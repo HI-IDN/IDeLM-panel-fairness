@@ -48,8 +48,9 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 * $m^*$: næsti fundur, og $N \subseteq P$: umsóknir sem eru auglýstar á hann.
 * $\bar k$: mesti fjöldi eigin umsókna sem fagráðsmaður má hafa á einum fundi, og $\bar k_s \le \bar k$
   mjúkt hámark sem kostar að fara yfir.
-* $t_r$: markgildi fyrir fjölda eigin umsókna á hverjum fundi sem fagráðsmaður $r$ mætir á
-  (t.d. `r num(config$target_experienced)` fyrir reynda og `r num(config$target_new)` fyrir nýja).
+* $t_r$: markgildi fyrir fjölda eigin umsókna á hverjum fundi sem fagráðsmaður $r$ mætir á:
+  $t_r = t_e$ fyrir reynda (e. *experienced*, t.d. `r num(config$target_experienced)`) og $t_r = t_n$
+  fyrir nýja (e. *new*, t.d. `r num(config$target_new)`).
 
 Í þessari fyrstu útgáfu tekur hver umsókn einn dagskrárlið af sömu lengd.
 
@@ -262,7 +263,7 @@ tibble(
                  "Allir mæta á fyrsta fund með eina umsókn", "Markgildi á fund, reyndir",
                  "Markgildi á fund, nýir", "Vigt fráviks frá markgildi",
                  "Refsing fyrir frestun af næsta fundi", "Mest hlutfall ritstjóra hjá nýjum (kafli 6)"),
-  Tákn = c("$\\alpha_r$", "$\\bar K$", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_r$", "$t_r$",
+  Tákn = c("$\\alpha_r$", "$\\bar K$", "$c$", "", "$U_r$", "$\\bar k$", "$\\bar k_s$", "$s$", "", "$t_e$", "$t_n$",
            "$g$", "$q$", "$\\rho$"),
   Gildi = c(if (is.null(config$alpha_file)) paste(num(config$alpha), "dagskrárliðir fyrir alla")
             else paste(num(config$alpha), "dagskrárliðir, nema þeir sem eru í", config$alpha_file), num(config$max_per_meeting),
