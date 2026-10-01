@@ -17,7 +17,7 @@ Skipulag fagráðsins felur í sér þrjár ákvarðanir sem hafa áhrif hver á
 
 | Ákvörðun | Hvað skiptir máli | Í þessari greinargerð |
 |---|---|---|
-| 1. **Hverjir fjalla um hverja umsókn** (ritstjóri og tveir lesarar) | Umsókn má **alls ekki** úthluta á fagráðsmann sem er vanhæfur í henni. Að öðru leyti: hæfni til að meta umsóknina; helst einhver úr fyrri yfirferð ef umsókn er endursend; óskir fagráðsmanna, sem merkja í kerfinu hvort þeir *vilja ekki*, *er sama* eða *vilja gjarnan* fara yfir umsókn; jafnt álag | Tekin sem gefin (núverandi úthlutun) |
+| 1. **Hverjir fjalla um hverja umsókn** (ritstjóri og tveir lesarar) | Umsókn má **alls ekki** úthluta á fagráðsmann sem er vanhæfur í henni. Að öðru leyti: hæfni til að meta umsóknina; helst einhver úr fyrri yfirferð ef umsókn er endursend; óskir fagráðsmanna, sem merkja í kerfinu hvort þeir *vilja ekki*, eru *hlutlausir* eða *vilja gjarnan* fara yfir umsókn; jafnt álag | Tekin sem gefin (núverandi úthlutun) |
 | 2. **Á hvaða fundi hver umsókn er tekin fyrir** | Fjöldi funda sem hver þarf að mæta á. Vanhæfur fagráðsmaður á helst ekki að sitja sama fund og umsóknin; ef hann gerir það þarf hann að vera farinn áður en hún er tekin fyrir, og í versta falli að bregða sér af fundi, sem er lágmarkað svo það trufli ekki flæði fundarins. Líkar umsóknir í sama holli, svo umræðan verði þematísk og hlustun virkari, sem skiptir sérstaklega máli fyrir nýja fagráðsmenn sem læra af umræðu sem þeir geta tengt við | Bestuð, en án tillits til efnis umsókna (@sec-limitations) |
 | 3. **Röðin innan hvers fundar** | Að lágmarka biðpunkta, með tilliti til álags hvers og eins yfir lotuna; vanhæfur fagráðsmaður farinn áður en umsóknin er tekin fyrir | Bestuð |
 
@@ -32,7 +32,7 @@ kennslu en ekki í rekstri. Til að TÞS geti keyrt líkanið sjálft þyrfti a�
 lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-verkefni, sjá
 @sec-limitations.
 
-## Framsetning
+## Líkan fyrir fundi og röð (ákvarðanir 2 og 3)
 
 **Mengi og gögn**
 
