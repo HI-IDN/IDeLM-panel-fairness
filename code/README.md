@@ -80,7 +80,13 @@ sets rather than forbidden by constraints.
 * *waiting* = slots sat through minus own proposals = proposals of others sat through;
 * *meetings* = meetings attended;
 * *burden* = α × meetings + waiting. α (in slots) says how much one meeting attended weighs against
-  waiting; the chosen value is α = 2.
+  waiting; the chosen value is α = 2. α can differ per member (`--alpha-file`, a CSV of member,
+  alpha): a member who would rather attend less often and stay longer gets a higher α. Own proposals are paid work and are not counted, so this is
+  the *unpaid* burden. Burden carried over from earlier rounds (`--carry`, a CSV of member, burden)
+  is added to it in the fairness steps.
+
+The output recomputes every measure from the agenda (`member_measures` in `panel_model.py`), not
+from the model variables, so it shows what the plan actually does.
 
 **Rules (constraints)**
 
@@ -106,7 +112,33 @@ the steps before reached (`lexburden`):
 3. **The least total waiting**, with a tiny reward for new members waiting early in the round,
    when they sit longer to learn anyway.
 
-The time limit is split 40 % for step 1 and the rest equally over the other steps. Other modes
+Step 2 protects only the member with the largest burden; everyone below it is left to step 3, which
+favours whoever is quickest to serve, and that is how the original model came to make frequent
+attenders wait more. `--fairness leximin` therefore replaces step 2 by a series (Ogryczak's ordered
+min-max): the smallest largest burden, then the smallest sum of the two largest, and so on, for
+`leximin_levels` steps. The default, 3, is a truncated leximin: it fixes the three largest
+burdens in turn and leaves the rest to step 3, to keep runs short; 0 fixes every member's, at the
+cost of one more solve per member. On small test instances this never gave a
+worse burden vector than `lexburden`, often a better one at the same total waiting, and fewer pairs
+where the member who attends more also waits more.
+
+Two further options apply to all the step modes:
+
+* `--meetings-slack s` holds step 1 at its value plus *s* instead of exactly. Step 1 otherwise
+  treats a meeting attended as worth any amount of waiting, so α never gets to trade a meeting for
+  α slots of waiting; a slack of one or two lets the later steps do that.
+* `--no-worse-than <agenda.csv>` adds a step 0 that makes the total excess of each member's burden
+  over their burden in a reference plan (e.g. the staff's meetings, scenario `current`) as small as
+  possible: zero when nobody needs to be worse off. The log lists anyone who still is. The
+  comparison is of this round only; `--carry` does not enter it.
+
+Each step is held with a small tolerance (10⁻⁴, relative), since Gurobi accepts binaries within
+10⁻⁵ of 0 or 1 and a tighter hold can make the next step infeasible. Step 1 is held as one weighted
+sum of meetings and rule costs, so later steps may trade between those terms (one more meeting
+for one fewer conflicted member present, say).
+
+The time limit is split 40 % for step 1 (10 % for step 0, if any) and the rest equally over the
+other steps. Other modes
 are kept for comparison: `lexsum` (steps 1 and 3 only: the plan with least total waiting, to show
 the price of fairness), `lexmax` (step 2 on waiting alone), `lex` and `lexboth` (APAP-style equity
 bands on waiting per meeting), and the single-objective `proposal` (the book's original: least
@@ -121,7 +153,12 @@ meetings: the solutions are the best found, not proven optimal. Splitting the pr
 (meetings first, then the order within each meeting, like one APAP day) is the next step.
 
 **Output** (`--out <prefix>`): `<prefix>_agenda.csv` (meeting, position, application),
-`<prefix>_members.csv` (per member: proposals, meetings, slots, waiting, burden) and
+`<prefix>_members.csv` (per member: proposals, meetings, slots, waiting, burden, carry),
+`<prefix>_fairness.csv` (largest and mean burden, Gini coefficient, all burdens largest first,
+total waiting and meetings, the rank correlation of meetings and waiting, which is positive when
+frequent attenders also wait more, and the number of such pairs), `<prefix>_levels.csv` (per
+step the held value, and the solver's objective, bound and gap: with large gaps, a later step only improves on an earlier step's best
+found solution, not its optimum) and
 `<prefix>_coi_present.csv`. The log prints the value and bound of each step.
 
 ## The role model (`models/role_model.py`)
@@ -133,8 +170,13 @@ reader 1 (`--mode roles`), or all three reviewers and the editor (`--mode assign
   mode the spread of pay among experienced members is minimised, per proposal by default.
   Waiting is unpaid, and `--pay-per` can reward it with editor roles: per slot sat through
   (`presence`), per proposal plus waiting above the regression curve of waiting on meetings
-  (`fit`), or, recommended, pay per proposal rising in proportion to how far a member's waiting
-  per proposal is above the mean (`mean`: 50 % above the mean, 50 % more per proposal).
+  (`fit`), pay per proposal plus the unpaid burden above the mean burden (`burden`, recommended with
+  the stepwise schedule, since it uses the schedule's own measure; pass the schedule's `--alpha` or
+  `--alpha-file` here too if it was run with them), or pay per proposal rising in
+  proportion to how far a member's waiting per proposal is above the mean (`mean`: 50 % above the
+  mean, 50 % more per proposal). `mean` pays members who wait long because they attend rarely,
+  which the stepwise schedule intends, so it partly undoes the schedule; and with the 2/3 editor
+  cap pay per proposal can rise by only about 25-30 %. New members don't count towards either mean.
 * **Limits**: nobody is editor on more than 2/3 of their proposals (`max_editor_share`); new
   members are not editor before the midpoint of their meetings and then on at most 15 %
   (`new_editor_share`); in `assign` mode at most two new members review a proposal.
@@ -148,7 +190,12 @@ Output: `<prefix>_panel.csv`, in the format of `panel.csv`, so it can be schedul
 
 Checks an agenda against the rules of its scenario, independently of the model: held meetings as
 they were, closed meetings as planned, nothing added to the next meeting, per-member limits.
-`run_panel_scenarios.sh` runs it after every schedule.
+With `--keep-meetings` it checks that no proposal left its planned meeting, and with
+`--first-meeting-rule` that everyone has exactly one proposal in the first meeting; `--unavailable`
+and `--new-editor-from` check unavailable meetings and proposals edited by new members coming up too
+early (held meetings excepted). It also prints,
+without counting them as problems, the conflicted members present and the fairness measures of
+the agenda. `run_panel_scenarios.sh` runs it after every schedule.
 
 ## Running
 
@@ -174,6 +221,8 @@ MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_pan
 | `current` | the staff's meetings; only the order within each meeting |
 | `free` | the next meeting (M3) is announced; later meetings are re-planned |
 | `free_sum` | as `free`, without the fairness step (least total waiting, for comparison) |
+| `free_leximin` | as `free`, with `--fairness leximin` (the three largest burdens, `leximin_levels`) |
+| `free_noworse` | as `free_leximin`, and nobody worse off than in `current` where possible |
 | `free_max4` | as `free`, at most 4 own proposals per meeting |
 | `scratch` | the whole round from the start, nothing fixed |
 | `roles`, `roles_presence`, `roles_presence_free` | roles on the staff's meetings or on `free` |
@@ -189,6 +238,7 @@ Read by both models and shown as a table in the book; command-line options overr
 | Setting | Value | Meaning |
 |---|---|---|
 | `alpha` | 2 | cost of attending a meeting, in slots (chosen from an experiment with 0–4) |
+| `alpha_file` | none | CSV (member, alpha) of α per member, overriding `alpha` |
 | `max_per_meeting` | 15 | most proposals in a meeting |
 | `max_per_member` / `soft_max_per_member` | 5 / 4 | hard limit and soft cap on own proposals in a meeting |
 | `soft_max_weight` | 0.5 | cost per proposal above the soft cap |
@@ -197,6 +247,8 @@ Read by both models and shown as a table in the book; command-line options overr
 | `target_experienced` / `target_new` | 3.5 / 2.5 | target own proposals per meeting |
 | `new_editor_share`, `max_editor_share`, `max_new_per_proposal` | 0.15, 2/3, 2 | role limits |
 | `time_limit` | 600 s | default time limit |
+| `meetings_slack` | 0 | slack on the meetings step (step modes) |
+| `leximin_levels` | 3 | largest burdens fixed in turn with `--fairness leximin` (0: all) |
 
 `run_experiments.py` collects parameter experiments in a local SQLite file
 (`../data/tdf/experiments/`).

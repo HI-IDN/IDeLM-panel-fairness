@@ -311,8 +311,3 @@ eftir miðbik lotunnar.
 
 Í báðum líkönum er líka aukamarkmið, með minni vigt: að munurinn á fjölda lesara 1- og lesara
 2-hlutverka hjá hverjum fagráðsmanni sé sem minnstur, svo allir fái svipað rými í umræðunni.
-
-## Heimildir {.unnumbered}
-
-::: {#refs}
-:::
