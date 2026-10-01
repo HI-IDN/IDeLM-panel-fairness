@@ -180,6 +180,44 @@ $$
 fundir og síðan minnsta heildarbið, hver sem ber hana. Munurinn á þeim tveimur er verðið á
 sanngirninni.
 
+**Afbrigði**
+
+Fjórar viðbætur taka á fyrirvörunum hér að neðan. Engin þeirra hefur enn verið keyrð á öllum
+sviðsmyndunum.
+
+*Leximin* (`leximin`) kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; leximin ver líka þann næstverst setta, þann
+þar á eftir o.s.frv. Það er útfært með raðaðri lágmörkun hámarks [e. *ordered min-max*, @ogryczak2003]:
+í undirþrepi $k$ er summa $k$ stærstu byrðanna gerð sem minnst og síðan fest,
+
+$$
+\min \;\; \underbrace{k\, t_k + \sum_{r} \delta_{rk}}_{\text{summa } k \text{ stærstu byrða}}
+\;+\; \varepsilon \underbrace{\sum_r w_r}_{\text{heildarbið}}
+\qquad \text{þ.a.} \quad \delta_{rk} \ge B_r - t_k, \;\; \delta_{rk} \ge 0 \;\; \forall r ,
+$$
+
+þar sem $t_k$ verður $k$-ta stærsta byrðin í bestu lausn. Undirþrep 1 er það sama og þrep 2 hér að
+ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep; með 0 eru þau jafnmörg fagráðsmönnum.
+
+*Enginn verr settur* (`--no-worse-than`). Með viðmiðunarplani, t.d. tillögu starfsmanna, bætist við
+þrep 0 á undan öllum hinum:
+
+$$
+\min \;\; \underbrace{\sum_r \big(B_r - B_r^{\text{við}}\big)^+}_{\text{byrði umfram viðmiðunarplan}} ,
+$$
+
+þar sem $B_r^{\text{við}}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu. Ef reglurnar leyfa er
+gildið 0 og enginn er verr settur en þar; annars er umframbyrðin eins lítil og hægt er.
+
+*Svigrúm í þrepi 1* (`meetings_slack`). Þrep 1 er fest við gildi sitt *að viðbættu* svigrúmi. Þá má
+seinna þrep bæta við fundi þar sem það sparar a.m.k. $\alpha$ dagskrárliði af bið, og $\alpha$ fer
+að vega fundi á móti bið. Sjálfgefið svigrúm er `r num(config$meetings_slack %||% 0)`.
+
+*Byrði úr fyrri lotum* (`--carry`). Byrði sem fagráðsmaður ber með sér úr fyrri lotum, $C_r$, er
+bætt við $B_r$ í sanngirnisþrepunum, svo sá sem bar þungt í fyrra fær léttari lotu nú.
+
+Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
+námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er skráð með niðurstöðunum.
+
 ::: {.callout-note}
 ## Fyrra markfall
 
@@ -192,22 +230,24 @@ niðurstöður verða endurnýjaðar með þrepamarkfallinu.
 
 **Fyrirvarar við þrepamarkfallið**
 
-* **Aðeins sá verst setti er varinn.** Þrep 2 heldur mestu byrðinni niðri, en neðan hennar
+* **Í `lexburden` er aðeins sá verst setti varinn.** Þrep 2 heldur mestu byrðinni niðri, en neðan hennar
   lágmarkar þrep 3 aðeins heildarbið. Það er sama aðferð og olli upphaflega vandanum: sá sem mætir
   oft getur enn beðið lengur en sá sem mætir sjaldan, svo lengi sem hvorugur er sá verst setti. Á
   litlum tilbúnum dæmum helmingaði þrepamarkfallið um það bil fjölda slíkra para miðað við `lexsum`,
-  en *leximin*, sem ver næstverst setta, þann þar á eftir o.s.frv., fækkaði þeim enn frekar.
+  en leximin fækkaði þeim enn frekar. Því er mælt með leximin.
 * **Sanngirni sem fæst ókeypis er ekki alltaf tekin.** Í nokkrum tilbúnum dæmum var til önnur lausn
-  með sömu heildarbið þar sem næstverst settu fagráðsmennirnir voru betur settir.
+  með sömu heildarbið þar sem næstverst settu fagráðsmennirnir voru betur settir. Leximin tekur hana.
 * **Þrep 1 ræður fjölda funda áður en $\alpha$ hefur nokkuð að segja.** $\alpha$ vegur fundi á móti
   bið í þrepi 2, en þá er fjöldi funda þegar festur. Í raun metur þrep 1 einn fund meira en hvaða
   bið sem er. Hámarkið $\bar k$ og markgildin $t_r$ halda aftur af því, en $\alpha$ hefur minni áhrif
-  en ætla mætti.
+  en ætla mætti. Svigrúm í þrepi 1 dregur úr þessu.
 * **Þrep 1 er vegin summa**, ekki hreinn fjöldi funda: seinni þrep geta ekki skipt einum fundi
   fyrir eitt skipti sem vanhæfur bregður sér út, því summan er fest í heild.
 * **Bil í hverju þrepi.** Hvert þrep fær hluta tímamarkanna og er fest við bestu lausn sem fannst,
   ekki sannað besta gildi. Með 50–90 % bili er „lagskipt sanngjarnt“ því að hluta eiginleiki
   leitarinnar. Bilið í hverju þrepi er skráð og ætti að fylgja niðurstöðunum.
+* **Mælikvarðar eru reiknaðir úr dagskránni**, ekki úr breytum líkansins, svo þeir sýna hvað planið
+  gerir í raun. Í fyrri útgáfu var tilkynnt byrði of há um $n_r$, því eigin umsóknir voru taldar með.
 
 **Stillingar**
 
