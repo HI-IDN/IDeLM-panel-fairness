@@ -14,7 +14,7 @@ skref.
 * **Hverjir eru nýir byggir á minni höfundar.** Höfundur merkti nýja fagráðsmenn eftir minni, og
   merkingin getur verið röng. Hún tekur heldur ekki tillit til reynslu úr öðrum flokkum sjóðsins:
   fagráðsmaður sem hefur setið árum saman í Sprota er varla nýgræðingur þótt hann sé nýr í
-  Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin í sviðsmynd 4 ber að lesa með
+  Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin fyrir nýja ber að lesa með
   það í huga.
 * **1. lesari og 2. lesari fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
   yfirlitinu ráði því hver talar næstur á fundi.

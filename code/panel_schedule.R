@@ -8,10 +8,13 @@ library(tidyverse)
 # Scenarios: result file prefix -> label, in the order they are compared.
 scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
                free = "2. Næsti fundur festur, restin bestuð",
+               free_sum = "2a. Eins og 2, án sanngirnisþreps",
+               free_leximin = "2b. Eins og 2, leximin",
+               free_noworse = "2c. Eins og 2b, enginn verr settur en í 1",
                free_max4 = "3. Eins og 2, mest 4 á fund",
-               free_target = "4. Eins og 2, markgildi á fund",
-               scratch = "5. Bestað frá byrjun")
-scenario_colours <- setNames(c("#eb6834", "#2a78d6", "#1baf7a", "#e87ba4", "#4a3aa7"), scenarios)
+               scratch = "4. Bestað frá byrjun")
+scenario_colours <- setNames(c("#eb6834", "#2a78d6", "#8fb8ea", "#1f4f8f", "#e87ba4", "#1baf7a",
+                               "#4a3aa7"), scenarios)
 
 # Held meetings with a known agenda: per member, own proposals, slot of their last proposal (when
 # they may leave) and how many proposals of others they sat through before that.
@@ -158,10 +161,12 @@ plot_compare <- function(runs, value, title, fill_label, digits = 0) {
 summary_table <- function(runs) {
   runs %>%
     group_by(Sviðsmynd = droplevels(scenario)) %>%
-    summarise(`Versta byrði á umsókn` = max(burden_per_proposal),
+    summarise(`Mesta byrði` = max(burden),
+              `Fundir samtals` = sum(meetings),
               `Fundir sem mætt er á (bil)` = sprintf("%d–%d", min(meetings), max(meetings)),
               `Biðpunktar samtals` = sum(waiting),
-              `Biðpunktar á umsókn, mest` = max(waiting_per_proposal), .groups = "drop")
+              `Fylgni funda og biðar` = cor(meetings, waiting, method = "spearman"),
+              .groups = "drop")
 }
 
 # Solver time (minutes) and final gap (%) per scenario. The Gurobi logs stay local (they hold

@@ -228,11 +228,10 @@ námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er s
 ::: {.callout-note}
 ## Fyrra markfall
 
-Fyrri útgáfur líkansins, og niðurstöðurnar sem nú eru í @sec-scenarios, @sec-roles og @sec-assign,
-notuðu eitt vegið markfall: mestu byrði *á umsókn* (dagskrárliðir setnir, eigin umsóknir meðtaldar,
+Fyrri útgáfur líkansins notuðu eitt vegið markfall: mestu byrði *á umsókn* (dagskrárliðir setnir, eigin umsóknir meðtaldar,
 auk $\alpha_r$ á fund, deilt með $n_r$), að viðbættri meðalbyrði með lítilli vigt og sömu refsiliðum
-og í þrepi 1. Það umbunaði ekki beint tíðri mætingu og sá sem mætti oft beið líka oft lengi. Þær
-niðurstöður verða endurnýjaðar með þrepamarkfallinu.
+og í þrepi 1. Það umbunaði ekki beint tíðri mætingu og sá sem mætti oft beið líka oft lengi. Allar
+niðurstöður í greinargerðinni eru nú með þrepamarkfallinu.
 :::
 
 **Fyrirvarar við þrepamarkfallið**
@@ -300,14 +299,15 @@ ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem r
 | Þrír fagráðsmenn á hverja umsókn | $\sum_{r} z_{pr} = 3 \quad \forall p$ |
 | Ritstjórinn er einn af þeim þremur | $y_{pr} \le z_{pr} \quad \forall p, r$ |
 | Vanhæfur fagráðsmaður fjallar aldrei um umsóknina | $z_{pr} = 0 \quad \forall p,\ r \in V_p$ |
-| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin funda | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á fundi fyrir miðbik } r$ |
+| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin umsókna, í tímaröð (aðeins við jafna úthlutun) | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á undan miðbiki } r$ |
 | Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^{\text{nýr}}$ |
 
 **Endurúthlutun hlutverka** (@sec-roles): sömu þrír fagráðsmenn eru á hverri umsókn
 ($z_{pr}$ er fast), en líkanið velur hver þeirra er ritstjóri og hver er 1. lesari (talar næstur;
-$u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er 2. lesari. Nýr fagráðsmaður er ekki
-ritstjóri á fyrri helmingi sinna eigin funda, og eftir það á mest hlutfallinu $\rho$ af umsóknum
-sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn). Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
+$u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er 2. lesari. Nýr fagráðsmaður er
+ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn).
+Reglan um miðbik á ekki við hér, því starfsmenn völdu fagráðsmennina þrjá: umsókn með þremur nýjum
+sem er færð framar hefði annars engan mögulegan ritstjóra. Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
 má greiða fyrir byrði dagskrárinnar (`--pay-per burden`): fagráðsmenn sem bera meiri byrði
 (@eq-burden, með sama $\alpha_r$ og dagskráin) en meðaltal reyndra fá fleiri ritstjórahlutverk.
@@ -316,7 +316,8 @@ Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á
 mesta og minnsta fjölda umsókna á fagráðsmann og muninn á mesta og minnsta fjölda
-ritstjórahlutverka meðal reyndra. Nýir eru ritstjórar á mest tilteknum hluta umsókna sinna. Síðan er
+ritstjórahlutverka meðal reyndra. Nýir eru ritstjórar á mest tilteknum hluta umsókna sinna, og ekki á fyrri helmingi þeirra í
+tímaröð. Síðan er
 fundaskipanin bestuð frá grunni með líkaninu hér að ofan, þar sem nýir verða ekki ritstjórar fyrr en
 eftir miðbik lotunnar.
 

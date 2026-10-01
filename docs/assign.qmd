@@ -17,17 +17,11 @@ if (have_schedule) {
   runs <- read_scenarios(results)
   compare <- bind_rows(
     filter(runs, startsWith(as.character(scenario), "1.")),
-    filter(runs, startsWith(as.character(scenario), "5.")),
+    filter(runs, startsWith(as.character(scenario), "4.")),
     read_members(file.path(results, "assign_schedule"), "Jöfn úthlutun frá grunni")
   ) %>% mutate(scenario = factor(scenario, levels = unique(scenario)))
 }
 ```
-
-::: {.callout-warning}
-## Niðurstöður með fyrra markfalli
-Niðurstöðurnar í þessum kafla eru úr keyrslum með fyrra markfallinu (byrði á umsókn, $\alpha = 4$), ekki
-þrepamarkfallinu sem lýst er í @sec-model. Þær verða endurnýjaðar þegar nýjar keyrslur liggja fyrir.
-:::
 
 Hvað ef allir fagráðsmenn væru jafnhæfir til að fjalla um allar umsóknir, og lotan væri skipulögð
 frá grunni? Þá mætti skipta álaginu jafnt, svo enginn beri áberandi meira en aðrir. Þetta er
@@ -40,7 +34,8 @@ Bestað er lagskipt, í tveimur skrefum (@sec-model):
    1. lesari og 2. lesari. Ekkert er fest, ekki heldur fundir sem eru búnir. Vanhæfur fagráðsmaður
    fjallar aldrei um umsókn. Álagi er skipt jafnt á alla, og ritstjórahlutverkum jafnt á reynda
    fagráðsmenn; nýir eru ritstjórar á mest
-   `r scales::percent(config$new_editor_share)` umsókna sinna.
+   `r scales::percent(config$new_editor_share)` umsókna sinna, og ekki á fyrri helmingi þeirra í
+   tímaröð.
 2. **Fundir og röð.** Líkanið skipuleggur lotuna frá grunni fyrir þessa pörun: á fyrsta fundi mæta
    allir með eina umsókn hver, en eftir það er allt frjálst. Nýir fagráðsmenn eru ekki ritstjórar
    fyrr en eftir miðbik lotunnar (M5). Þar sem fundir hvers og eins eru ekki þekktir fyrr en í þessu
@@ -119,7 +114,7 @@ if (!have_schedule) {
 
 ```{r}
 #| label: tbl-assign-schedule
-#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við tillögu starfsmanna (sviðsmynd 1) og bestun frá byrjun með núverandi úthlutun (sviðsmynd 5)."
+#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við tillögu starfsmanna (sviðsmynd 1) og bestun frá byrjun með núverandi úthlutun (sviðsmynd 4)."
 #| eval: !expr have_schedule
 summary_table(compare) %>%
   rename(Skipulag = Sviðsmynd) %>%
