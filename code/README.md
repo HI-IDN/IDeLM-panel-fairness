@@ -184,8 +184,9 @@ reader 1 (`--mode roles`), or all three reviewers and the editor (`--mode assign
   which the stepwise schedule intends, so it partly undoes the schedule; and with the 2/3 editor
   cap pay per proposal can rise by only about 25-30 %. New members don't count towards either mean.
 * **Limits**: nobody is editor on more than 2/3 of their proposals (`max_editor_share`); new
-  members are not editor before the midpoint of their meetings and then on at most 15 %
-  (`new_editor_share`); in `assign` mode at most two new members review a proposal.
+  members are editor on at most 15 % of their proposals (`new_editor_share`); in `assign` mode
+  they are not editor before the midpoint of their own proposals (in time order), and at most two new members review a
+  proposal. In `roles` mode the staff chose the three, so the midpoint rule does not apply.
 * **Settled roles** are kept: held meetings always, and announced ones with `--keep-roles M3`.
 * **Room in the discussion**: the editor takes 3 parts, reader 1 2 and reader 2 1; with a smaller
   weight, the spread of room per proposal over members is kept small.
