@@ -61,10 +61,10 @@ check free_sum --next-meeting M3 --max-per-member 5
 # turn (leximin_levels in panel_model.yml; --leximin-levels 0 for all members, one solve each).
 run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
 check free_leximin --next-meeting M3 --max-per-member 5
-# As free_leximin, with a first step that keeps every member at most as burdened as in scenario 1
-# (the staff's meetings) where possible.
+# As free_leximin, with first steps that keep every member at most as burdened as in scenario 1
+# (the staff's meetings) where the rules allow it. Warm-started from that plan, which has no excess.
 run free_noworse --next-meeting M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
-  --start "$R/free_leximin_agenda.csv" --time-limit 1200
+  --start "$R/current_agenda.csv" --time-limit 1200
 check free_noworse --next-meeting M3 --max-per-member 5
 # 3. As 2, at most 4 own proposals per meeting.
 run free_max4 --next-meeting M3 --max-per-member 4 --start "$R/free_agenda.csv" --time-limit 1200
