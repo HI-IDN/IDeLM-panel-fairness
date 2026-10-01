@@ -19,7 +19,8 @@ per own proposal and, with a small weight, the total burden. The recommended one
 steps: first the fewest meetings attended (with the rule costs), then fairness of the unpaid burden
 alpha * meetings + waiting (the largest one with 'lexburden', or leximin with 'leximin', which
 protects every member and not only the worst-off one), then the least total waiting. A reference
-plan (`reference_burden`) adds a first step that keeps everyone at most as burdened as there.
+plan (`reference_burden`) adds two first steps: the rule costs alone, then keeping everyone at
+most as burdened as there.
 Reported measures are recomputed from the agenda (member_measures, fairness_metrics).
 
 Meetings that have already been held are fixed: their proposals stay in that meeting, and their
@@ -307,8 +308,9 @@ class PanelScheduleModel:
         leximin_levels:     with 'leximin', how many of the largest burdens are fixed in turn
                             (None or 0: all members)
         reference_burden:   step modes: {member: burden} of a reference plan (e.g. the staff's).
-                            A first step makes the total excess over it as small as possible, so
-                            nobody is worse off than in that plan where the rules allow it
+                            After a step for the rule penalties alone (conflicts, postponements),
+                            a step makes the total excess over it as small as possible, so nobody
+                            is worse off than in that plan where the rules allow it
         carry:              {member: burden carried over from earlier rounds}, added to each
                             member's burden in the fairness steps (lexburden, leximin). Not in
                             the reference step: that compares this round with a plan for the
@@ -769,11 +771,13 @@ class PanelScheduleModel:
             # Each step minimises only its own measure: a tie-break on waiting inside a fairness step
             # could trade a slightly larger burden (alpha and carry may be fractional) for less
             # waiting, and the last step settles the ties anyway.
-            # With a reference plan, a step 0 first makes the total excess burden over that plan
-            # as small as possible (zero when nobody needs to be worse off).
+            # With a reference plan, two steps come first: the rule penalties alone (a conflicted
+            # member present, a postponed proposal), then the total excess burden over that plan
+            # (zero when nobody needs to be worse off). The rules go first because the excess step
+            # would otherwise trade them for burden, and its value is held from then on.
             waiting = quicksum(self.leave.values()) - sum(len(trio) for trio in self.data.reviewers.values())
-            meetings = (quicksum(self.a.values()) + self.postpone_penalty * postponed
-                        + self.coi_penalty * quicksum(self.coi_present.values())
+            rules = self.postpone_penalty * postponed + self.coi_penalty * quicksum(self.coi_present.values())
+            meetings = (quicksum(self.a.values()) + rules
                         + len(self.data.members) * (self.target_weight * deviation + self.pair_weight * excess
                                                     + self.soft_max_weight * above_cap))
             least = waiting - self.learning_weight * self._learning()
@@ -797,7 +801,7 @@ class PanelScheduleModel:
                                      name=f'excess_reference[{r}]')
                     excess.append(e)
                 excess = quicksum(excess)
-                self.levels.insert(0, ('reference', excess, excess))
+                self.levels[:0] = [('rules', rules, rules), ('reference', excess, excess)]
             self.m.setObjective(self.levels[0][1], GRB.MINIMIZE)
             return
         fair = 0 if self.fairness == 'sum' else self.z
@@ -881,10 +885,10 @@ class PanelScheduleModel:
         while the next level is optimised. The time limit is split between the levels. Returns the
         value and bound of each level."""
         time_limit, reached = self.m.Params.TimeLimit, []
-        # The meetings step gets 40% of the time (the reference step, if any, 10%); the other steps
-        # share the rest equally.
+        # The meetings step gets 40% of the time (with a reference plan, the rules step 10% and the
+        # reference step 20%); the other steps share the rest equally.
         names = [name for name, _, _ in self.levels]
-        first = {'reference': 0.1, 'meetings': 0.4}
+        first = {'rules': 0.1, 'reference': 0.2, 'meetings': 0.4}
         rest = (1 - sum(first.get(n, 0) for n in names)) / max(1, sum(n not in first for n in names))
         shares = [first.get(n, rest) for n in names]
         for (name, objective, held), share in zip(self.levels, shares):
@@ -988,8 +992,9 @@ def main():
                         help='step modes: hold the meetings step at its value plus this slack, so later '
                              'steps may trade a meeting attended for alpha slots less waiting')
     parser.add_argument('--no-worse-than',
-                        help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); a '
-                             'first step keeps every member\'s burden at most theirs there where possible')
+                        help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); '
+                             'after a step for the rule costs (conflicts, postponements), a step keeps every '
+                             'member\'s burden at most theirs there where possible')
     parser.add_argument('--alpha-file',
                         help='CSV (member, alpha): alpha per member, e.g. as each member chose; others get --alpha')
     parser.add_argument('--carry', help='CSV (member, burden) of burden carried over from earlier rounds')
