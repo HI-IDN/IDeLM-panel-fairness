@@ -24,6 +24,10 @@ members: ../data/tdf/members.csv  # member, new (TRUE/FALSE); relative to code/
 target_experienced: 3.5
 target_new: 2.5
 target_weight: 0.5    # weight of the average deviation from the target, per member
+# New members are only readers in the first half of the round. The same meeting ends both:
+#   * with --new-editor-from, proposals they edit go to this meeting or later;
+#   * their waiting in the meetings before it gets the small learning discount (M^fyrri).
+new_editor_from: M5   # first meeting of the second half (null: the middle of the round)
 
 # More, shorter meetings (used with --more-meetings).
 extra_meetings: 6     # meetings added after the last planned one

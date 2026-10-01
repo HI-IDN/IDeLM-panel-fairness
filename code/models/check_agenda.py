@@ -147,8 +147,9 @@ def main():
     parser.add_argument('--alpha', type=float, default=2.0, help='cost of a meeting in the fairness measures')
     parser.add_argument('--alpha-file', help='CSV (member, alpha): alpha per member; others get --alpha')
     parser.add_argument('--unavailable', help='CSV of meetings members cannot attend (member, meeting)')
-    parser.add_argument('--new-editor-from',
-                        help='meeting from which proposals edited by new members may come up (e.g. M5)')
+    parser.add_argument('--new-editor-from', nargs='?', const='settings',
+                        help='meeting from which proposals edited by new members may come up (alone: '
+                             'new_editor_from in the settings, M5)')
     parser.add_argument('--config', default=os.path.join(os.path.dirname(__file__), 'panel_model.yml'),
                         help='YAML file with the model settings (for the list of new members)')
     args = parser.parse_args()
@@ -161,7 +162,12 @@ def main():
     not_before = {}
     if args.new_editor_from:
         with open(args.config, encoding='utf-8') as f:
-            new = read_new_members(yaml.safe_load(f)['members'])
+            config = yaml.safe_load(f)
+        new = read_new_members(config['members'])
+        if args.new_editor_from == 'settings':
+            args.new_editor_from = config.get('new_editor_from')
+            if not args.new_editor_from:
+                parser.error('--new-editor-from without a meeting needs new_editor_from in the settings')
         not_before = {p: args.new_editor_from for p, trio in data.reviewers.items() if trio[0] in new}
     with open(args.agenda, newline='', encoding='utf-8') as f:
         agenda = [(row['application'], row['meeting'], int(row['position'])) for row in csv.DictReader(f)]
