@@ -19,7 +19,8 @@ per own proposal and, with a small weight, the total burden. The recommended one
 steps: first the fewest meetings attended (with the rule costs), then fairness of the unpaid burden
 alpha * meetings + waiting (the largest one with 'lexburden', or leximin with 'leximin', which
 protects every member and not only the worst-off one), then the least total waiting. A reference
-plan (`reference_burden`) adds a first step that keeps everyone at most as burdened as there.
+plan (`reference_burden`) adds two first steps: the rule costs alone, then keeping everyone at
+most as burdened as there.
 Reported measures are recomputed from the agenda (member_measures, fairness_metrics).
 
 Meetings that have already been held are fixed: their proposals stay in that meeting, and their
@@ -991,8 +992,9 @@ def main():
                         help='step modes: hold the meetings step at its value plus this slack, so later '
                              'steps may trade a meeting attended for alpha slots less waiting')
     parser.add_argument('--no-worse-than',
-                        help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); a '
-                             'first step keeps every member\'s burden at most theirs there where possible')
+                        help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); '
+                             'after a step for the rule costs (conflicts, postponements), a step keeps every '
+                             'member\'s burden at most theirs there where possible')
     parser.add_argument('--alpha-file',
                         help='CSV (member, alpha): alpha per member, e.g. as each member chose; others get --alpha')
     parser.add_argument('--carry', help='CSV (member, burden) of burden carried over from earlier rounds')

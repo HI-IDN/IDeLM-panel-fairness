@@ -62,7 +62,7 @@ check free_sum --next-meeting M3 --max-per-member 5
 run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
 check free_leximin --next-meeting M3 --max-per-member 5
 # As free_leximin, with first steps that keep every member at most as burdened as in scenario 1
-# (the staff's meetings) where the rules allow it. Starts from that plan, the closest to it.
+# (the staff's meetings) where the rules allow it. Warm-started from that plan, which has no excess.
 run free_noworse --next-meeting M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
   --start "$R/current_agenda.csv" --time-limit 1200
 check free_noworse --next-meeting M3 --max-per-member 5

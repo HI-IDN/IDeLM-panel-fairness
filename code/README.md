@@ -127,21 +127,24 @@ Two further options apply to all the step modes:
 * `--meetings-slack s` holds step 1 at its value plus *s* instead of exactly. Step 1 otherwise
   treats a meeting attended as worth any amount of waiting, so α never gets to trade a meeting for
   α slots of waiting; a slack of one or two lets the later steps do that.
-* `--no-worse-than <agenda.csv>` adds two first steps: the rule penalties alone (a conflicted
-  member present, a postponed proposal), then the total excess of each member's burden over their
-  burden in a reference plan (e.g. the staff's meetings, scenario `current`), made as small as
-  possible: zero when nobody needs to be worse off. The rules come first, since the excess step is
-  held from then on and would otherwise buy less burden with conflicts. Start from the reference
-  plan (`--start`), which has no excess where it keeps the rules. The log lists anyone who still is. The
-  comparison is of this round only; `--carry` does not enter it.
+* `--no-worse-than <agenda.csv>` adds two first steps. Step −1 minimises the rule penalties alone:
+  a conflicted member present (one who still has an own proposal later in the meeting, so would
+  have to step out and come back in) and postponed proposals. Step 0 then makes the total excess
+  of each member's burden over their burden in a reference plan (e.g. the staff's meetings,
+  scenario `current`) as small as possible: zero when nobody needs to be worse off. The log lists
+  anyone who still is. The rules come first because step 0 is held from then on and would
+  otherwise buy less burden with conflicts. A warm start from the reference plan (`--start`)
+  gives step 0 a solution with no excess wherever that plan keeps the rules. The comparison is of
+  this round only; `--carry` does not enter it.
 
 Each step is held with a small tolerance (10⁻⁴, relative), since Gurobi accepts binaries within
 10⁻⁵ of 0 or 1 and a tighter hold can make the next step infeasible. Step 1 is held as one weighted
 sum of meetings and rule costs, so later steps may trade between those terms (one more meeting
-for one fewer conflicted member present, say).
+for one fewer conflicted member present, say); with a reference plan, step −1 already holds the
+rule costs, so only meetings and targets can move.
 
-The time limit is split 40 % for step 1 (10 % for step 0, if any) and the rest equally over the
-other steps. Other modes
+The time limit is split 40 % for step 1 (with a reference plan, 10 % for step −1 and 20 % for
+step 0) and the rest equally over the other steps. Other modes
 are kept for comparison: `lexsum` (steps 1 and 3 only: the plan with least total waiting, to show
 the price of fairness), `lexmax` (step 2 on waiting alone), `lex` and `lexboth` (APAP-style equity
 bands on waiting per meeting), and the single-objective `proposal` (the book's original: least
