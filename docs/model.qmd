@@ -299,7 +299,7 @@ ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem r
 | Þrír fagráðsmenn á hverja umsókn | $\sum_{r} z_{pr} = 3 \quad \forall p$ |
 | Ritstjórinn er einn af þeim þremur | $y_{pr} \le z_{pr} \quad \forall p, r$ |
 | Vanhæfur fagráðsmaður fjallar aldrei um umsóknina | $z_{pr} = 0 \quad \forall p,\ r \in V_p$ |
-| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin umsókna, í tímaröð (aðeins við jafna úthlutun) | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á undan miðbiki } r$ |
+| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin umsókna, í tímaröð (aðeins við jafna úthlutun á gefna fundi; ekki í endurúthlutun hlutverka, og ekki frá grunni, þar sem miðbik lotunnar er notað í fundaskipaninni) | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á undan miðbiki } r$ |
 | Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^{\text{nýr}}$ |
 
 **Endurúthlutun hlutverka** (@sec-roles): sömu þrír fagráðsmenn eru á hverri umsókn
@@ -316,8 +316,8 @@ Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á
 mesta og minnsta fjölda umsókna á fagráðsmann og muninn á mesta og minnsta fjölda
-ritstjórahlutverka meðal reyndra. Nýir eru ritstjórar á mest tilteknum hluta umsókna sinna, og ekki á fyrri helmingi þeirra í
-tímaröð. Síðan er
+ritstjórahlutverka meðal reyndra. Nýir eru ritstjórar á mest tilteknum hluta umsókna sinna. Þar sem fundir eru ekki enn þekktir á þessu
+stigi á miðbiksreglan ekki við hér. Síðan er
 fundaskipanin bestuð frá grunni með líkaninu hér að ofan, þar sem nýir verða ekki ritstjórar fyrr en
 eftir miðbik lotunnar.
 
