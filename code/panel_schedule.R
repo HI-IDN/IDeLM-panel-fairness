@@ -146,11 +146,21 @@ plot_compare <- function(runs, value, title, fill_label, digits = 0) {
   runs <- runs %>%
     mutate(member = factor(member, levels = order),
            number = factor(sub("[.].*", "", scenario), levels = sub("[.].*", "", levels(scenario))))
-  ggplot(runs, aes(x = number, y = member, fill = v)) +
+  # Distinct colour steps rather than a smooth gradient, so neighbouring values are easy to tell
+  # apart: one colour per value for a few whole numbers (meetings), otherwise binned.
+  few_values <- all(runs$v == round(runs$v)) && n_distinct(runs$v) <= 9
+  if (few_values) {
+    runs <- runs %>% mutate(fill = factor(v, levels = sort(unique(v))))
+    fill_scale <- scale_fill_brewer(palette = "YlOrRd", name = fill_label, guide = guide_legend(reverse = TRUE))
+  } else {
+    runs <- runs %>% mutate(fill = v)
+    fill_scale <- scale_fill_fermenter(palette = "YlOrRd", direction = 1, n.breaks = 7, name = fill_label)
+  }
+  ggplot(runs, aes(x = number, y = member, fill = fill)) +
     geom_tile(colour = "white", linewidth = 0.8) +
     geom_text(aes(label = format(round(v, digits), nsmall = digits, decimal.mark = ","),
-                  colour = v > (min(v) + max(v)) / 2), size = 3) +
-    scale_fill_viridis_c(option = "mako", direction = -1, begin = 0.15, end = 0.85, name = fill_label) +
+                  colour = v > min(v) + 0.6 * (max(v) - min(v))), size = 3) +
+    fill_scale +
     scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "black"), guide = "none") +
     scale_x_discrete(position = "top") +
     labs(title = title, x = "Sviðsmynd", y = NULL) +
