@@ -86,8 +86,10 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   eitt markmið án þess að annað versni, t.d. með því að herða skorður á einu markmiði í skrefum
   (e. *ε-constraint*) og besta hin. Framlínuna mætti sýna fagráðinu og TÞS, svo þau velji sjálf
   punkt á henni og sjái hvað hver kostur kostar.
-* **Enginn verr settur en í tillögu starfsmanna** (*í kóða*). Skorða sem tryggir að byrði hvers fagráðsmanns sé
-  ekki meiri en í tillögu starfsmanna, og birta hve margir eru betur settir.
+* **Enginn verr settur en í tillögu starfsmanna** (*í kóða*). Þrep 0 lágmarkar summu
+  þeirrar byrði sem er umfram byrðina í tillögu starfsmanna. Aðeins ef sú summa verður 0 er tryggt
+  að enginn sé verr settur; annars er umframbyrðin eins lítil og reglurnar leyfa. Birta ætti hve
+  margir eru betur settir og hve margir verr.
 * **Skipta vandanum upp.** Fyrst fundir, svo röð innan hvers fundar, sem er einfalt verkefni á einni
   vél fyrir hvern fund. Þar sem fundir eru innbyrðis skiptanlegir gætu mengjaskiptingarlíkön
   (e. *set partitioning*, *branch-and-price*) lokað bilinu.
