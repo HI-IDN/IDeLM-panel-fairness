@@ -78,7 +78,10 @@ fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við s�
 
 Sumir fagráðsmenn vita fyrir fram að þeir komast ekki á tiltekna fundi vegna annarra skuldbindinga.
 Líkanið getur tekið tillit til þess: umsóknir viðkomandi eru þá ekki settar á þá fundi, og líkanið
-reynir áfram að halda fjölda funda sem hann þarf að mæta á, og bið hans á þeim, í lágmarki.
+reynir áfram að halda fjölda funda sem hann þarf að mæta á, og bið hans á þeim, í lágmarki. Ef umsókn er
+fest á fund sem einhver fagráðsmanna hennar kemst ekki á, stoppar líkanið með villu sem nefnir
+umsóknina og fundinn, í stað þess að skila ógerlegu líkani; sama gildir ef hún er fest á fund áður
+en hún má koma fyrir.
 
 ## Vanhæfi
 

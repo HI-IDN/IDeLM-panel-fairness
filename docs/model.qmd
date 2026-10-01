@@ -148,7 +148,6 @@ $$
 
 $$
 F_2 = \min \;\; \underbrace{z}_{\text{mesta byrði}}
-\;+\; \varepsilon \, \underbrace{\sum_{r} w_r}_{\text{heildarbið}}
 \qquad \text{þ.a.} \quad F_1\text{-liðirnir} \le F_1^*, \quad B_r \le z \;\; \forall r .
 $$
 
@@ -169,8 +168,8 @@ $$
   umsókn **yfir mjúka hámarkinu** $\bar k_s$ kostar $s$.
 * **Mesta byrði** (þrep 2) er sanngirnisþrepið. Þar sem byrðin er $\alpha_r$ á hvern fund auk biðar
   má fagráðsmaður sem mætir á einum fundi fleiri bíða $\alpha_r$ dagskrárliðum skemur en hinn, og
-  þeir sem mæta oft fá því að fara fyrr. **Heildarbið** með örlítilli vigt $\varepsilon$ velur á milli
-  jafngóðra lausna.
+  þeir sem mæta oft fá því að fara fyrr. Hvert sanngirnisþrep lágmarkar aðeins eigin mælikvarða;
+  jafntefli eru útkljáð í þrepi 3.
 * **Heildarbið** (þrep 3) nýtir það svigrúm sem eftir er: enginn bíður að óþörfu, svo lengi sem
   enginn fer upp fyrir mestu byrðina úr þrepi 2. Nýir fagráðsmenn ($R^{\text{nýr}}$) fá lítinn
   **afslátt** $\lambda$ fyrir að sitja lengur á fyrri helmingi lotunnar ($M^{\text{fyrri}}$), því þeir
@@ -191,12 +190,13 @@ sviðsmyndunum.
 
 $$
 \min \;\; \underbrace{k\, t_k + \sum_{r} \delta_{rk}}_{\text{summa } k \text{ stærstu byrða}}
-\;+\; \varepsilon \underbrace{\sum_r w_r}_{\text{heildarbið}}
 \qquad \text{þ.a.} \quad \delta_{rk} \ge B_r - t_k, \;\; \delta_{rk} \ge 0 \;\; \forall r ,
 $$
 
 þar sem $t_k$ verður $k$-ta stærsta byrðin í bestu lausn. Undirþrep 1 er það sama og þrep 2 hér að
-ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep; með 0 eru þau jafnmörg fagráðsmönnum.
+ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep, svo þetta er *stýfð* leximin: þrjár
+stærstu byrðarnar eru festar, og þrep 3 sér um hinar. Með 0 eru undirþrepin jafnmörg fagráðsmönnum,
+og hvert þeirra er sérstök bestun.
 
 *Enginn verr settur* (`--no-worse-than`). Með viðmiðunarplani, t.d. tillögu starfsmanna, bætist við
 þrep 0 á undan öllum hinum:
@@ -205,15 +205,18 @@ $$
 \min \;\; \underbrace{\sum_r \big(B_r - B_r^{\text{við}}\big)^+}_{\text{byrði umfram viðmiðunarplan}} ,
 $$
 
-þar sem $B_r^{\text{við}}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu. Ef reglurnar leyfa er
-gildið 0 og enginn er verr settur en þar; annars er umframbyrðin eins lítil og hægt er.
+þar sem $B_r^{\text{við}}$ er byrði fagráðsmanns $r$ í viðmiðunarplaninu, reiknuð úr dagskrá þess
+með sama $\alpha_r$ og óstýfð. Ef reglurnar leyfa er gildið 0 og enginn er verr settur en þar;
+annars er umframbyrðin eins lítil og hægt er. Byrði úr fyrri lotum (hér að neðan) er ekki með í
+þessum samanburði, því viðmiðunarplanið er fyrir sömu lotu.
 
 *Svigrúm í þrepi 1* (`meetings_slack`). Þrep 1 er fest við gildi sitt *að viðbættu* svigrúmi. Þá má
 seinna þrep bæta við fundi þar sem það sparar a.m.k. $\alpha$ dagskrárliði af bið, og $\alpha$ fer
 að vega fundi á móti bið. Sjálfgefið svigrúm er `r num(config$meetings_slack %||% 0)`.
 
 *Byrði úr fyrri lotum* (`--carry`). Byrði sem fagráðsmaður ber með sér úr fyrri lotum, $C_r$, er
-bætt við $B_r$ í sanngirnisþrepunum, svo sá sem bar þungt í fyrra fær léttari lotu nú.
+bætt við $B_r$ í sanngirnisþrepunum (þrepi 2 eða leximin), svo sá sem bar þungt í fyrra fær léttari
+lotu nú. $C_r$ má vera neikvætt.
 
 Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
 námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er skráð með niðurstöðunum.
@@ -300,7 +303,10 @@ ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem r
 $u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er lesari 2. Nýr fagráðsmaður er ekki
 ritstjóri á fyrri helmingi sinna eigin funda, og eftir það á mest hlutfallinu $\rho$ af umsóknum
 sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn). Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
-reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum.
+reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
+má greiða fyrir byrði dagskrárinnar (`--pay-per burden`): fagráðsmenn sem bera meiri byrði
+(@eq-burden, með sama $\alpha_r$ og dagskráin) en meðaltal reyndra fá fleiri ritstjórahlutverk.
+Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
 
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á

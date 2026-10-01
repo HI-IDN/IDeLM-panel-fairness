@@ -48,10 +48,10 @@ skref.
   fagráðsmönnum. Sama á við um valið á heildarbyrði frekar en byrði á fund (@sec-fairness-relative).
 * **Föst áætlun.** Líkanið gerir ráð fyrir að allir mæti og að allt fari eftir dagskrá. Forföll,
   frestanir og vanhæfi sem kemur fram seint eru ekki í líkaninu.
-* **Rýni dagskrár er ekki tæmandi.** Hver dagskrá er yfirfarin með sjálfstæðu forriti
-  (`check_agenda.py`), sem reiknar líka alla mælikvarða úr dagskránni sjálfri. Það athugar fyrsta
-  fund og umsóknir sem eiga að haldast á sínum fundi og telur vanhæfa viðstadda, en ekki enn fundi
-  sem fagráðsmaður kemst ekki á né umsóknir sem mega ekki koma fyrir tiltekinn fund.
+* **Rýni dagskrár.** Hver dagskrá er yfirfarin með sjálfstæðu forriti (`check_agenda.py`), sem
+  reiknar líka alla mælikvarða úr dagskránni sjálfri. Það athugar fyrsta fund, umsóknir sem eiga að
+  haldast á sínum fundi, fundi sem fagráðsmaður kemst ekki á og fyrsta fund nýrra ritstjóra, og
+  telur vanhæfa viðstadda á sama hátt og líkanið. Það athugar ekki hvort dagskráin sé sú besta.
 * **Gagnsæi.** Þriggja þrepa bestun, sem veltur á tímamörkum, er erfitt fyrir fagráðsmenn að
   sannreyna sjálfir. Einfaldar, birtar reglur (hámark, regla um að sá sem beið síðast fari fyrr
   næst) gætu sannfært betur, og líkanið mætti nota til að sýna hvað þær kosta.
