@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run all review-panel scenarios of the book (docs/scenarios.qmd and docs/assign.qmd). Run from code/.
-# Each scenario writes <name>_agenda.csv, <name>_members.csv, <name>_coi_present.csv and a log to
+# Each scenario writes <name>_agenda.csv, <name>_members.csv, <name>_coi_present.csv,
+# <name>_fairness.csv (fairness measures), <name>_levels.csv (value, bound and gap of each step) and a log to
 # ../data/tdf/results/. Each scenario starts from the solution of the one before (--start).
 #
 # Optional environment variables, e.g. to try another objective without touching the book's results:
@@ -49,13 +50,20 @@ roles() {  # roles <name> <role model options...>: reviewers and roles (models/r
 # the staff's meetings, which have up to 6, so it is checked against 6.
 # 1. The staff's meetings, fair order within each meeting.
 run current --keep-meetings --fix-meetings M3 --time-limit 300
-check current --closed M3 --max-per-member 6
+check current --closed M3 --max-per-member 6 --keep-meetings
 # 2. Next meeting (M3) fixed, later meetings re-optimised.
 run free --next-meeting M3 --start "$R/current_agenda.csv" --time-limit 1200
 check free --next-meeting M3 --max-per-member 5
 # 2 for comparison: no fairness step, the fewest meetings and then the least total waiting.
 run free_sum --next-meeting M3 --fairness lexsum --start "$R/free_agenda.csv" --time-limit 1200
 check free_sum --next-meeting M3 --max-per-member 5
+# 2 with leximin of the burden instead of only the worst-off member, and with a first step that
+# keeps every member at most as burdened as in scenario 1 (the staff's meetings) where possible.
+run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
+check free_leximin --next-meeting M3 --max-per-member 5
+run free_noworse --next-meeting M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
+  --start "$R/free_leximin_agenda.csv" --time-limit 1200
+check free_noworse --next-meeting M3 --max-per-member 5
 # 3. As 2, at most 4 own proposals per meeting.
 run free_max4 --next-meeting M3 --max-per-member 4 --start "$R/free_agenda.csv" --time-limit 1200
 check free_max4 --next-meeting M3 --max-per-member 4
