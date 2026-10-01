@@ -39,19 +39,20 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    auglýst, því fagráðsmenn hafa undirbúið sig fyrir auglýstu umsóknirnar. Auglýstri umsókn má þó
    fresta á seinni fund, eins og við manneklu, en það kostar í markfallinu. Seinni fundir (M4–M9)
    eru óskorðaðir: líkanið má raða umsóknum á þá upp á nýtt, þar á meðal umsóknum sem eru ekki enn
-   komnar á fund.
-   a. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
-   b. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
+   komnar á fund. Fjögur afbrigði eru borin saman, sem eru ólík aðeins í markfallinu:
+   a. **`lexburden`:** þrepamarkfallið eins og það er sett fram í @sec-model.
+   b. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
+   c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
-   c. **Enginn verr settur en í 1:** eins og 2b, en fyrst er umframbyrði hvers og eins miðað við
+   d. **Enginn verr settur en í 1:** eins og 2c, en fyrst er umframbyrði hvers og eins miðað við
       sviðsmynd 1 gerð sem minnst. Lausnin byrjar á plani sviðsmyndar 1.
-3. **Eins og 2, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi,
+3. **Eins og 2a, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi,
    líka á næsta fundi; þar sem það er ekki hægt öðruvísi er umsókn frestað.
 4. **Bestað frá byrjun:** ekkert er fest, hvorki M1 né M2. Líkanið skipuleggur alla lotuna frá
-   grunni, með sömu skorðum og í sviðsmynd 2, þar á meðal að allir mæti á fyrsta fund með eina
+   grunni, með sömu skorðum og í sviðsmynd 2a, þar á meðal að allir mæti á fyrsta fund með eina
    umsókn hver. Þetta sýnir hvernig betra upphafsplan hefði getað litið út.
 
-Munurinn á 1 og 2 sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; 2a–2c sýna
+Munurinn á 1 og 2b sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; 2a–2d sýna
 hvaða máli markfallið skiptir; sviðsmynd 4 sýnir hvað hefði unnist með því að besta frá upphafi
 lotunnar. Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
@@ -131,24 +132,24 @@ cat(paste0(
 
 ",
 "* **Byrjunin skiptir miklu.** Engin sviðsmynd var leyst til enda innan tímamarka; bilið að neðri ",
-"marki er stórt (dálkurinn *Bil*). Sviðsmynd 2c, sem byrjaði á plani starfsmanna, er best þeirra sem halda fyrstu fundunum, á öllum ",
-"mælikvörðum: mesta byrði ", res("2c", "Mesta byrði"), " á móti ", res(1, "Mesta byrði"),
-" í tillögu starfsmanna, ", res("2c", "Fundir samtals"), " fundarsetur á móti ", res(1, "Fundir samtals"),
-" og ", res("2c", "Biðpunktar samtals"), " biðpunktar á móti ", res(1, "Biðpunktar samtals"), ". ",
-"Plan hennar er líka leyfilegt í sviðsmynd 2, svo 2 hefði getað náð jafn langt með betri byrjun eða ",
+"marki er stórt (dálkurinn *Bil*). Sviðsmynd 2d, sem byrjaði á plani starfsmanna, er best þeirra sem halda fyrstu fundunum á flestum ",
+"mælikvörðum: mesta byrði ", res("2d", "Mesta byrði"), " á móti ", res(1, "Mesta byrði"),
+" í tillögu starfsmanna, ", res("2d", "Fundir samtals"), " fundarsetur á móti ", res(1, "Fundir samtals"),
+" og ", res("2d", "Biðpunktar samtals"), " biðpunktar á móti ", res(1, "Biðpunktar samtals"), ". ",
+"Plan hennar er líka leyfilegt í sviðsmynd 2a, svo 2a hefði getað náð jafn langt með betri byrjun eða ",
 "meiri tíma.
 ",
 "* **Þrepamarkfallið eitt og sér eyðir ekki gallanum.** Fylgni funda og biðar er ",
-res(1, "Fylgni funda og biðar"), " í tillögu starfsmanna og ", res(2, "Fylgni funda og biðar"),
-" í sviðsmynd 2: þeir sem mæta oftast bíða enn mest, því þrep 2 ver aðeins þann verst setta. ",
-"Aðeins 2c lækkar hana að ráði (", res("2c", "Fylgni funda og biðar"), ").
+res(1, "Fylgni funda og biðar"), " í tillögu starfsmanna og ", res("2a", "Fylgni funda og biðar"),
+" í sviðsmynd 2a: þeir sem mæta oftast bíða enn mest, því þrep 2 ver aðeins þann verst setta. ",
+"Aðeins 2d lækkar hana að ráði (", res("2d", "Fylgni funda og biðar"), ").
 ",
-"* **Fæstir fundir kosta byrði.** `leximin` (2b) fann plan með fæstum fundum (",
-res("2b", "Fundir samtals"), "), en þar sem fundirnir eru festir fyrst varð mesta byrðin hærri (",
-res("2b", "Mesta byrði"), "). Þetta er verðið á því að setja fjölda funda ofar sanngirni.
+"* **Fæstir fundir kosta byrði.** `leximin` (2c) fann plan með fæstum fundum (",
+res("2c", "Fundir samtals"), "), en þar sem fundirnir eru festir fyrst varð mesta byrðin hærri (",
+res("2c", "Mesta byrði"), "). Þetta er verðið á því að setja fjölda funda ofar sanngirni.
 ",
 "* **Bestun frá byrjun skilar ekki meiru.** Sviðsmynd 4, þar sem ekkert er fest, gefur mestu byrði ",
-res(4, "Mesta byrði"), " og ", res(4, "Biðpunktar samtals"), " biðpunkta, ekki betra en 2c. Með þessum ",
+res(4, "Mesta byrði"), " og ", res(4, "Biðpunktar samtals"), " biðpunkta, ekki betra en 2d. Með þessum ",
 "tímamörkum skiptir góð byrjun meira en að losa um fyrstu fundina.
 ",
 "* **Vanhæfir viðstaddir:** ", res(1, "Vanhæfir viðstaddir"), " í tillögu starfsmanna, ",
@@ -191,7 +192,7 @@ Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðs
 #| eval: !expr have_results
 # Best scenario without planning from scratch: the lowest worst-off burden among scenarios 2-3.
 candidates <- runs %>%
-  filter(sub("[.].*", "", as.character(scenario)) %in% c("2", "2a", "2b", "2c", "3")) %>%
+  filter(sub("[.].*", "", as.character(scenario)) %in% c("2a", "2b", "2c", "2d", "3")) %>%
   group_by(scenario) %>% summarise(worst = max(burden), .groups = "drop")
 best <- as.character(candidates$scenario[which.min(candidates$worst)])
 best_number <- sub("[.].*", "", best)
@@ -244,7 +245,7 @@ takmarkað álag á meðan þeir eru að læra.
 ## Handvirkt plan og bestað plan {#sec-plans}
 
 Hér er tillaga starfsmanna TÞS, sem er gerð handvirkt, borin saman við bestaða lausn líkansins úr
-sviðsmynd 2: engri umsókn er bætt á næsta fund (M3), og líkanið raðar umsóknum á seinni fundi. Í báðum plönum eru **sömu fagráðsmenn paraðir við sömu umsóknir**, í sömu
+sviðsmynd 2a: engri umsókn er bætt á næsta fund (M3), og líkanið raðar umsóknum á seinni fundi. Í báðum plönum eru **sömu fagráðsmenn paraðir við sömu umsóknir**, í sömu
 hlutverkum; það eina sem breytist er **á hvaða fundi** umsókn er tekin fyrir og **í hvaða röð**.
 Að lokum er dregið saman hvaða mælikvarðar breytast.
 
@@ -276,41 +277,41 @@ plot_meetings(panel)
 plot_meetings(schedules[["current"]])
 ```
 
-#### 2. Næsti fundur festur
+#### 2a. Næsti fundur festur
 
 ```{r}
 #| label: fig-meetings-free
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2."
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2a."
 #| fig-height: 6
 #| eval: !expr '"free" %in% names(schedules)'
 plot_meetings(schedules[["free"]])
 ```
 
-#### 2a. Án sanngirnisþreps
+#### 2b. Án sanngirnisþreps
 
 ```{r}
 #| label: fig-meetings-free-sum
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2a."
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2b."
 #| fig-height: 6
 #| eval: !expr '"free_sum" %in% names(schedules)'
 plot_meetings(schedules[["free_sum"]])
 ```
 
-#### 2b. `leximin`
+#### 2c. `leximin`
 
 ```{r}
 #| label: fig-meetings-free-leximin
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2b."
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2c."
 #| fig-height: 6
 #| eval: !expr '"free_leximin" %in% names(schedules)'
 plot_meetings(schedules[["free_leximin"]])
 ```
 
-#### 2c. Enginn verr settur
+#### 2d. Enginn verr settur
 
 ```{r}
 #| label: fig-meetings-free-noworse
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2c."
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 2d."
 #| fig-height: 6
 #| eval: !expr '"free_noworse" %in% names(schedules)'
 plot_meetings(schedules[["free_noworse"]])
@@ -362,41 +363,41 @@ plot_attendance(panel)
 plot_attendance(schedules[["current"]])
 ```
 
-#### 2. Næsti fundur festur
+#### 2a. Næsti fundur festur
 
 ```{r}
 #| label: fig-attendance-free
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2a."
 #| fig-height: 6
 #| eval: !expr '"free" %in% names(schedules)'
 plot_attendance(schedules[["free"]])
 ```
 
-#### 2a. Án sanngirnisþreps
+#### 2b. Án sanngirnisþreps
 
 ```{r}
 #| label: fig-attendance-free-sum
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2a."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2b."
 #| fig-height: 6
 #| eval: !expr '"free_sum" %in% names(schedules)'
 plot_attendance(schedules[["free_sum"]])
 ```
 
-#### 2b. `leximin`
+#### 2c. `leximin`
 
 ```{r}
 #| label: fig-attendance-free-leximin
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2b."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2c."
 #| fig-height: 6
 #| eval: !expr '"free_leximin" %in% names(schedules)'
 plot_attendance(schedules[["free_leximin"]])
 ```
 
-#### 2c. Enginn verr settur
+#### 2d. Enginn verr settur
 
 ```{r}
 #| label: fig-attendance-free-noworse
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2c."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 2d."
 #| fig-height: 6
 #| eval: !expr '"free_noworse" %in% names(schedules)'
 plot_attendance(schedules[["free_noworse"]])
@@ -446,7 +447,7 @@ plot_attendance(schedules[["scratch"]])
 #| tbl-cap: "Tillaga starfsmanna og bestað plan borin saman. Röðin innan funda er ekki hluti af tillögu starfsmanna, svo biðpunktar, byrði og vanhæfir viðstaddir eru reiknaðir með sanngjarnri röð innan funda hennar (sviðsmynd 1). Munurinn sýnir því aðeins áhrif þess að færa umsóknir á milli funda."
 #| eval: !expr have_plan
 staff_run <- filter(runs, startsWith(as.character(scenario), "1."))
-opt_run <- filter(runs, startsWith(as.character(scenario), "2."))
+opt_run <- filter(runs, startsWith(as.character(scenario), "2a."))
 fmt <- function(x) format(round(x, 2), decimal.mark = ",")
 range_med <- function(x) sprintf("%d–%d (miðgildi %s)", min(x), max(x), fmt(median(x)))
 tibble(
@@ -504,11 +505,11 @@ plot_exit_heatmap(schedules[["current"]])
 plot_exit_flow_interactive(schedules[["current"]])
 ```
 
-#### 2. Næsti fundur festur
+#### 2a. Næsti fundur festur
 
 ```{r}
 #| label: fig-exit-heat-free
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2a."
 #| fig-height: 7
 #| fig-width: 8
 #| eval: !expr '"free" %in% names(schedules)'
@@ -517,18 +518,18 @@ plot_exit_heatmap(schedules[["free"]])
 
 ```{r}
 #| label: fig-exit-free
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2a. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free" %in% names(schedules)'
 plot_exit_flow_interactive(schedules[["free"]])
 ```
 
-#### 2a. Án sanngirnisþreps
+#### 2b. Án sanngirnisþreps
 
 ```{r}
 #| label: fig-exit-heat-free-sum
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2a."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2b."
 #| fig-height: 7
 #| fig-width: 8
 #| eval: !expr '"free_sum" %in% names(schedules)'
@@ -537,18 +538,18 @@ plot_exit_heatmap(schedules[["free_sum"]])
 
 ```{r}
 #| label: fig-exit-free-sum
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2a. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2b. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_sum" %in% names(schedules)'
 plot_exit_flow_interactive(schedules[["free_sum"]])
 ```
 
-#### 2b. `leximin`
+#### 2c. `leximin`
 
 ```{r}
 #| label: fig-exit-heat-free-leximin
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2b."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2c."
 #| fig-height: 7
 #| fig-width: 8
 #| eval: !expr '"free_leximin" %in% names(schedules)'
@@ -557,18 +558,18 @@ plot_exit_heatmap(schedules[["free_leximin"]])
 
 ```{r}
 #| label: fig-exit-free-leximin
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2b. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2c. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_leximin" %in% names(schedules)'
 plot_exit_flow_interactive(schedules[["free_leximin"]])
 ```
 
-#### 2c. Enginn verr settur
+#### 2d. Enginn verr settur
 
 ```{r}
 #| label: fig-exit-heat-free-noworse
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2c."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2d."
 #| fig-height: 7
 #| fig-width: 8
 #| eval: !expr '"free_noworse" %in% names(schedules)'
@@ -577,7 +578,7 @@ plot_exit_heatmap(schedules[["free_noworse"]])
 
 ```{r}
 #| label: fig-exit-free-noworse
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2c. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2d. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_noworse" %in% names(schedules)'

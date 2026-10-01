@@ -7,11 +7,11 @@ library(tidyverse)
 
 # Scenarios: result file prefix -> label, in the order they are compared.
 scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
-               free = "2. Næsti fundur festur, restin bestuð",
-               free_sum = "2a. Eins og 2, án sanngirnisþreps",
-               free_leximin = "2b. Eins og 2, leximin",
-               free_noworse = "2c. Eins og 2b, enginn verr settur en í 1",
-               free_max4 = "3. Eins og 2, mest 4 á fund",
+               free = "2a. Næsti fundur festur, restin bestuð",
+               free_sum = "2b. Eins og 2a, án sanngirnisþreps",
+               free_leximin = "2c. Eins og 2a, leximin",
+               free_noworse = "2d. Eins og 2c, enginn verr settur en í 1",
+               free_max4 = "3. Eins og 2a, mest 4 á fund",
                scratch = "4. Bestað frá byrjun")
 scenario_colours <- setNames(c("#eb6834", "#2a78d6", "#8fb8ea", "#1f4f8f", "#e87ba4", "#1baf7a",
                                "#4a3aa7"), scenarios)
