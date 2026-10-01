@@ -116,7 +116,9 @@ Step 2 protects only the member with the largest burden; everyone below it is le
 favours whoever is quickest to serve, and that is how the original model came to make frequent
 attenders wait more. `--fairness leximin` therefore replaces step 2 by a series (Ogryczak's ordered
 min-max): the smallest largest burden, then the smallest sum of the two largest, and so on, for
-`leximin_levels` steps (default 3; 0 for all members). On small test instances this never gave a
+`leximin_levels` steps. The default, 3, is a truncated leximin: it fixes the three largest
+burdens in turn and leaves the rest to step 3, to keep runs short; 0 fixes every member's, at the
+cost of one more solve per member. On small test instances this never gave a
 worse burden vector than `lexburden`, often a better one at the same total waiting, and fewer pairs
 where the member who attends more also waits more.
 
@@ -154,8 +156,7 @@ meetings: the solutions are the best found, not proven optimal. Splitting the pr
 `<prefix>_fairness.csv` (largest and mean burden, Gini coefficient, all burdens largest first,
 total waiting and meetings, the rank correlation of meetings and waiting, which is positive when
 frequent attenders also wait more, and the number of such pairs), `<prefix>_levels.csv` (per
-step the held value, and the solver's objective, bound and gap, which for the fairness steps include
-a tiny tie-break on waiting: with large gaps, a later step only improves on an earlier step's best
+step the held value, and the solver's objective, bound and gap: with large gaps, a later step only improves on an earlier step's best
 found solution, not its optimum) and
 `<prefix>_coi_present.csv`. The log prints the value and bound of each step.
 
@@ -218,7 +219,7 @@ MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_pan
 | `current` | the staff's meetings; only the order within each meeting |
 | `free` | the next meeting (M3) is announced; later meetings are re-planned |
 | `free_sum` | as `free`, without the fairness step (least total waiting, for comparison) |
-| `free_leximin` | as `free`, with `--fairness leximin` |
+| `free_leximin` | as `free`, with `--fairness leximin` (the three largest burdens, `leximin_levels`) |
 | `free_noworse` | as `free_leximin`, and nobody worse off than in `current` where possible |
 | `free_max4` | as `free`, at most 4 own proposals per meeting |
 | `scratch` | the whole round from the start, nothing fixed |

@@ -57,7 +57,8 @@ check free --next-meeting M3 --max-per-member 5
 # 2 for comparison: no fairness step, the fewest meetings and then the least total waiting.
 run free_sum --next-meeting M3 --fairness lexsum --start "$R/free_agenda.csv" --time-limit 1200
 check free_sum --next-meeting M3 --max-per-member 5
-# 2 with leximin of the burden instead of only the worst-off member.
+# 2 with leximin of the burden instead of only the worst-off member: the three largest burdens in
+# turn (leximin_levels in panel_model.yml; --leximin-levels 0 for all members, one solve each).
 run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
 check free_leximin --next-meeting M3 --max-per-member 5
 # As free_leximin, with a first step that keeps every member at most as burdened as in scenario 1
