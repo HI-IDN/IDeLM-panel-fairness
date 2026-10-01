@@ -7,6 +7,9 @@ gurobipy>=11.0
 # Model settings file (models/panel_model.yml)
 pyyaml>=6.0
 
+# Regression of waiting on meetings, for rewarding unlucky members (models/role_model.py)
+numpy>=1.24
+
 # Extract the application overview from the panel's PDF exports (local, one-off)
 pdfplumber>=0.11
 
