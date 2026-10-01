@@ -37,6 +37,8 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 **Mengi og gögn**
 
 * $P$: umsóknir; $R$: fagráðsmenn; $M$: fundir, í tímaröð.
+* $R = R^e \cup R^n$, $R^e \cap R^n = \emptyset$: fagráðsmenn skiptast í reynda, $R^e$ (e. *experienced*),
+  og nýja, $R^n$ (e. *new*).
 * $P_r \subseteq P$: umsóknir fagráðsmanns $r$ (sem ritstjóri eða lesari); $n_r = |P_r|$, þar af
   $n^E_r$ sem ritstjóri og $n^L_r = n_r - n^E_r$ sem lesari (1. eða 2. lesari).
 * $K = \{1, \dots, \bar K\}$: dagskrárliðir á fundi, þar sem $\bar K$ er mesti fjöldi umsókna sem
@@ -49,8 +51,8 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 * $\bar k$: mesti fjöldi eigin umsókna sem fagráðsmaður má hafa á einum fundi, og $\bar k_s \le \bar k$
   mjúkt hámark sem kostar að fara yfir.
 * $t_r$: markgildi fyrir fjölda eigin umsókna á hverjum fundi sem fagráðsmaður $r$ mætir á:
-  $t_r = t_e$ fyrir reynda (e. *experienced*, t.d. `r num(config$target_experienced)`) og $t_r = t_n$
-  fyrir nýja (e. *new*, t.d. `r num(config$target_new)`).
+  $t_r = t_e$ fyrir $r \in R^e$ (t.d. `r num(config$target_experienced)`) og $t_r = t_n$ fyrir
+  $r \in R^n$ (t.d. `r num(config$target_new)`).
 
 Í þessari fyrstu útgáfu tekur hver umsókn einn dagskrárlið af sömu lengd.
 
@@ -156,7 +158,7 @@ $$
 
 $$
 \min \;\; \underbrace{\sum_{r} w_r}_{\text{heildarbið}}
-\;-\; \lambda \, \underbrace{\sum_{r \in R^{\text{nýr}}} \sum_{m \in M^{\text{fyrri}}} \Big(\ell_{rm} - \sum_{p \in P_r} \sum_k x_{pmk}\Big)}_{\text{nýir sitja lengur fyrri hluta lotunnar}}
+\;-\; \lambda \, \underbrace{\sum_{r \in R^n} \sum_{m \in M^{\text{fyrri}}} \Big(\ell_{rm} - \sum_{p \in P_r} \sum_k x_{pmk}\Big)}_{\text{nýir sitja lengur fyrri hluta lotunnar}}
 \qquad \text{þ.a.} \quad F_1\text{-liðirnir} \le F_1^*, \quad z \le F_2^* .
 $$
 
@@ -172,7 +174,7 @@ $$
   þeir sem mæta oft fá því að fara fyrr. Hvert sanngirnisþrep lágmarkar aðeins eigin mælikvarða;
   jafntefli eru útkljáð í þrepi 3.
 * **Heildarbið** (þrep 3) nýtir það svigrúm sem eftir er: enginn bíður að óþörfu, svo lengi sem
-  enginn fer upp fyrir mestu byrðina úr þrepi 2. Nýir fagráðsmenn ($R^{\text{nýr}}$) fá lítinn
+  enginn fer upp fyrir mestu byrðina úr þrepi 2. Nýir fagráðsmenn ($R^n$) fá lítinn
   **afslátt** $\lambda$ fyrir að sitja lengur á fyrri helmingi lotunnar ($M^{\text{fyrri}}$), því þeir
   læra af umræðunni hvort sem er.
 
@@ -291,13 +293,13 @@ ritstjóri umsóknar $p$, og $z_{pr} \in \{0,1\}$ ef hann fjallar um hana (sem r
 | Þrír fagráðsmenn á hverja umsókn | $\sum_{r} z_{pr} = 3 \quad \forall p$ |
 | Ritstjórinn er einn af þeim þremur | $y_{pr} \le z_{pr} \quad \forall p, r$ |
 | Vanhæfur fagráðsmaður fjallar aldrei um umsóknina | $z_{pr} = 0 \quad \forall p,\ r \in V_p$ |
-| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin umsókna, í tímaröð (aðeins við jafna úthlutun á gefna fundi; ekki í endurúthlutun hlutverka, og ekki frá grunni, þar sem miðbik lotunnar er notað í fundaskipaninni) | $y_{pr} = 0 \quad \forall r \in R^{\text{nýr}},\ p \text{ á undan miðbiki } r$ |
-| Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^{\text{nýr}}$ |
+| Nýr fagráðsmaður er ekki ritstjóri á fyrri helmingi eigin umsókna, í tímaröð (aðeins við jafna úthlutun á gefna fundi; ekki í endurúthlutun hlutverka, og ekki frá grunni, þar sem miðbik lotunnar er notað í fundaskipaninni) | $y_{pr} = 0 \quad \forall r \in R^n,\ p \text{ á undan miðbiki } r$ |
+| Nýr fagráðsmaður er ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum | $\sum_p y_{pr} \le \rho \sum_p z_{pr} \quad \forall r \in R^n$ |
 
 **Endurúthlutun hlutverka** (@sec-roles): sömu þrír fagráðsmenn eru á hverri umsókn
 ($z_{pr}$ er fast), en líkanið velur hver þeirra er ritstjóri og hver er 1. lesari (talar næstur;
 $u_{pr} \in \{0,1\}$, með $\sum_r u_{pr} = 1$ og $u_{pr} + y_{pr} \le z_{pr}$); sá þriðji er 2. lesari. Nýr fagráðsmaður er
-ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum ($R^{\text{nýr}}$ eru nýir fagráðsmenn).
+ritstjóri á mest hlutfallinu $\rho$ af umsóknum sínum.
 Reglan um miðbik á ekki við hér, því starfsmenn völdu fagráðsmennina þrjá: umsókn með þremur nýjum
 sem er færð framar hefði annars engan mögulegan ritstjóra. Markmiðið er jöfn greiðsla á umsókn, @eq-pay-per-proposal, meðal
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
