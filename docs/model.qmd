@@ -191,11 +191,11 @@ byrði þess sem ber mest gerð sem minnst, svo byrði þess sem ber næstmest, 
 í undirþrepi $k$ er summa $k$ stærstu byrðanna gerð sem minnst og síðan fest,
 
 $$
-\min \;\; \underbrace{k\, t_k + \sum_{r} \delta_{rk}}_{\text{summa } k \text{ stærstu byrða}}
-\qquad \text{þ.a.} \quad \delta_{rk} \ge B_r - t_k, \;\; \delta_{rk} \ge 0 \;\; \forall r ,
+\min \;\; \underbrace{k\, \theta_k + \sum_{r} \delta_{rk}}_{\text{summa } k \text{ stærstu byrða}}
+\qquad \text{þ.a.} \quad \delta_{rk} \ge B_r - \theta_k, \;\; \delta_{rk} \ge 0 \;\; \forall r ,
 $$
 
-Í bestu lausn er markfallsgildið summa $k$ stærstu byrðanna, hvert sem gildi hjálparbreytunnar $t_k$ er. Undirþrep 1 er það sama og þrep 2 hér að
+Í bestu lausn er markfallsgildið summa $k$ stærstu byrðanna, hvert sem gildi hjálparbreytunnar $\theta_k$ er. Undirþrep 1 er það sama og þrep 2 hér að
 ofan. Sjálfgefið eru `r num(config$leximin_levels %||% 3)` undirþrep, svo þetta er *stýfð* `leximin`: þrjár
 stærstu byrðarnar eru festar, og þrep 3 sér um hinar. Með 0 eru undirþrepin jafnmörg fagráðsmönnum,
 og hvert þeirra er sérstök bestun.
