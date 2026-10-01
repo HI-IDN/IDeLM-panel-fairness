@@ -197,6 +197,18 @@ def fairness_metrics(rows):
             'rho_meetings_waiting': spearman(meetings, waiting), 'inverted_pairs': inverted}
 
 
+def read_alpha(alpha_file, default, members):
+    """alpha per member: columns member, alpha (slots per meeting attended). Members not in the file
+    get the default. Returns {member: alpha}."""
+    alpha = {r: float(default) for r in members}
+    if alpha_file:
+        with open(alpha_file, newline='', encoding='utf-8-sig') as f:
+            for row in csv.DictReader(f):
+                if row['member'] in alpha:
+                    alpha[row['member']] = float(row['alpha'])
+    return alpha
+
+
 def read_carry(carry_file):
     """Burden carried over from earlier rounds: columns member, burden (slots; may be negative)."""
     with open(carry_file, newline='', encoding='utf-8-sig') as f:
@@ -966,6 +978,8 @@ def main():
     parser.add_argument('--no-worse-than',
                         help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); a '
                              'first step keeps every member\'s burden at most theirs there where possible')
+    parser.add_argument('--alpha-file',
+                        help='CSV (member, alpha): alpha per member, e.g. as each member chose; others get --alpha')
     parser.add_argument('--carry', help='CSV (member, burden) of burden carried over from earlier rounds')
     parser.add_argument('--coi-penalty', type=float,
                         help='objective cost each time a conflicted member must step out and come back')
@@ -1010,7 +1024,7 @@ def main():
         config = yaml.safe_load(f)
     # Command-line options override the settings file.
     for name in ('alpha', 'max_per_meeting', 'time_limit', 'unavailable', 'max_per_member', 'coi_penalty',
-                 'postpone_penalty', 'leximin_levels', 'meetings_slack'):
+                 'postpone_penalty', 'leximin_levels', 'meetings_slack', 'alpha_file'):
         if getattr(args, name) is not None:
             config[name] = getattr(args, name)
 
@@ -1048,15 +1062,18 @@ def main():
     if max_meetings:
         print(f'meeting limit per member: {min(max_meetings.values())}-{max(max_meetings.values())}')
 
+    alpha = read_alpha(config.get('alpha_file'), config['alpha'], data.members)
+    if len(set(alpha.values())) > 1:
+        print(f'alpha per member: {min(alpha.values()):g}-{max(alpha.values()):g}')
     reference, carry = None, None
     if args.carry:
         carry = read_carry(args.carry)
         print(f'burden carried over for {len(carry)} members')
     if args.no_worse_than:
-        rows = member_measures(data, read_agenda(args.no_worse_than), float(config['alpha']))
+        rows = member_measures(data, read_agenda(args.no_worse_than), alpha)
         reference = {row['member']: row['burden'] for row in rows}
         print(f'reference plan {args.no_worse_than}: largest burden {max(reference.values()):g}')
-    model = PanelScheduleModel(data, alpha=float(config['alpha']), max_per_meeting=config['max_per_meeting'],
+    model = PanelScheduleModel(data, alpha=alpha, max_per_meeting=config['max_per_meeting'],
                                total_weight=config['total_weight'], time_limit=config['time_limit'],
                                keep_meetings=args.keep_meetings, coi_penalty=float(config['coi_penalty']),
                                closed_meetings=args.fix_meetings, max_per_member=config.get('max_per_member'),

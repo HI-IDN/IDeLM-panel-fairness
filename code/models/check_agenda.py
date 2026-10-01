@@ -31,8 +31,8 @@ import os
 
 import yaml
 
-from models.panel_model import (fairness_metrics, member_measures, read_new_members, read_panel,
-                                read_unavailable)
+from models.panel_model import (fairness_metrics, member_measures, read_alpha, read_new_members,
+                                read_panel, read_unavailable)
 
 
 def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_meeting=None,
@@ -144,6 +144,7 @@ def main():
     parser.add_argument('--first-meeting-rule', action='store_true',
                         help='everyone has exactly one proposal in the first meeting')
     parser.add_argument('--alpha', type=float, default=2.0, help='cost of a meeting in the fairness measures')
+    parser.add_argument('--alpha-file', help='CSV (member, alpha): alpha per member; others get --alpha')
     parser.add_argument('--unavailable', help='CSV of meetings members cannot attend (member, meeting)')
     parser.add_argument('--new-editor-from',
                         help='meeting from which proposals edited by new members may come up (e.g. M5)')
@@ -173,7 +174,8 @@ def main():
     print(f'conflicted members present: {len(present)}'
           + (' (' + ', '.join(f'{r} at {p} in {m}' for p, r, m in present) + ')' if present else ''))
     by_proposal = {p: (m, k) for p, m, k in agenda}
-    for metric, value in fairness_metrics(member_measures(data, by_proposal, args.alpha)).items():
+    for metric, value in fairness_metrics(member_measures(data, by_proposal,
+                                                       read_alpha(args.alpha_file, args.alpha, data.members))).items():
         print(f'{metric}: {value}')
     for problem in problems:
         print('PROBLEM:', problem)

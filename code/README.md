@@ -80,7 +80,8 @@ sets rather than forbidden by constraints.
 * *waiting* = slots sat through minus own proposals = proposals of others sat through;
 * *meetings* = meetings attended;
 * *burden* = α × meetings + waiting. α (in slots) says how much one meeting attended weighs against
-  waiting; the chosen value is α = 2. Own proposals are paid work and are not counted, so this is
+  waiting; the chosen value is α = 2. α can differ per member (`--alpha-file`, a CSV of member,
+  alpha): a member who would rather attend less often and stay longer gets a higher α. Own proposals are paid work and are not counted, so this is
   the *unpaid* burden. Burden carried over from earlier rounds (`--carry`, a CSV of member, burden)
   is added to it in the fairness steps.
 
@@ -234,6 +235,7 @@ Read by both models and shown as a table in the book; command-line options overr
 | Setting | Value | Meaning |
 |---|---|---|
 | `alpha` | 2 | cost of attending a meeting, in slots (chosen from an experiment with 0–4) |
+| `alpha_file` | none | CSV (member, alpha) of α per member, overriding `alpha` |
 | `max_per_meeting` | 15 | most proposals in a meeting |
 | `max_per_member` / `soft_max_per_member` | 5 / 4 | hard limit and soft cap on own proposals in a meeting |
 | `soft_max_weight` | 0.5 | cost per proposal above the soft cap |

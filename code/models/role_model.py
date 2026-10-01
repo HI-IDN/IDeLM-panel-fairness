@@ -54,7 +54,7 @@ import numpy
 import yaml
 from gurobipy import GRB, Model, quicksum  # pylint: disable=no-name-in-module
 
-from models.panel_model import member_measures, read_agenda, read_new_members, read_panel
+from models.panel_model import member_measures, read_agenda, read_alpha, read_new_members, read_panel
 
 PAY = {'start': 38000, 'editor': 23000, 'reader': 15000}  # ISK, as in code/panel_workload.R
 
@@ -140,7 +140,7 @@ class RoleModel:
     def __init__(self, data, agenda, mode, new_members=(), new_editor_share=0.15, max_per_member=6,
                  spread_weight=0.0, voice_weight=0.1, time_limit=300, pay=PAY, from_scratch=False,
                  max_new_per_proposal=2, pay_per='proposal', keep_roles=(), max_editor_share=None,
-                 alpha=2.0):
+                 alpha=2.0):  # alpha: a number or {member: value}
         self.data, self.agenda, self.mode = data, agenda, mode
         self.pay = pay
         self.m = Model('Roles')
@@ -369,7 +369,7 @@ def main():
                       from_scratch=args.from_scratch, pay_per=args.pay_per,
                       max_new_per_proposal=config.get('max_new_per_proposal', 2),
                       keep_roles=args.keep_roles, max_editor_share=config.get('max_editor_share'),
-                      alpha=float(config['alpha']))
+                      alpha=read_alpha(config.get('alpha_file'), config['alpha'], data.members))
     rows = model.solve()
     os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     # Written in the format of panel.csv, so it can be scheduled by models/panel_model.py. From
