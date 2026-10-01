@@ -50,8 +50,8 @@ berast svo tölvupóstar með óskum um að fá að koma seinna eða fara fyrr a
 breytt til að mæta þeim. Með stærðfræðilegu líkani og fjölskiptu markfalli má hins vegar skoða
 margar sviðsmyndir og leita kerfisbundið að bestu lausninni, fyrir gefnar forsendur. Í stærstu
 sviðsmyndunum finnur lausnarinn góða lausn innan tímamarka en getur ekki sannað að hún sé sú besta. Líkanið er líka
-auðvelt að keyra aftur: þegar forsendur breytast, t.d. ef umsókn er frestað eða fagráðsmaður
-kemst ekki á fund, má endurreikna og hagræða komandi fundum með sama hætti.
+auðvelt að keyra aftur: þegar forsendur breytast, t.d. ef umsókn er frestað, fagráðsmaður
+kemst ekki á fund eða vanhæfi kemur í ljós eftir á, má endurreikna og hagræða komandi fundum með sama hætti.
 
 Með heildarplani sem er sanngjarnt frá upphafi, og fyrirsjáanlegt fyrir alla, ætti að vera hægt að
 fækka slíkum tilfærslum. Það myndi spara tíma starfsmanna sjóðsins, bæta upplifun fagráðsmanna og
