@@ -6,6 +6,9 @@ Only whitelisted columns are copied, and only pseudonymised codes (R.., A.., M..
 The Gurobi logs are never copied: they hold licence details. Solver time, gap and version are
 summarised in solver.csv instead.
 
+Experiments the book refers to (EXPERIMENTS below) go to docs/data/experiments/, with their own
+solver.csv, so their numbers are computed in the book rather than typed in.
+
 Run from code/ after run_panel_scenarios.sh:  python export_docs_data.py
 """
 import csv
@@ -23,6 +26,14 @@ COLUMNS = {
     '_members.csv': ['member', 'proposals', 'meetings', 'leave_slots', 'waiting', 'waiting_per_meeting',
                      'waiting_per_proposal', 'alpha', 'burden', 'burden_per_proposal'],
     '_coi_present.csv': ['application', 'member', 'meeting'],
+}
+# Experiments the book refers to: name in docs/data/experiments/ -> results prefix (in RESULTS).
+EXPERIMENTS = {
+    # Rotation rule on scenario 2, 60 minutes each from the same start: without the rule, the
+    # members of the last proposal skip the next meeting, or wait at most 2 there.
+    'rotation_none': 'final_long/free',
+    'rotation_skip': 'rotation/free_skip',
+    'rotation_wait2': 'rotation/free_wait2',
 }
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
@@ -43,13 +54,16 @@ def copy(src, dst, columns):
 
 
 def solver_info(log_file):
+    """Gurobi version, total solve time over all steps, and the gap of the last step (the model's
+    own summary line when there is one, as a stepwise solve has one Gurobi run per step)."""
     text = open(log_file, encoding='utf-8', errors='replace').read()
     version = re.search(r'Gurobi Optimizer version ([0-9.]+)', text)
-    seconds = re.search(r'Explored .* in ([0-9.]+) seconds', text)
-    gap = re.search(r'Best objective .*gap ([0-9.]+)%', text)
+    seconds = [float(s) for s in re.findall(r'Explored .* in ([0-9.]+) seconds', text)]
+    gap = (re.findall(r'(?m)^objective .*gap ([0-9.]+)%', text)
+           or re.findall(r'Best objective .*gap ([0-9.]+)%', text))
     return {'version': version.group(1) if version else '',
-            'minutes': round(float(seconds.group(1)) / 60, 1) if seconds else '',
-            'gap': round(float(gap.group(1)), 1) if gap else ''}
+            'minutes': round(sum(seconds) / 60, 1) if seconds else '',
+            'gap': round(float(gap[-1]), 1) if gap else ''}
 
 
 def main():
@@ -65,11 +79,27 @@ def main():
             copy(os.path.join(RESULTS, name), os.path.join(OUT, name), columns)
     solver = [{'scenario': os.path.basename(f)[:-4], **solver_info(f)}
               for f in sorted(glob.glob(os.path.join(RESULTS, '*.log')))]
-    with open(os.path.join(OUT, 'solver.csv'), 'w', newline='', encoding='utf-8') as f:
+    write_solver(os.path.join(OUT, 'solver.csv'), solver)
+    experiments = os.path.join(OUT, 'experiments')
+    os.makedirs(experiments, exist_ok=True)
+    solver = []
+    for name, prefix in EXPERIMENTS.items():
+        src = os.path.join(RESULTS, prefix)
+        if not os.path.exists(src + '_members.csv'):
+            continue
+        for suffix in ('_members.csv', '_coi_present.csv'):
+            copy(src + suffix, os.path.join(experiments, name + suffix), COLUMNS[suffix])
+        if os.path.exists(src + '.log'):
+            solver.append({'scenario': name, **solver_info(src + '.log')})
+    write_solver(os.path.join(experiments, 'solver.csv'), solver)
+    print(f'{len(os.listdir(OUT))} files in {OUT}, {len(os.listdir(experiments))} in {experiments}')
+
+
+def write_solver(path, rows):
+    with open(path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=['scenario', 'version', 'minutes', 'gap'])
         writer.writeheader()
-        writer.writerows(solver)
-    print(f'{len(os.listdir(OUT))} files in {OUT}')
+        writer.writerows(rows)
 
 
 if __name__ == '__main__':
