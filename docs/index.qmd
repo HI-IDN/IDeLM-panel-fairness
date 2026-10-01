@@ -41,8 +41,7 @@ mörgum boltum á lofti í einu, sérstaklega ef skipulagið er gert í töflure
 berast svo tölvupóstar með óskum um að fá að koma seinna eða fara fyrr af fundi, og dagskránni er
 breytt til að mæta þeim. Með stærðfræðilegu líkani og fjölskiptu markfalli má hins vegar skoða
 margar sviðsmyndir og leita kerfisbundið að bestu lausninni, fyrir gefnar forsendur. Í stærstu
-sviðsmyndunum finnur lausnarinn góða lausn innan tímamarka en getur ekki sannað að hún sé sú besta
-(@sec-limitations). Líkanið er líka
+sviðsmyndunum finnur lausnarinn góða lausn innan tímamarka en getur ekki sannað að hún sé sú besta. Líkanið er líka
 auðvelt að keyra aftur: þegar forsendur breytast, t.d. ef umsókn er frestað eða fagráðsmaður
 kemst ekki á fund, má endurreikna og hagræða komandi fundum með sama hætti.
 
