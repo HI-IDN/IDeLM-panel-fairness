@@ -170,5 +170,9 @@ eru *í kóða* eru útfærðar í líkaninu (@sec-model) en hafa ekki verið ke
   greiðslu fyrir tímann á fundum. Lestur skiptir samt máli: sá sem hefur margar umsóknir má ekki við
   neinu, t.d. ef hann missir af fundi vegna veikinda, og líkur aukast á að umsóknir ruglist þegar
   margar eru settar fyrir með stuttum fyrirvara. Allir sinna þessu í hjáverkum.
+* **Öll fagráð saman.** Sumir fagráðsmenn sitja í fleiri en einu fagráði samhliða, t.d. í Sprota
+  og Vexti, en hvert fagráð er skipulagt sér. Skipuleggja mætti alla styrktarflokka í einu, með
+  viðbættum skorðum um hver getur verið í hvaða flokki, svo heildarálag hvers og eins sjáist og
+  dreifist yfir öll fagráðin. Þetta er annað dæmi um lausn sem NSN-verkefni gæti skoðað.
 * **Innleiðing.** NSN-verkefni, með aðstoð upplýsingatæknideildar TÞS, sem tengir líkanið við
   kerfi sjóðsins fyrir komandi fundi.

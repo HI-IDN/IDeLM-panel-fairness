@@ -172,6 +172,10 @@ yfir alla lotuna, svo að erfiður fundur er bættur upp síðar:
 Fagráðið breytist frá ári til árs, svo eðlilegt tímabil er ein lota. Fyrir fagráðsmenn sem sitja
 áfram mætti flytja stöðu á milli lotna.
 
+Sumir fagráðsmenn sitja líka í fleiri en einu fagráði samhliða, t.d. bæði í Sprota og Vexti. Lítið
+álag í einu fagráði getur því stafað af því að viðkomandi er að vinna fyrir annað fagráð á sama
+tíma. Þessi greinargerð hefur enga vitneskju um stöðuna í öðrum fagráðum.
+
 ## Sanngirni í úthlutun hlutverka
 
 Fundaskipanin er seinni ákvörðunin af tveimur. Sú fyrri, hver er ritstjóri og hverjir lesarar á
