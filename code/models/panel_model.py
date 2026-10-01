@@ -310,8 +310,9 @@ class PanelScheduleModel:
                             A first step makes the total excess over it as small as possible, so
                             nobody is worse off than in that plan where the rules allow it
         carry:              {member: burden carried over from earlier rounds}, added to each
-                            member's burden in the fairness steps (lexburden, leximin) and the
-                            reference step
+                            member's burden in the fairness steps (lexburden, leximin). Not in
+                            the reference step: that compares this round with a plan for the
+                            same round, so a carry would cancel out
         """
         self.data = data
         self.alpha = alpha if isinstance(alpha, dict) else {r: alpha for r in data.members}
@@ -366,10 +367,19 @@ class PanelScheduleModel:
 
     def _allowed(self, p):
         """Meetings a proposal may go to. Meetings one of its members can't attend are left out
-        (not held ones: they already happened)."""
-        if p in self.fixed_meeting:
-            return [self.fixed_meeting[p]]
+        (not held ones: they already happened). A proposal fixed to a meeting not yet held that one
+        of its members can't attend, or that is before its not_before meeting, has nowhere to go, so
+        that is reported as an error rather than left as an infeasible or invalid model."""
         away = {m for r in self.data.reviewers[p] for m in self.data.unavailable.get(r, ())} - self.held
+        if p in self.fixed_meeting:
+            m = self.fixed_meeting[p]
+            if m in away:
+                absent = [r for r in self.data.reviewers[p] if m in self.data.unavailable.get(r, ())]
+                raise ValueError(f'{p} is fixed to {m}, which {", ".join(absent)} cannot attend')
+            first = self.not_before.get(p)
+            if first and m not in self.held and self.data.meetings.index(m) < self.data.meetings.index(first):
+                raise ValueError(f'{p} is fixed to {m}, before {first} where it may first go')
+            return [m]
         open_meetings = [m for m in self.data.meetings
                          if m not in self.closed and m != self.next_meeting and m not in away]
         if p in self.not_before:
@@ -613,13 +623,13 @@ class PanelScheduleModel:
         """Commitment (alpha per meeting attended) plus waiting (slot of the last proposal)."""
         return quicksum(self.alpha[r] * self.a[r, m] + self.leave[r, m] for m in self.meetings_of[r])
 
-    def unpaid(self, r):
+    def unpaid(self, r, carry=True):
         """The burden the fairness steps compare: alpha per meeting attended plus waiting (proposals
-        of others sat through), plus what is carried over from earlier rounds. Own proposals are
-        paid work and are not counted."""
-        return (self.burden(r) - len(self.data.proposals_of(r))) + self.carry.get(r, 0.0)
+        of others sat through), plus what is carried over from earlier rounds (unless carry is
+        False). Own proposals are paid work and are not counted."""
+        return (self.burden(r) - len(self.data.proposals_of(r))) + (self.carry.get(r, 0.0) if carry else 0.0)
 
-    def _ordered_levels(self, waiting):
+    def _ordered_levels(self):
         """Leximin by Ogryczak's ordered min-max: step k minimises the sum of the k largest burdens,
         k*t + sum_r d[r] with d[r] >= unpaid(r) - t, d >= 0 (at the optimum t is the k-th largest).
         Holding that expression afterwards keeps the k largest burdens at most that sum, so each
@@ -634,7 +644,7 @@ class PanelScheduleModel:
             for r in members:
                 self.m.addConstr(d[r] >= burden[r] - t, name=f'ordered[{k},{r}]')
             top = k * t + quicksum(d.values())
-            levels.append((f'top{k}', top + 1e-4 * waiting, top))
+            levels.append((f'top{k}', top, top))
         return levels
 
     def _equity_bands(self, bands=(1, 0.5, 0.2)):
@@ -749,15 +759,16 @@ class PanelScheduleModel:
             #      to each member's target (total deviation, so a meeting saved by overloading
             #      another one does not pay), and the rule penalties (a conflicted member present,
             #      a postponed proposal);
-            #   2. equity:   the most members within the bands of the common waiting target. Many
-            #      targets give the same equity, so a tiny weight on waiting (less than the
-            #      smallest band) already steers this step to a low target;
+            #   2. equity:   the most members within the bands of the common waiting target;
             #      With 'lexmax' the second step is instead
             #      worst:    the shortest possible waiting for the member who waits the longest;
             #      and with 'lexboth' the equity step is followed by the worst step;
             #      With 'leximin' the second step is a series: the largest burden, the sum of the two
             #      largest, and so on (see _ordered_levels);
             #   3. waiting:  the least total waiting, new members waiting early in the round.
+            # Each step minimises only its own measure: a tie-break on waiting inside a fairness step
+            # could trade a slightly larger burden (alpha and carry may be fractional) for less
+            # waiting, and the last step settles the ties anyway.
             # With a reference plan, a step 0 first makes the total excess burden over that plan
             # as small as possible (zero when nobody needs to be worse off).
             waiting = quicksum(self.leave.values()) - sum(len(trio) for trio in self.data.reviewers.values())
@@ -769,11 +780,11 @@ class PanelScheduleModel:
             fairness_steps = []
             if self.fairness in ('lex', 'lexboth'):
                 equity = self._equity_bands()
-                fairness_steps.append(('equity', -equity + 1e-4 * waiting, -equity))
+                fairness_steps.append(('equity', -equity, -equity))
             if self.fairness in ('lexmax', 'lexboth', 'lexburden'):
-                fairness_steps.append(('worst', self.z + 1e-4 * waiting, 1.0 * self.z))
+                fairness_steps.append(('worst', 1.0 * self.z, 1.0 * self.z))
             if self.fairness == 'leximin':
-                fairness_steps += self._ordered_levels(waiting)
+                fairness_steps += self._ordered_levels()
             self.levels = [('meetings', meetings, meetings)] + fairness_steps + [('waiting', least, least)]
             if self.reference_burden is not None:
                 excess = []
@@ -781,11 +792,12 @@ class PanelScheduleModel:
                     if r not in self.reference_burden:
                         continue
                     e = self.m.addVar(lb=0, name=f'excess_reference[{r}]')
-                    self.m.addConstr(e >= self.unpaid(r) - self.reference_burden[r] - self.carry.get(r, 0.0),
+                    # This round only: the reference plan is for the same round and has no carry.
+                    self.m.addConstr(e >= self.unpaid(r, carry=False) - self.reference_burden[r],
                                      name=f'excess_reference[{r}]')
                     excess.append(e)
                 excess = quicksum(excess)
-                self.levels.insert(0, ('reference', excess + 1e-4 * waiting, excess))
+                self.levels.insert(0, ('reference', excess, excess))
             self.m.setObjective(self.levels[0][1], GRB.MINIMIZE)
             return
         fair = 0 if self.fairness == 'sum' else self.z
@@ -883,8 +895,8 @@ class PanelScheduleModel:
                 raise RuntimeError(f'No solution found at level {name} (status {self.m.Status}).')
             value = held.getValue()
             gap = self.m.MIPGap if self.m.IsMIP else 0.0
-            # value is the held expression; objective, bound and gap are the solver's, which for the
-            # fairness steps include a tiny tie-break on waiting.
+            # value is the held expression; objective, bound and gap are the solver's (the same
+            # expression, except the learning reward in the waiting step).
             reached.append({'level': name, 'value': value, 'objective': self.m.ObjVal,
                             'bound': self.m.ObjBound, 'gap': gap})
             print(f"level {name}: value {value:.3f}, objective {self.m.ObjVal:.4f}, "
@@ -1071,7 +1083,9 @@ def main():
         print(f'burden carried over for {len(carry)} members')
     if args.no_worse_than:
         rows = member_measures(data, read_agenda(args.no_worse_than), alpha)
-        reference = {row['member']: row['burden'] for row in rows}
+        # From the unrounded parts (the reported burden is rounded), so a fractional alpha
+        # compares the burden the model optimises.
+        reference = {row['member']: alpha[row['member']] * row['meetings'] + row['waiting'] for row in rows}
         print(f'reference plan {args.no_worse_than}: largest burden {max(reference.values()):g}')
     model = PanelScheduleModel(data, alpha=alpha, max_per_meeting=config['max_per_meeting'],
                                total_weight=config['total_weight'], time_limit=config['time_limit'],
@@ -1110,7 +1124,8 @@ def main():
           f"{fair['total_waiting']}, rho(meetings, waiting) {fair['rho_meetings_waiting']}, "
           f"inverted pairs {fair['inverted_pairs']}")
     if reference is not None:
-        worse = [row['member'] for row in solution['members'] if row['burden'] > reference[row['member']] + 1e-6]
+        worse = [row['member'] for row in solution['members']
+                 if alpha[row['member']] * row['meetings'] + row['waiting'] > reference[row['member']] + 1e-6]
         print(f"worse off than in the reference plan: {', '.join(worse) or 'nobody'}")
     print(f"objective {solution['objective']:.3f}, gap {solution['gap']:.1%}, "
           f"conflicted members present: {len(solution['coi_present'])}, "

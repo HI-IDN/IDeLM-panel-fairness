@@ -201,11 +201,15 @@ class RoleModel:
         self.load, self.editors = load, editors
 
         # Nobody is editor on more than max_editor_share of their proposals (settled roles count, and
-        # are allowed to exceed it on their own).
+        # may exceed it on their own).
+        # Only the settled roles' own excess over the cap is allowed: if the settled roles are already
+        # within it, the open proposals must keep the member within it too.
         if max_editor_share:
             for r in members:
-                settled = sum(1 for p in held if p in proposals and data.reviewers[p][0] == r)
-                self.m.addConstr(editors[r] <= max_editor_share * load[r] + settled * (1 - max_editor_share),
+                settled = [p for p in held if p in proposals and r in data.reviewers[p]]
+                settled_editor = sum(1 for p in settled if data.reviewers[p][0] == r)
+                excess = max(0.0, settled_editor - max_editor_share * len(settled))
+                self.m.addConstr(editors[r] <= max_editor_share * load[r] + excess,
                                  name=f'max_editor_share[{r}]')
 
         # At most max_per_member own proposals in a meeting (only matters when reviewers can change).
@@ -355,11 +359,18 @@ def main():
     parser.add_argument('--keep-roles', nargs='*', default=[],
                         help='meetings whose roles are already announced and stay as they are (e.g. M3); '
                              'held meetings always do')
+    parser.add_argument('--alpha', type=float, help="with --pay-per burden: cost of attending a meeting, in "
+                                                      "slots; use the schedule's value")
+    parser.add_argument('--alpha-file', help="with --pay-per burden: CSV (member, alpha), as for the schedule")
     parser.add_argument('--out', required=True, help='output prefix; writes <out>_panel.csv')
     args = parser.parse_args()
 
     with open(args.config, encoding='utf-8') as f:
         config = yaml.safe_load(f)
+    # As in models/panel_model.py, so --pay-per burden can use the schedule's own alpha.
+    for name in ('alpha', 'alpha_file'):
+        if getattr(args, name) is not None:
+            config[name] = getattr(args, name)
     data = read_panel(args.panel)
     agenda = read_agenda(args.agenda)
     new = read_new_members(config['members'])

@@ -116,7 +116,9 @@ Step 2 protects only the member with the largest burden; everyone below it is le
 favours whoever is quickest to serve, and that is how the original model came to make frequent
 attenders wait more. `--fairness leximin` therefore replaces step 2 by a series (Ogryczak's ordered
 min-max): the smallest largest burden, then the smallest sum of the two largest, and so on, for
-`leximin_levels` steps (default 3; 0 for all members). On small test instances this never gave a
+`leximin_levels` steps. The default, 3, is a truncated leximin: it fixes the three largest
+burdens in turn and leaves the rest to step 3, to keep runs short; 0 fixes every member's, at the
+cost of one more solve per member. On small test instances this never gave a
 worse burden vector than `lexburden`, often a better one at the same total waiting, and fewer pairs
 where the member who attends more also waits more.
 
@@ -127,7 +129,8 @@ Two further options apply to all the step modes:
   α slots of waiting; a slack of one or two lets the later steps do that.
 * `--no-worse-than <agenda.csv>` adds a step 0 that makes the total excess of each member's burden
   over their burden in a reference plan (e.g. the staff's meetings, scenario `current`) as small as
-  possible: zero when nobody needs to be worse off. The log lists anyone who still is.
+  possible: zero when nobody needs to be worse off. The log lists anyone who still is. The
+  comparison is of this round only; `--carry` does not enter it.
 
 Each step is held with a small tolerance (10⁻⁴, relative), since Gurobi accepts binaries within
 10⁻⁵ of 0 or 1 and a tighter hold can make the next step infeasible. Step 1 is held as one weighted
@@ -154,8 +157,7 @@ meetings: the solutions are the best found, not proven optimal. Splitting the pr
 `<prefix>_fairness.csv` (largest and mean burden, Gini coefficient, all burdens largest first,
 total waiting and meetings, the rank correlation of meetings and waiting, which is positive when
 frequent attenders also wait more, and the number of such pairs), `<prefix>_levels.csv` (per
-step the held value, and the solver's objective, bound and gap, which for the fairness steps include
-a tiny tie-break on waiting: with large gaps, a later step only improves on an earlier step's best
+step the held value, and the solver's objective, bound and gap: with large gaps, a later step only improves on an earlier step's best
 found solution, not its optimum) and
 `<prefix>_coi_present.csv`. The log prints the value and bound of each step.
 
@@ -169,7 +171,8 @@ reader 1 (`--mode roles`), or all three reviewers and the editor (`--mode assign
   Waiting is unpaid, and `--pay-per` can reward it with editor roles: per slot sat through
   (`presence`), per proposal plus waiting above the regression curve of waiting on meetings
   (`fit`), pay per proposal plus the unpaid burden above the mean burden (`burden`, recommended with
-  the stepwise schedule, since it uses the schedule's own measure), or pay per proposal rising in
+  the stepwise schedule, since it uses the schedule's own measure; pass the schedule's `--alpha` or
+  `--alpha-file` here too if it was run with them), or pay per proposal rising in
   proportion to how far a member's waiting per proposal is above the mean (`mean`: 50 % above the
   mean, 50 % more per proposal). `mean` pays members who wait long because they attend rarely,
   which the stepwise schedule intends, so it partly undoes the schedule; and with the 2/3 editor
@@ -238,7 +241,7 @@ MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_pan
 | `current` | the staff's meetings; only the order within each meeting |
 | `free` | the next meeting (M3) is announced; later meetings are re-planned |
 | `free_sum` | as `free`, without the fairness step (least total waiting, for comparison) |
-| `free_leximin` | as `free`, with `--fairness leximin` |
+| `free_leximin` | as `free`, with `--fairness leximin` (the three largest burdens, `leximin_levels`) |
 | `free_noworse` | as `free_leximin`, and nobody worse off than in `current` where possible |
 | `free_max4` | as `free`, at most 4 own proposals per meeting |
 | `scratch` | the whole round from the start, nothing fixed |
