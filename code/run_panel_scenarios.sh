@@ -57,10 +57,11 @@ check free --next-meeting M3 --max-per-member 5
 # 2 for comparison: no fairness step, the fewest meetings and then the least total waiting.
 run free_sum --next-meeting M3 --fairness lexsum --start "$R/free_agenda.csv" --time-limit 1200
 check free_sum --next-meeting M3 --max-per-member 5
-# 2 with leximin of the burden instead of only the worst-off member, and with a first step that
-# keeps every member at most as burdened as in scenario 1 (the staff's meetings) where possible.
+# 2 with leximin of the burden instead of only the worst-off member.
 run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
 check free_leximin --next-meeting M3 --max-per-member 5
+# As free_leximin, with a first step that keeps every member at most as burdened as in scenario 1
+# (the staff's meetings) where possible.
 run free_noworse --next-meeting M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
   --start "$R/free_leximin_agenda.csv" --time-limit 1200
 check free_noworse --next-meeting M3 --max-per-member 5
@@ -69,7 +70,7 @@ run free_max4 --next-meeting M3 --max-per-member 4 --start "$R/free_agenda.csv" 
 check free_max4 --next-meeting M3 --max-per-member 4
 # 4. The whole round planned from the start (nothing fixed).
 run scratch --from-scratch --start "$R/free_max4_agenda.csv" --time-limit 1800
-check scratch --from-scratch --max-per-member 5
+check scratch --from-scratch --max-per-member 5 --first-meeting-rule
 # Chapter 6: who of the three is editor, on the staff's reviewers. Equal pay per proposal on the
 # staff's meetings, and pay per slot sat through (which rewards waiting) on those and on scenario 2.
 roles roles --mode roles --agenda "$R/current_agenda.csv" --time-limit 300
@@ -80,4 +81,4 @@ roles roles_presence_free --mode roles --pay-per presence --agenda "$R/free_agen
 # members editing only from the middle of the round.
 roles assign --mode assign --from-scratch --agenda "$R/current_agenda.csv" --time-limit 300
 PANEL="$R/assign_panel.csv" run assign_schedule --from-scratch --new-editor-from M5   --start "$R/assign_start_agenda.csv" --time-limit 1800
-PANEL="$R/assign_panel.csv" check assign_schedule --from-scratch --max-per-member 5 --new-editor-from M5
+PANEL="$R/assign_panel.csv" check assign_schedule --from-scratch --max-per-member 5 --new-editor-from M5 --first-meeting-rule
