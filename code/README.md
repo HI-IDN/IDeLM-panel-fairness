@@ -110,7 +110,9 @@ the steps before reached (`lexburden`):
 2. **The smallest largest burden**: minimise `z` with α × meetings + waiting ≤ `z` for every
    member. Members who attend often thus wait less, and nobody else waits more than necessary.
 3. **The least total waiting**, with a tiny reward for new members waiting early in the round,
-   when they sit longer to learn anyway.
+   when they sit longer to learn anyway. "Early" ends at `new_editor_from` in `panel_model.yml`
+   (M5), the same meeting from which `--new-editor-from` lets new members be editor: they are
+   only readers until then.
 
 Step 2 protects only the member with the largest burden; everyone below it is left to step 3, which
 favours whoever is quickest to serve, and that is how the original model came to make frequent
@@ -199,7 +201,7 @@ Checks an agenda against the rules of its scenario, independently of the model: 
 they were, closed meetings as planned, nothing added to the next meeting, per-member limits.
 With `--keep-meetings` it checks that no proposal left its planned meeting, and with
 `--first-meeting-rule` that everyone has exactly one proposal in the first meeting; `--unavailable`
-and `--new-editor-from` check unavailable meetings and proposals edited by new members coming up too
+and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable meetings and proposals edited by new members coming up too
 early (held meetings excepted). It also prints,
 without counting them as problems, the conflicted members present and the fairness measures of
 the agenda. `run_panel_scenarios.sh` runs it after every schedule.

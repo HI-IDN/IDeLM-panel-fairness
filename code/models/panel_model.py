@@ -241,7 +241,7 @@ class PanelScheduleModel:
                  open_meeting_size=None, pair_limit=None, pair_weight=0.0, max_meetings=None,
                  next_meeting=None, postpone_penalty=0.5, not_before=None, max_two_meetings=None,
                  meeting_cost=0.0, min_per_member=None, fairness='proposal', max_waiting=None,
-                 new_members=(), learning_weight=0.001, soft_max_per_member=None, soft_max_weight=0.0,
+                 new_members=(), learning_weight=0.001, learning_until=None, soft_max_per_member=None, soft_max_weight=0.0,
                  rotate_wait=None, meetings_slack=0.0, leximin_levels=3, reference_burden=None,
                  carry=None):
         """
@@ -302,6 +302,9 @@ class PanelScheduleModel:
                             the first half of the round is rewarded, as they sit longer to learn
                             anyway (in the last step only; the fairness steps count it in full)
         learning_weight:    objective weight of that reward, per slot (a tie-breaker)
+        learning_until:     first meeting after that first half (e.g. 'M5'), the same meeting from
+                            which new members may be editor (new_editor_from); None for the middle
+                            of the round
         meetings_slack:     step modes: the first step (meetings and rule costs) is held at its
                             value plus this slack, so later steps may add a meeting attended where
                             it buys at least alpha slots less waiting (0: hold it exactly)
@@ -339,6 +342,9 @@ class PanelScheduleModel:
         self.fairness = fairness
         self.new_members = set(new_members)
         self.learning_weight = learning_weight
+        if learning_until is not None and learning_until not in data.meetings:
+            raise ValueError(f'learning_until {learning_until} is not a meeting of the round')
+        self.learning_until = learning_until
         self.waiting_target = None
         self.levels = []  # fairness='lex': (name, objective, expression held afterwards), in order
         self.max_waiting = max_waiting
@@ -449,7 +455,7 @@ class PanelScheduleModel:
         free = [m for m in data.meetings if m not in self.closed and m != self.next_meeting
                 and not (self.first_meeting_rule and m == first)]
         learning = (self.fairness == 'bands' or self.fairness in STEP_MODES) and self.new_members
-        early = set(data.meetings[:len(data.meetings) // 2]) if learning else set()
+        early = set(self._first_half()) if learning else set()
         groups = defaultdict(list)
         for m in free:
             groups[(frozenset(self.candidates[m]), m in early)].append(m)
@@ -680,10 +686,19 @@ class PanelScheduleModel:
                 equity += eps * y
         return equity
 
+    def _first_half(self):
+        """Meetings of the first half of the round, while new members are only readers: those before
+        learning_until (the meeting new members may be editor from), else the first half of the
+        meetings."""
+        meetings = self.data.meetings
+        if self.learning_until is None:
+            return meetings[:len(meetings) // 2]
+        return meetings[:meetings.index(self.learning_until)]
+
     def _learning(self):
         """Proposals of others that new members sit through in the first half of the round (meetings
         still open), when they stay longer to learn anyway."""
-        early = [m for m in self.data.meetings[:len(self.data.meetings) // 2] if m not in self.closed]
+        early = [m for m in self._first_half() if m not in self.closed]
         total = 0
         for r in self.new_members & set(self.data.members):
             for m in early:
@@ -1017,8 +1032,9 @@ def main():
     parser.add_argument('--pair-weight', type=float, help='objective weight of the excess over --pair-limit')
     parser.add_argument('--max-two-meetings', type=int,
                         help='most own proposals of a member in two consecutive meetings')
-    parser.add_argument('--new-editor-from',
-                        help='meeting from which new members may be editor (e.g. M5, the middle of the round)')
+    parser.add_argument('--new-editor-from', nargs='?', const='settings',
+                        help='new members may be editor only from this meeting (alone: new_editor_from in '
+                             'the settings, M5); proposals they edit go to that meeting or later')
     parser.add_argument('--next-meeting',
                         help='next meeting: nothing may be added, planned proposals may be postponed')
     parser.add_argument('--max-meetings-from',
@@ -1045,6 +1061,8 @@ def main():
         if getattr(args, name) is not None:
             config[name] = getattr(args, name)
 
+    if args.new_editor_from == 'settings':
+        args.new_editor_from = config['new_editor_from']
     data = read_panel(args.panel)
     if args.more_meetings:
         extra = config['extra_meetings']
@@ -1111,6 +1129,7 @@ def main():
                                             if args.fairness == 'bands' or args.fairness in STEP_MODES
                                             else ()),
                                learning_weight=config.get('learning_weight', 0.001),
+                               learning_until=args.new_editor_from or config.get('new_editor_from'),
                                soft_max_per_member=config.get('soft_max_per_member'),
                                soft_max_weight=config.get('soft_max_weight', 0.0),
                                rotate_wait=args.rotate_wait,
