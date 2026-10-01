@@ -202,9 +202,9 @@ Checks an agenda against the rules of its scenario, independently of the model: 
 they were, closed meetings as planned, nothing added to the next meeting, per-member limits.
 With `--keep-meetings` it checks that no proposal left its planned meeting, and with
 `--first-meeting-rule` that everyone has exactly one proposal in the first meeting; `--unavailable`
-and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable meetings and proposals edited by new members coming up too
-early (held meetings excepted). It also prints,
-without counting them as problems, the conflicted members present and the fairness measures of
+and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable
+meetings and proposals edited by new members coming up too early (held meetings excepted). It also
+prints, without counting them as problems, the conflicted members present and the fairness measures of
 the agenda. `run_panel_scenarios.sh` runs it after every schedule.
 
 ## Exact order within meetings (`models/order_meetings.py`)

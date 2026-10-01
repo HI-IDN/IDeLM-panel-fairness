@@ -241,7 +241,8 @@ class PanelScheduleModel:
                  open_meeting_size=None, pair_limit=None, pair_weight=0.0, max_meetings=None,
                  next_meeting=None, postpone_penalty=0.5, not_before=None, max_two_meetings=None,
                  meeting_cost=0.0, min_per_member=None, fairness='proposal', max_waiting=None,
-                 new_members=(), learning_weight=0.001, learning_until=None, soft_max_per_member=None, soft_max_weight=0.0,
+                 new_members=(), learning_weight=0.001, learning_until=None, soft_max_per_member=None,
+                 soft_max_weight=0.0,
                  rotate_wait=None, meetings_slack=0.0, leximin_levels=3, reference_burden=None,
                  carry=None):
         """
@@ -1062,7 +1063,9 @@ def main():
             config[name] = getattr(args, name)
 
     if args.new_editor_from == 'settings':
-        args.new_editor_from = config['new_editor_from']
+        args.new_editor_from = config.get('new_editor_from')
+        if not args.new_editor_from:
+            parser.error('--new-editor-from without a meeting needs new_editor_from in the settings')
     data = read_panel(args.panel)
     if args.more_meetings:
         extra = config['extra_meetings']

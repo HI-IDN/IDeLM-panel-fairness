@@ -165,7 +165,9 @@ def main():
             config = yaml.safe_load(f)
         new = read_new_members(config['members'])
         if args.new_editor_from == 'settings':
-            args.new_editor_from = config['new_editor_from']
+            args.new_editor_from = config.get('new_editor_from')
+            if not args.new_editor_from:
+                parser.error('--new-editor-from without a meeting needs new_editor_from in the settings')
         not_before = {p: args.new_editor_from for p, trio in data.reviewers.items() if trio[0] in new}
     with open(args.agenda, newline='', encoding='utf-8') as f:
         agenda = [(row['application'], row['meeting'], int(row['position'])) for row in csv.DictReader(f)]
