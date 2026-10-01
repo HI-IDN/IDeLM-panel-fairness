@@ -132,8 +132,8 @@ eru *í kóða* eru útfærðar í líkaninu en hafa ekki verið keyrðar á svi
   *að* bíða lengur, svo slík greiðsla vinnur að hluta gegn dagskránni. Betra er að greiða fyrir þá
   byrði sem eftir stendur umfram meðaltal, sem nú er hægt, og prófa hvort það jafni greiðslu á
   tíma.
-* **Óvissa** (*mikið*). Röðun sem þolir forföll og misjafnlega langar umræður (stokastísk [@birge2011] eða
-  traust bestun [@bertsimas2004]), og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
+* **Óvissa** (*mikið*). Röðun sem þolir forföll og misjafnlega langar umræður (slembibestun, e. *stochastic optimization* [@birge2011], eða
+  traust bestun, e. *robust optimization* [@bertsimas2004]), og reglur um endurbestun sem breyta auglýstri dagskrá sem minnst.
 
 #### Lausnaraðferðir
 
