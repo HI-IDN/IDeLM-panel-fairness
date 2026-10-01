@@ -171,7 +171,8 @@ reader 1 (`--mode roles`), or all three reviewers and the editor (`--mode assign
   Waiting is unpaid, and `--pay-per` can reward it with editor roles: per slot sat through
   (`presence`), per proposal plus waiting above the regression curve of waiting on meetings
   (`fit`), pay per proposal plus the unpaid burden above the mean burden (`burden`, recommended with
-  the stepwise schedule, since it uses the schedule's own measure), or pay per proposal rising in
+  the stepwise schedule, since it uses the schedule's own measure; pass the schedule's `--alpha` or
+  `--alpha-file` here too if it was run with them), or pay per proposal rising in
   proportion to how far a member's waiting per proposal is above the mean (`mean`: 50 % above the
   mean, 50 % more per proposal). `mean` pays members who wait long because they attend rarely,
   which the stepwise schedule intends, so it partly undoes the schedule; and with the 2/3 editor

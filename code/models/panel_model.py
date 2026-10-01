@@ -1083,7 +1083,9 @@ def main():
         print(f'burden carried over for {len(carry)} members')
     if args.no_worse_than:
         rows = member_measures(data, read_agenda(args.no_worse_than), alpha)
-        reference = {row['member']: row['burden'] for row in rows}
+        # From the unrounded parts (the reported burden is rounded), so a fractional alpha
+        # compares the burden the model optimises.
+        reference = {row['member']: alpha[row['member']] * row['meetings'] + row['waiting'] for row in rows}
         print(f'reference plan {args.no_worse_than}: largest burden {max(reference.values()):g}')
     model = PanelScheduleModel(data, alpha=alpha, max_per_meeting=config['max_per_meeting'],
                                total_weight=config['total_weight'], time_limit=config['time_limit'],
@@ -1122,7 +1124,8 @@ def main():
           f"{fair['total_waiting']}, rho(meetings, waiting) {fair['rho_meetings_waiting']}, "
           f"inverted pairs {fair['inverted_pairs']}")
     if reference is not None:
-        worse = [row['member'] for row in solution['members'] if row['burden'] > reference[row['member']] + 1e-6]
+        worse = [row['member'] for row in solution['members']
+                 if alpha[row['member']] * row['meetings'] + row['waiting'] > reference[row['member']] + 1e-6]
         print(f"worse off than in the reference plan: {', '.join(worse) or 'nobody'}")
     print(f"objective {solution['objective']:.3f}, gap {solution['gap']:.1%}, "
           f"conflicted members present: {len(solution['coi_present'])}, "

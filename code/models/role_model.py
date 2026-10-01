@@ -359,11 +359,18 @@ def main():
     parser.add_argument('--keep-roles', nargs='*', default=[],
                         help='meetings whose roles are already announced and stay as they are (e.g. M3); '
                              'held meetings always do')
+    parser.add_argument('--alpha', type=float, help="with --pay-per burden: cost of attending a meeting, in "
+                                                      "slots; use the schedule's value")
+    parser.add_argument('--alpha-file', help="with --pay-per burden: CSV (member, alpha), as for the schedule")
     parser.add_argument('--out', required=True, help='output prefix; writes <out>_panel.csv')
     args = parser.parse_args()
 
     with open(args.config, encoding='utf-8') as f:
         config = yaml.safe_load(f)
+    # As in models/panel_model.py, so --pay-per burden can use the schedule's own alpha.
+    for name in ('alpha', 'alpha_file'):
+        if getattr(args, name) is not None:
+            config[name] = getattr(args, name)
     data = read_panel(args.panel)
     agenda = read_agenda(args.agenda)
     new = read_new_members(config['members'])
