@@ -26,7 +26,11 @@ proposal. Objectives:
             waiting above the regression parabola of waiting on meetings: the members the plan
             treats worse than the others (unlucky) are paid for that excess as for proposals; or,
             with --pay-per mean, so that pay per proposal rises in proportion to how far a member's
-            waiting per proposal is above the mean (50% above the mean: 50% more per proposal);
+            waiting per proposal is above the mean (50% above the mean: 50% more per proposal); or,
+            with --pay-per burden, of pay per proposal plus the unpaid burden (alpha per meeting
+            attended plus waiting) above the mean burden: the schedule's own measure, so members
+            who wait long because they attend rarely (as the stepwise schedule intends) are not
+            paid again for it;
     assign  minimise the spread of the number of proposals and of editor roles per member;
 
 and in both, with smaller weights, give everyone similar room in the discussion and avoid a member
@@ -50,7 +54,7 @@ import numpy
 import yaml
 from gurobipy import GRB, Model, quicksum  # pylint: disable=no-name-in-module
 
-from models.panel_model import read_agenda, read_new_members, read_panel
+from models.panel_model import member_measures, read_agenda, read_new_members, read_panel
 
 PAY = {'start': 38000, 'editor': 23000, 'reader': 15000}  # ISK, as in code/panel_workload.R
 
@@ -88,9 +92,10 @@ def excess_waiting(data, agenda):
     return {r: max(0.0, waiting[r] - numpy.polyval(coef, meetings[r])) for r in members}
 
 
-def above_mean(data, agenda):
+def above_mean(data, agenda, exclude=()):
     """How far each member's waiting per own proposal is above the mean over members, relative to
-    that mean (0.5: 50% above; 0 for members at or below the mean)."""
+    that mean (0.5: 50% above; 0 for members at or below the mean). Members in exclude (new members,
+    who wait longer by design and are left out of the pay spread) don't count towards the mean."""
     leave, own = defaultdict(int), defaultdict(int)
     for p, (m, k) in agenda.items():
         for r in data.reviewers.get(p, ()):
@@ -101,10 +106,21 @@ def above_mean(data, agenda):
         waiting[r] += k - own[r, m]
         proposals[r] += own[r, m]
     rate = {r: waiting[r] / proposals[r] for r in waiting}
-    mean = sum(rate.values()) / len(rate) if rate else 0
+    counted = [v for r, v in rate.items() if r not in exclude] or list(rate.values())
+    mean = sum(counted) / len(counted) if counted else 0
     if mean == 0:  # no one waits: no one is above the mean
         return {r: 0.0 for r in rate}
     return {r: max(0.0, v / mean - 1) for r, v in rate.items()}
+
+
+def above_mean_burden(data, agenda, alpha, exclude=()):
+    """Unpaid burden (alpha * meetings + waiting, in slots) above the mean over members not in
+    exclude, per member (0 at or below the mean)."""
+    burden = {row['member']: row['burden'] for row in member_measures(data, agenda, alpha)
+              if row['meetings']}
+    counted = [b for r, b in burden.items() if r not in exclude] or list(burden.values())
+    mean = sum(counted) / len(counted) if counted else 0
+    return {r: max(0.0, b - mean) for r, b in burden.items()}
 
 
 def time_order(data, agenda):
@@ -123,7 +139,8 @@ class RoleModel:
 
     def __init__(self, data, agenda, mode, new_members=(), new_editor_share=0.15, max_per_member=6,
                  spread_weight=0.0, voice_weight=0.1, time_limit=300, pay=PAY, from_scratch=False,
-                 max_new_per_proposal=2, pay_per='proposal', keep_roles=(), max_editor_share=None):
+                 max_new_per_proposal=2, pay_per='proposal', keep_roles=(), max_editor_share=None,
+                 alpha=2.0):
         self.data, self.agenda, self.mode = data, agenda, mode
         self.pay = pay
         self.m = Model('Roles')
@@ -274,8 +291,11 @@ class RoleModel:
             elif pay_per == 'presence':
                 per = presence(data, agenda)
             elif pay_per == 'mean':  # pay per proposal up in proportion to the excess
-                above = above_mean(data, agenda)
+                above = above_mean(data, agenda, exclude=self.new_members)
                 per = {r: n[r] * (1 + above.get(r, 0.0)) for r in members}
+            elif pay_per == 'burden':  # own proposals plus unpaid burden above the mean, paid alike
+                above = above_mean_burden(data, agenda, alpha, exclude=self.new_members)
+                per = {r: n[r] + above.get(r, 0.0) for r in members}
             else:  # fit: own proposals plus the unlucky waiting, paid alike
                 above = excess_waiting(data, agenda)
                 per = {r: n[r] + above.get(r, 0.0) for r in members}
@@ -326,11 +346,12 @@ def main():
     parser.add_argument('--time-limit', type=float, default=300)
     parser.add_argument('--from-scratch', action='store_true',
                         help='nothing is fixed, not even held meetings (with --mode assign)')
-    parser.add_argument('--pay-per', choices=['proposal', 'presence', 'fit', 'mean'], default='proposal',
+    parser.add_argument('--pay-per', choices=['proposal', 'presence', 'fit', 'mean', 'burden'], default='proposal',
                         help="with --mode roles: equal pay per proposal, per agenda slot sat through "
                              "('presence'), or per proposal plus waiting above the regression parabola "
                              "of waiting on meetings ('fit'), or rising in proportion to waiting per proposal "
-                             "above the mean ('mean'); the last three reward waiting with editor roles")
+                             "above the mean ('mean'), or per proposal plus unpaid burden (alpha * meetings + "
+                             "waiting) above the mean ('burden'); the last four reward waiting with editor roles")
     parser.add_argument('--keep-roles', nargs='*', default=[],
                         help='meetings whose roles are already announced and stay as they are (e.g. M3); '
                              'held meetings always do')
@@ -347,7 +368,8 @@ def main():
                       max_per_member=config.get('max_per_member') or 99, time_limit=args.time_limit,
                       from_scratch=args.from_scratch, pay_per=args.pay_per,
                       max_new_per_proposal=config.get('max_new_per_proposal', 2),
-                      keep_roles=args.keep_roles, max_editor_share=config.get('max_editor_share'))
+                      keep_roles=args.keep_roles, max_editor_share=config.get('max_editor_share'),
+                      alpha=float(config['alpha']))
     rows = model.solve()
     os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     # Written in the format of panel.csv, so it can be scheduled by models/panel_model.py. From

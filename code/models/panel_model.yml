@@ -14,6 +14,10 @@ soft_max_weight: 0.5    # weight of the proposals above the soft cap, per member
 first_meeting_rule: true  # first meeting: everyone attends with exactly one proposal
 max_meetings_per_member: null  # most meetings one member attends in the round (null: no limit)
 
+# Objectives solved in steps (--fairness lexburden, leximin, ...).
+meetings_slack: 0     # the meetings step is held at its value plus this (0: exactly); lets alpha trade meetings for waiting
+leximin_levels: 3     # --fairness leximin: how many of the largest burdens are fixed in turn (0: all members)
+
 # Target number of own proposals per meeting attended (soft; used with --target).
 members: ../data/tdf/members.csv  # member, new (TRUE/FALSE); relative to code/
 target_experienced: 3.5

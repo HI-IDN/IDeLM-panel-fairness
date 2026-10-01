@@ -14,9 +14,13 @@ A member who has to attend often is therefore compensated by leaving earlier, an
 attends rarely may stay longer. `alpha` can differ per member, to reflect whether they would
 rather attend less often and stay longer (high alpha) or attend often and leave early (low alpha).
 
-Burden is compared relative to each member's own load (number of proposals). The objective
-minimises the largest relative burden (the least well-off member) and, with a small weight, the
-total burden.
+The objective is chosen with `fairness`. The original one ('proposal') minimises the largest burden
+per own proposal and, with a small weight, the total burden. The recommended ones are solved in
+steps: first the fewest meetings attended (with the rule costs), then fairness of the unpaid burden
+alpha * meetings + waiting (the largest one with 'lexburden', or leximin with 'leximin', which
+protects every member and not only the worst-off one), then the least total waiting. A reference
+plan (`reference_burden`) adds a first step that keeps everyone at most as burdened as there.
+Reported measures are recomputed from the agenda (member_measures, fairness_metrics).
 
 Meetings that have already been held are fixed: their proposals stay in that meeting, and their
 order is fixed too when an agenda is given. Their burden counts towards the round, just like APAP
@@ -42,6 +46,10 @@ import yaml
 from gurobipy import GRB, Model, quicksum  # pylint: disable=no-name-in-module
 
 ROLES = ('editor', 'reader1', 'reader2')
+# Objectives solved in steps (see PanelScheduleModel._solve_in_steps).
+STEP_MODES = ('lex', 'lexmax', 'lexboth', 'lexburden', 'lexsum', 'leximin')
+# Modes with an equity-band term, which needs leave tied to the actual last own slot.
+BAND_MODES = ('bands', 'lex', 'lexboth')
 
 
 @dataclass
@@ -117,6 +125,84 @@ def meetings_attended(data, agenda):
     return {r: len(ms) for r, ms in attended.items()}
 
 
+def member_measures(data, agenda, alpha):
+    """Per member, recomputed from an agenda {proposal: (meeting, slot)} rather than from model
+    variables: proposals, meetings attended, slots stayed (up to their last own proposal in each
+    meeting), waiting (proposals of others sat through) and burden = alpha * meetings + waiting,
+    the quantity the fairness steps compare. alpha is a number or {member: value}."""
+    leave, own = defaultdict(int), defaultdict(int)
+    for p, (m, k) in agenda.items():
+        for r in data.reviewers.get(p, ()):
+            leave[r, m] = max(leave[r, m], k)
+            own[r, m] += 1
+    rows = []
+    for r in data.members:
+        a = alpha[r] if isinstance(alpha, dict) else alpha
+        meetings = [m for (s, m) in leave if s == r]
+        slots = sum(leave[r, m] for m in meetings)
+        n = len(data.proposals_of(r))
+        waiting = slots - sum(own[r, m] for m in meetings)
+        burden = a * len(meetings) + waiting
+        rows.append({'member': r, 'proposals': n, 'meetings': len(meetings), 'leave_slots': slots,
+                     'waiting': waiting, 'waiting_per_meeting': round(waiting / max(len(meetings), 1), 3),
+                     'waiting_per_proposal': round(waiting / n, 3), 'alpha': a, 'burden': round(burden, 2),
+                     'burden_per_proposal': round(burden / n, 3)})
+    return rows
+
+
+def _ranks(values):
+    """Ranks 1..n, ties sharing their average rank."""
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    ranks = [0.0] * len(values)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and values[order[j + 1]] == values[order[i]]:
+            j += 1
+        for t in range(i, j + 1):
+            ranks[order[t]] = (i + j) / 2 + 1
+        i = j + 1
+    return ranks
+
+
+def spearman(xs, ys):
+    """Spearman rank correlation (None if either variable is constant)."""
+    rx, ry = _ranks(xs), _ranks(ys)
+    mx, my = sum(rx) / len(rx), sum(ry) / len(ry)
+    sxy = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    sxx, syy = sum((a - mx) ** 2 for a in rx), sum((b - my) ** 2 for b in ry)
+    return round(sxy / (sxx * syy) ** 0.5, 3) if sxx and syy else None
+
+
+def fairness_metrics(rows):
+    """How fairly an agenda shares the unpaid burden, from member_measures rows:
+        max_burden, mean_burden, gini_burden: the worst-off member, the average and the inequality;
+        burden_sorted: all burdens, largest first (compare plans leximin-wise: the first entry that
+                       differs decides);
+        total_waiting, total_meetings: efficiency;
+        rho_meetings_waiting: rank correlation of meetings attended and total waiting. Positive is
+                       the original defect: those who attend often also wait more in total;
+        inverted_pairs: pairs of members where the one who attends more meetings also waits more in
+                       total (the intent is the opposite)."""
+    burden = [r['burden'] for r in rows]
+    meetings = [r['meetings'] for r in rows]
+    waiting = [r['waiting'] for r in rows]
+    n, total = len(burden), sum(burden)
+    gini = (sum(abs(a - b) for a in burden for b in burden) / (2 * n * total)) if total else 0.0
+    inverted = sum(1 for i in range(n) for j in range(n)
+                   if meetings[i] > meetings[j] and waiting[i] > waiting[j])
+    return {'max_burden': max(burden), 'mean_burden': round(total / n, 3), 'gini_burden': round(gini, 4),
+            'burden_sorted': ' '.join(f'{b:g}' for b in sorted(burden, reverse=True)),
+            'total_waiting': sum(waiting), 'total_meetings': sum(meetings),
+            'rho_meetings_waiting': spearman(meetings, waiting), 'inverted_pairs': inverted}
+
+
+def read_carry(carry_file):
+    """Burden carried over from earlier rounds: columns member, burden (slots; may be negative)."""
+    with open(carry_file, newline='', encoding='utf-8-sig') as f:
+        return {row['member']: float(row['burden']) for row in csv.DictReader(f)}
+
+
 def read_agenda(agenda_file):
     """Agenda from an earlier solution: columns application, meeting, position (1 = first)."""
     with open(agenda_file, newline='', encoding='utf-8-sig') as f:
@@ -143,7 +229,8 @@ class PanelScheduleModel:
                  next_meeting=None, postpone_penalty=0.5, not_before=None, max_two_meetings=None,
                  meeting_cost=0.0, min_per_member=None, fairness='proposal', max_waiting=None,
                  new_members=(), learning_weight=0.001, soft_max_per_member=None, soft_max_weight=0.0,
-                 rotate_wait=None):
+                 rotate_wait=None, meetings_slack=0.0, leximin_levels=3, reference_burden=None,
+                 carry=None):
         """
         alpha:              cost of attending a meeting, in slots; a number or {member: value}
         max_per_meeting:    most proposals one meeting can handle
@@ -193,10 +280,26 @@ class PanelScheduleModel:
                             'lexburden' has as second step the largest unpaid burden, alpha per
                             meeting attended plus waiting, so members who attend often wait less;
                             'lexsum' has no fairness step: the fewest meetings, then the least
-                            total waiting, whoever carries it (for comparison)
-        new_members:        codes of new members; with fairness='bands' their waiting in the first
-                            half of the round is rewarded, as they sit longer to learn anyway
+                            total waiting, whoever carries it (for comparison);
+                            'leximin' replaces the single worst-off step of 'lexburden' by
+                            leximin_levels steps: the largest burden, then the sum of the two
+                            largest, and so on (Ogryczak's ordered min-max), so members below the
+                            worst-off one are protected too
+        new_members:        codes of new members; with 'bands' and the step modes their waiting in
+                            the first half of the round is rewarded, as they sit longer to learn
+                            anyway (in the last step only; the fairness steps count it in full)
         learning_weight:    objective weight of that reward, per slot (a tie-breaker)
+        meetings_slack:     step modes: the first step (meetings and rule costs) is held at its
+                            value plus this slack, so later steps may add a meeting attended where
+                            it buys at least alpha slots less waiting (0: hold it exactly)
+        leximin_levels:     with 'leximin', how many of the largest burdens are fixed in turn
+                            (None or 0: all members)
+        reference_burden:   step modes: {member: burden} of a reference plan (e.g. the staff's).
+                            A first step makes the total excess over it as small as possible, so
+                            nobody is worse off than in that plan where the rules allow it
+        carry:              {member: burden carried over from earlier rounds}, added to each
+                            member's burden in the fairness steps (lexburden, leximin) and the
+                            reference step
         """
         self.data = data
         self.alpha = alpha if isinstance(alpha, dict) else {r: alpha for r in data.members}
@@ -238,6 +341,12 @@ class PanelScheduleModel:
         self.pair_limit = pair_limit
         self.pair_weight = pair_weight
         self.max_meetings = max_meetings or {}
+        self.meetings_slack = meetings_slack
+        self.leximin_levels = leximin_levels
+        self.reference_burden = reference_burden
+        self.carry = carry or {}
+        if reference_burden is not None and fairness not in STEP_MODES:
+            raise ValueError('reference_burden needs a fairness mode solved in steps')
 
         self._set_variables()
         self._set_constraints()
@@ -256,7 +365,8 @@ class PanelScheduleModel:
             open_meetings = [m for m in open_meetings if self.data.meetings.index(m) >= first]
         if p in self.planned_next:  # stays in the next meeting, or is postponed to a later one
             later = self.data.meetings.index(self.next_meeting)
-            stay = [self.next_meeting] if self.next_meeting not in away else []
+            too_early = (p in self.not_before and later < self.data.meetings.index(self.not_before[p]))
+            stay = [self.next_meeting] if self.next_meeting not in away and not too_early else []
             return stay + [m for m in open_meetings if self.data.meetings.index(m) > later]
         return open_meetings
 
@@ -312,7 +422,7 @@ class PanelScheduleModel:
         first = data.meetings[0]
         free = [m for m in data.meetings if m not in self.closed and m != self.next_meeting
                 and not (self.first_meeting_rule and m == first)]
-        learning = self.fairness in ('bands', 'lex', 'lexmax', 'lexboth', 'lexburden', 'lexsum') and self.new_members
+        learning = (self.fairness == 'bands' or self.fairness in STEP_MODES) and self.new_members
         early = set(data.meetings[:len(data.meetings) // 2]) if learning else set()
         groups = defaultdict(list)
         for m in free:
@@ -424,8 +534,28 @@ class PanelScheduleModel:
                 self.m.addConstr(self.leave[r, m] >= own, name=f'leave_own[{r},{m}]')
                 self.m.addConstr(self.leave[r, m] <= len(self.slots[m]) * self.a[r, m],
                                  name=f'leave_attend[{r},{m}]')
+        if self.fairness in BAND_MODES:
+            self._exact_leave()
         if self.rotate_wait is not None:
             self._rotation()
+
+    def _exact_leave(self):
+        """Tie leave[r, m] to the slot of r's last proposal in m, not only bound it from below.
+        Most objectives minimise leave anyway, so the lower bounds suffice; the equity bands do not
+        (they reward moving a member's waiting into a band, which raising leave above the real last
+        slot would do with phantom waiting). last[r, p, m] = 1 picks the proposal whose slot leave
+        may not exceed; one is picked in each meeting r attends."""
+        for r in self.data.members:
+            for m in self.meetings_of[r]:
+                own = [p for p in self.data.proposals_of(r) if m in self.allowed[p]]
+                big_m = len(self.slots[m])
+                last = {}
+                for p in own:
+                    last[p] = self.m.addVar(vtype=GRB.BINARY, name=f'last_own[{r},{p},{m}]')
+                    self.m.addConstr(last[p] <= self._placed(p, m), name=f'last_own_placed[{r},{p},{m}]')
+                    self.m.addConstr(self.leave[r, m] <= self._slot(p, m) + big_m * (1 - last[p]),
+                                     name=f'leave_exact[{r},{p},{m}]')
+                self.m.addConstr(quicksum(last.values()) == self.a[r, m], name=f'last_own[{r},{m}]')
 
     def _rotation(self):
         """Rotation, as in APAP where the doctor who was on call goes home first: the members of the
@@ -468,6 +598,30 @@ class PanelScheduleModel:
     def burden(self, r):
         """Commitment (alpha per meeting attended) plus waiting (slot of the last proposal)."""
         return quicksum(self.alpha[r] * self.a[r, m] + self.leave[r, m] for m in self.meetings_of[r])
+
+    def unpaid(self, r):
+        """The burden the fairness steps compare: alpha per meeting attended plus waiting (proposals
+        of others sat through), plus what is carried over from earlier rounds. Own proposals are
+        paid work and are not counted."""
+        return (self.burden(r) - len(self.data.proposals_of(r))) + self.carry.get(r, 0.0)
+
+    def _ordered_levels(self, waiting):
+        """Leximin by Ogryczak's ordered min-max: step k minimises the sum of the k largest burdens,
+        k*t + sum_r d[r] with d[r] >= unpaid(r) - t, d >= 0 (at the optimum t is the k-th largest).
+        Holding that expression afterwards keeps the k largest burdens at most that sum, so each
+        later step can only lower the burdens below them. Returns the steps."""
+        members = self.data.members
+        burden = {r: self.unpaid(r) for r in members}
+        levels = []
+        count = min(self.leximin_levels or len(members), len(members))
+        for k in range(1, count + 1):
+            t = self.m.addVar(lb=-GRB.INFINITY, name=f'kth[{k}]')
+            d = {r: self.m.addVar(lb=0, name=f'above_kth[{k},{r}]') for r in members}
+            for r in members:
+                self.m.addConstr(d[r] >= burden[r] - t, name=f'ordered[{k},{r}]')
+            top = k * t + quicksum(d.values())
+            levels.append((f'top{k}', top + 1e-4 * waiting, top))
+        return levels
 
     def _equity_bands(self, bands=(1, 0.5, 0.2)):
         """The APAP equity measure for the panel: the sum over bands eps of eps times the number of
@@ -531,9 +685,8 @@ class PanelScheduleModel:
             elif self.fairness in ('lexmax', 'lexboth'):
                 self.m.addConstr(waiting <= self.z, name=f'fair[{r}]')  # z: the longest waiting
             elif self.fairness == 'lexburden':  # z: the largest unpaid burden
-                attended = quicksum(self.a[r, m] for m in self.meetings_of[r])
-                self.m.addConstr(self.alpha[r] * attended + waiting <= self.z, name=f'fair[{r}]')
-            elif self.fairness in ('bands', 'sum', 'lex', 'lexsum'):
+                self.m.addConstr(self.unpaid(r) <= self.z, name=f'fair[{r}]')
+            elif self.fairness in ('bands', 'sum', 'lex', 'lexsum', 'leximin'):
                 pass  # no worst-off member: equity is the band count below, or not counted at all
             else:
                 self.m.addConstr(self.burden(r) <= self.z * n, name=f'fair[{r}]')
@@ -576,7 +729,7 @@ class PanelScheduleModel:
         postponed = quicksum(1 - self._placed(p, self.next_meeting) for p in self.planned_next)
         # bands: maximise equity, plus the reward for new members waiting early in the round.
         # sum: no fairness term, only the total burden (least waiting overall, whoever carries it).
-        if self.fairness in ('lex', 'lexmax', 'lexboth', 'lexburden', 'lexsum'):
+        if self.fairness in STEP_MODES:
             # In steps (see solve): each step keeps what the steps before it reached.
             #   1. meetings: the fewest meetings attended, with own proposals per meeting close
             #      to each member's target (total deviation, so a meeting saved by overloading
@@ -588,7 +741,11 @@ class PanelScheduleModel:
             #      With 'lexmax' the second step is instead
             #      worst:    the shortest possible waiting for the member who waits the longest;
             #      and with 'lexboth' the equity step is followed by the worst step;
+            #      With 'leximin' the second step is a series: the largest burden, the sum of the two
+            #      largest, and so on (see _ordered_levels);
             #   3. waiting:  the least total waiting, new members waiting early in the round.
+            # With a reference plan, a step 0 first makes the total excess burden over that plan
+            # as small as possible (zero when nobody needs to be worse off).
             waiting = quicksum(self.leave.values()) - sum(len(trio) for trio in self.data.reviewers.values())
             meetings = (quicksum(self.a.values()) + self.postpone_penalty * postponed
                         + self.coi_penalty * quicksum(self.coi_present.values())
@@ -601,8 +758,21 @@ class PanelScheduleModel:
                 fairness_steps.append(('equity', -equity + 1e-4 * waiting, -equity))
             if self.fairness in ('lexmax', 'lexboth', 'lexburden'):
                 fairness_steps.append(('worst', self.z + 1e-4 * waiting, 1.0 * self.z))
+            if self.fairness == 'leximin':
+                fairness_steps += self._ordered_levels(waiting)
             self.levels = [('meetings', meetings, meetings)] + fairness_steps + [('waiting', least, least)]
-            self.m.setObjective(meetings, GRB.MINIMIZE)
+            if self.reference_burden is not None:
+                excess = []
+                for r in self.data.members:
+                    if r not in self.reference_burden:
+                        continue
+                    e = self.m.addVar(lb=0, name=f'excess_reference[{r}]')
+                    self.m.addConstr(e >= self.unpaid(r) - self.reference_burden[r] - self.carry.get(r, 0.0),
+                                     name=f'excess_reference[{r}]')
+                    excess.append(e)
+                excess = quicksum(excess)
+                self.levels.insert(0, ('reference', excess + 1e-4 * waiting, excess))
+            self.m.setObjective(self.levels[0][1], GRB.MINIMIZE)
             return
         fair = 0 if self.fairness == 'sum' else self.z
         if self.fairness == 'bands':
@@ -685,8 +855,12 @@ class PanelScheduleModel:
         while the next level is optimised. The time limit is split between the levels. Returns the
         value and bound of each level."""
         time_limit, reached = self.m.Params.TimeLimit, []
-        # The first step gets 40% of the time; the other steps share the rest equally.
-        shares = [0.4] + [0.6 / (len(self.levels) - 1)] * (len(self.levels) - 1)
+        # The meetings step gets 40% of the time (the reference step, if any, 10%); the other steps
+        # share the rest equally.
+        names = [name for name, _, _ in self.levels]
+        first = {'reference': 0.1, 'meetings': 0.4}
+        rest = (1 - sum(first.get(n, 0) for n in names)) / max(1, sum(n not in first for n in names))
+        shares = [first.get(n, rest) for n in names]
         for (name, objective, held), share in zip(self.levels, shares):
             self.m.setObjective(objective, GRB.MINIMIZE)
             self.m.Params.TimeLimit = share * time_limit
@@ -694,9 +868,15 @@ class PanelScheduleModel:
             if self.m.SolCount == 0:
                 raise RuntimeError(f'No solution found at level {name} (status {self.m.Status}).')
             value = held.getValue()
-            reached.append({'level': name, 'value': value, 'bound': self.m.ObjBound})
-            print(f"level {name}: value {value:.3f}, bound {self.m.ObjBound:.3f}")
-            self.m.addConstr(held <= value + 1e-6, name=f'hold[{name}]')
+            gap = self.m.MIPGap if self.m.IsMIP else 0.0
+            reached.append({'level': name, 'value': value, 'bound': self.m.ObjBound, 'gap': gap})
+            print(f"level {name}: value {value:.3f}, bound {self.m.ObjBound:.3f}, gap {gap:.1%}")
+            # Gurobi accepts binaries within 1e-5 of 0 or 1, so a held value can come back a little
+            # below the true one (6.99998 for 7). Holding it that tightly can make the next step
+            # infeasible, so hold with a tolerance well above that, but below any real difference.
+            tolerance = 1e-4 * max(1.0, abs(value))
+            slack = self.meetings_slack if name == 'meetings' else 0.0
+            self.m.addConstr(held <= value + slack + tolerance, name=f'hold[{name}]')
         return reached
 
     def solve(self):
@@ -708,9 +888,15 @@ class PanelScheduleModel:
         if self.m.SolCount == 0:
             raise RuntimeError(f'No solution found (status {self.m.Status}).')
         agenda = sorted((m, k, p) for (p, m, k), var in self.x.items() if var.X > 0.5)
+        # Measures are recomputed from the agenda, not read from leave or a, so they show what the
+        # plan actually does whatever slack the model variables have.
+        members = member_measures(self.data, {p: (m, k) for m, k, p in agenda}, self.alpha)
+        for row in members:
+            row['carry'] = self.carry.get(row['member'], 0.0)
         self.solution = {
             'agenda': [{'meeting': m, 'position': k, 'application': p} for m, k, p in agenda],
-            'members': [self._member_summary(r) for r in self.data.members],
+            'members': members,
+            'fairness': fairness_metrics(members),
             'status': self.m.Status, 'objective': self.m.ObjVal, 'gap': self.m.MIPGap,
             'waiting_target': self.waiting_target.X if self.waiting_target is not None else None,
             'levels': levels,
@@ -721,29 +907,22 @@ class PanelScheduleModel:
         }
         return self.solution
 
-    def _member_summary(self, r):
-        """Per member: meetings attended, slots stayed, and peel-off points, i.e. proposals of
-        others they sat through before their last own proposal (in total, per meeting attended and
-        per own proposal)."""
-        attended = [m for m in self.meetings_of[r] if self.a[r, m].X > 0.5]
-        leave_slots = sum(self.leave[r, m].X for m in self.meetings_of[r])
-        n = len(self.data.proposals_of(r))
-        waiting = round(leave_slots) - n
-        burden = self.alpha[r] * len(attended) + leave_slots
-        return {'member': r, 'proposals': n, 'meetings': len(attended), 'leave_slots': round(leave_slots),
-                'waiting': waiting, 'waiting_per_meeting': round(waiting / max(len(attended), 1), 3),
-                'waiting_per_proposal': round(waiting / n, 3),
-                'alpha': self.alpha[r], 'burden': round(burden, 2), 'burden_per_proposal': round(burden / n, 3)}
-
     def save(self, out_prefix):
         os.makedirs(os.path.dirname(out_prefix) or '.', exist_ok=True)
         columns = {'agenda': ['meeting', 'position', 'application'],
                    'members': ['member', 'proposals', 'meetings', 'leave_slots', 'waiting',
                                'waiting_per_meeting', 'waiting_per_proposal', 'alpha', 'burden',
-                               'burden_per_proposal'],
-                   'coi_present': ['application', 'member', 'meeting']}
+                               'burden_per_proposal', 'carry'],
+                   'coi_present': ['application', 'member', 'meeting'],
+                   'fairness': ['metric', 'value'],
+                   'levels': ['level', 'value', 'bound', 'gap']}
         for name, fields in columns.items():
-            rows = self.solution[name]
+            if name == 'fairness':
+                rows = [{'metric': k, 'value': v} for k, v in self.solution['fairness'].items()]
+            elif name == 'levels':
+                rows = self.solution['levels'] or []
+            else:
+                rows = self.solution[name]
             with open(f'{out_prefix}_{name}.csv', 'w', newline='', encoding='utf-8') as f:
                 writer = csv.DictWriter(f, fieldnames=fields)
                 writer.writeheader()
@@ -762,8 +941,7 @@ def main():
     parser.add_argument('--alpha', type=float, help='cost of attending a meeting, in slots')
     parser.add_argument('--max-per-meeting', type=int)
     parser.add_argument('--max-per-member', type=int, help='most proposals per member in one meeting')
-    parser.add_argument('--fairness', choices=['proposal', 'total', 'unpaid', 'bands', 'sum', 'lex', 'lexmax', 'lexboth',
-                                 'lexburden', 'lexsum'],
+    parser.add_argument('--fairness', choices=['proposal', 'total', 'unpaid', 'bands', 'sum', *STEP_MODES],
                         default='proposal',
                         help="worst-off member by burden per proposal, by total waiting ('total'), or by "
                              "commitment plus waiting, undivided ('unpaid'); or the APAP measure: members "
@@ -772,7 +950,17 @@ def main():
                              "equity by the bands, then least waiting ('lex'); or the same steps with the longest "
                              "waiting of any member as the second step ('lexmax'), with both ('lexboth'), or with "
                              "the largest alpha * meetings + waiting ('lexburden'); or no fairness step, fewest "
-                             "meetings then least total waiting ('lexsum')")
+                             "meetings then least total waiting ('lexsum'); or leximin of alpha * meetings + "
+                             "waiting in steps after the meetings step ('leximin', see --leximin-levels)")
+    parser.add_argument('--leximin-levels', type=int,
+                        help="with --fairness leximin: how many of the largest burdens to fix in turn (0: all)")
+    parser.add_argument('--meetings-slack', type=float,
+                        help='step modes: hold the meetings step at its value plus this slack, so later '
+                             'steps may trade a meeting attended for alpha slots less waiting')
+    parser.add_argument('--no-worse-than',
+                        help='step modes: agenda CSV of a reference plan (e.g. the staff\'s meetings); a '
+                             'first step keeps every member\'s burden at most theirs there where possible')
+    parser.add_argument('--carry', help='CSV (member, burden) of burden carried over from earlier rounds')
     parser.add_argument('--coi-penalty', type=float,
                         help='objective cost each time a conflicted member must step out and come back')
     parser.add_argument('--postpone-penalty', type=float,
@@ -816,7 +1004,7 @@ def main():
         config = yaml.safe_load(f)
     # Command-line options override the settings file.
     for name in ('alpha', 'max_per_meeting', 'time_limit', 'unavailable', 'max_per_member', 'coi_penalty',
-                 'postpone_penalty'):
+                 'postpone_penalty', 'leximin_levels', 'meetings_slack'):
         if getattr(args, name) is not None:
             config[name] = getattr(args, name)
 
@@ -834,7 +1022,7 @@ def main():
         print(f'{sum(map(len, data.unavailable.values()))} member-meeting unavailabilities')
     print(f'{len(data.fixed_position)} proposals fixed by the agenda of held meetings')
     targets = None
-    if args.target or args.fairness in ('lex', 'lexmax', 'lexboth', 'lexburden', 'lexsum'):  # in steps, the targets are part of the first step
+    if args.target or args.fairness in STEP_MODES:  # in steps, the targets are part of the first step
         new = read_new_members(config['members'])
         targets = {r: config['target_new'] if r in new else config['target_experienced'] for r in data.members}
         print(f"target per meeting: {config['target_experienced']} experienced, "
@@ -854,6 +1042,14 @@ def main():
     if max_meetings:
         print(f'meeting limit per member: {min(max_meetings.values())}-{max(max_meetings.values())}')
 
+    reference, carry = None, None
+    if args.carry:
+        carry = read_carry(args.carry)
+        print(f'burden carried over for {len(carry)} members')
+    if args.no_worse_than:
+        rows = member_measures(data, read_agenda(args.no_worse_than), float(config['alpha']))
+        reference = {row['member']: row['burden'] for row in rows}
+        print(f'reference plan {args.no_worse_than}: largest burden {max(reference.values()):g}')
     model = PanelScheduleModel(data, alpha=float(config['alpha']), max_per_meeting=config['max_per_meeting'],
                                total_weight=config['total_weight'], time_limit=config['time_limit'],
                                keep_meetings=args.keep_meetings, coi_penalty=float(config['coi_penalty']),
@@ -870,13 +1066,15 @@ def main():
                                meeting_cost=args.meeting_cost, min_per_member=args.min_per_member,
                                fairness=args.fairness, max_waiting=args.max_waiting,
                                new_members=(read_new_members(config['members'])
-                                            if args.fairness in ('bands', 'lex', 'lexmax', 'lexboth', 'lexburden',
-                                                                 'lexsum')
+                                            if args.fairness == 'bands' or args.fairness in STEP_MODES
                                             else ()),
                                learning_weight=config.get('learning_weight', 0.001),
                                soft_max_per_member=config.get('soft_max_per_member'),
                                soft_max_weight=config.get('soft_max_weight', 0.0),
-                               rotate_wait=args.rotate_wait)
+                               rotate_wait=args.rotate_wait,
+                               meetings_slack=float(config.get('meetings_slack') or 0.0),
+                               leximin_levels=config.get('leximin_levels', 3),
+                               reference_burden=reference, carry=carry)
     model.m.Params.MIPFocus = args.mip_focus
     if args.start:
         model.set_start(read_agenda(args.start))
@@ -884,6 +1082,13 @@ def main():
     model.save(args.out)
     if solution['waiting_target'] is not None:
         print(f"target waiting per meeting: {solution['waiting_target']:.2f}")
+    fair = solution['fairness']
+    print(f"burden: largest {fair['max_burden']:g}, gini {fair['gini_burden']}, total waiting "
+          f"{fair['total_waiting']}, rho(meetings, waiting) {fair['rho_meetings_waiting']}, "
+          f"inverted pairs {fair['inverted_pairs']}")
+    if reference is not None:
+        worse = [row['member'] for row in solution['members'] if row['burden'] > reference[row['member']] + 1e-6]
+        print(f"worse off than in the reference plan: {', '.join(worse) or 'nobody'}")
     print(f"objective {solution['objective']:.3f}, gap {solution['gap']:.1%}, "
           f"conflicted members present: {len(solution['coi_present'])}, "
           f"postponed from the next meeting: {solution['postponed'] or 'none'}")
