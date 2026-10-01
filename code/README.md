@@ -127,9 +127,12 @@ Two further options apply to all the step modes:
 * `--meetings-slack s` holds step 1 at its value plus *s* instead of exactly. Step 1 otherwise
   treats a meeting attended as worth any amount of waiting, so α never gets to trade a meeting for
   α slots of waiting; a slack of one or two lets the later steps do that.
-* `--no-worse-than <agenda.csv>` adds a step 0 that makes the total excess of each member's burden
-  over their burden in a reference plan (e.g. the staff's meetings, scenario `current`) as small as
-  possible: zero when nobody needs to be worse off. The log lists anyone who still is. The
+* `--no-worse-than <agenda.csv>` adds two first steps: the rule penalties alone (a conflicted
+  member present, a postponed proposal), then the total excess of each member's burden over their
+  burden in a reference plan (e.g. the staff's meetings, scenario `current`), made as small as
+  possible: zero when nobody needs to be worse off. The rules come first, since the excess step is
+  held from then on and would otherwise buy less burden with conflicts. Start from the reference
+  plan (`--start`), which has no excess where it keeps the rules. The log lists anyone who still is. The
   comparison is of this round only; `--carry` does not enter it.
 
 Each step is held with a small tolerance (10⁻⁴, relative), since Gurobi accepts binaries within
