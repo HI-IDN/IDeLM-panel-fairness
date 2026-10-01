@@ -8,12 +8,13 @@ max_editor_share (2/3) of their proposals. Two modes:
 
     roles   Keep the three members on each proposal, but choose which of them is the editor,
             and which reader speaks second (reader 1) and last (reader 2).
-            New members may not be editor until they have been reader on the first part of their
-            proposals (in time order).
+            The staff chose these three, so the midpoint rule for new members does not apply; the
+            share of editor roles for new members does.
     assign  Assume every member can review every proposal. Choose all three members and the editor,
             except members with a conflict of interest, who may never review the proposal.
             At most two of the three are new members, so every proposal has an experienced one.
-            New members follow the same editor rules as in 'roles'.
+            New members may not be editor until they have been reader on the first part of their
+            proposals (in time order).
 
 Pay (see the book): base fee f0 plus fE per editor role and fL per reader role. Assuming every
 proposal takes the same time, including waiting in the meeting, fair pay means equal pay per
@@ -223,17 +224,26 @@ class RoleModel:
                     if own:
                         self.m.addConstr(quicksum(own) <= max_per_member, name=f'per_meeting[{r},{mt}]')
 
-        # New members: no editor role before the midpoint of their own meetings (which may be later
-        # than the middle of the round if their meetings come late), and after that at most
-        # new_editor_share of their proposals as editor.
-        # Their meetings are taken from the current plan, also in 'assign' mode where their proposals
-        # can change. The share applies to the proposals they end up with (load is a variable there).
+        # New members: no editor role before the midpoint of their own proposals (which may be later
+        # than the middle of the round if their proposals come late), and after that at most
+        # new_editor_share of their proposals as editor. In 'roles' mode the staff chose the three,
+        # so the midpoint rule does not apply: a proposal with three new members could otherwise
+        # have no possible editor when the schedule moves it early.
+        # The midpoint is the middle one of their own proposals in time order (meeting, slot), not
+        # the middle one of their meetings. Their proposals are taken from the current plan, also in
+        # 'assign' mode where they can change. The share applies to the proposals they end up with
+        # (load is a variable there).
+        def when(p):
+            return int(agenda[p][0][1:]), agenda[p][1]
+
         for r in self.new_members:
             current = [p for p in proposals if r in data.reviewers[p]]
-            their_meetings = sorted({meeting[p] for p in current}, key=lambda m: int(m[1:]))
-            before_mid = set() if from_scratch else set(their_meetings[:len(their_meetings) // 2])
+            if from_scratch or mode == 'roles' or not current:
+                midpoint = None
+            else:
+                midpoint = sorted(when(p) for p in current)[len(current) // 2]
             for p in proposals:
-                if (p, r) in self.y and p not in held and meeting[p] in before_mid:
+                if (p, r) in self.y and p not in held and midpoint is not None and when(p) < midpoint:
                     self.y[p, r].UB = 0
             held_editor = sum(1 for p in current if p in held and data.reviewers[p][0] == r)
             self.m.addConstr(editors_of(r) <= new_editor_share * load[r] + 0.5 + held_editor,
