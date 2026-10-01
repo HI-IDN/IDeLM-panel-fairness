@@ -96,5 +96,5 @@ umræðunni, ekki aðeins svipaðan fjölda umsókna.
 * @sec-assign spyr hvað ef: hversu jafnt álagið gæti verið ef allir væru jafnhæfir og lotan skipulögð frá grunni.
 * @sec-limitations dregur saman forsendur, takmarkanir og næstu skref.
 
-Allt er endurgeranlegt úr kóðasafninu [@panelfairness]: Python [@python] fyrir gagnavinnslu og líkön og R [@rcore; @ggplot2] fyrir
+Allt er endurgeranlegt úr kóðasafninu: Python fyrir gagnavinnslu og líkön og R (ggplot2) fyrir
 töflur og myndir. Raunveruleg nöfn fara aldrei af tölvu höfundar.
