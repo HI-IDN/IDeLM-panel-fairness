@@ -193,7 +193,8 @@ summary_table <- function(runs) {
 read_solver_info <- function(results) {
   solver_file <- file.path(results, "solver.csv")
   if (!file.exists(solver_file)) {
-    return(tibble(scenario = factor(), minutes = numeric(), limit_minutes = numeric(), gap = numeric()))
+    return(tibble(scenario = factor(), minutes = numeric(), total_minutes = numeric(), limit_minutes = numeric(),
+                  gap = numeric()))
   }
   solver <- read_csv(solver_file, show_col_types = FALSE) %>% filter(scenario %in% names(scenarios))
   # Older summaries have no time limit; take it from the run script instead.
@@ -201,17 +202,42 @@ read_solver_info <- function(results) {
     limits <- script_time_limits()
     solver$limit_minutes <- if (length(limits)) unname(limits[solver$scenario]) else NA_real_
   }
+  # Each run starts from the solution of another (--start), so its own time understates the work behind
+  # it: add the time of every run in its chain.
+  starts <- script_starts()
+  own <- setNames(solver$minutes, solver$scenario)
+  chain_minutes <- function(s) {
+    total <- 0
+    while (!is.na(s) && s %in% names(own)) {
+      total <- total + own[[s]]
+      s <- if (s %in% names(starts)) starts[[s]] else NA
+    }
+    total
+  }
+  solver$total_minutes <- sapply(solver$scenario, chain_minutes)
   solver %>%
     transmute(scenario = factor(unlist(scenarios[scenario]), levels = unlist(scenarios)), minutes,
-              limit_minutes = as.numeric(limit_minutes), gap)
+              total_minutes, limit_minutes = as.numeric(limit_minutes), gap)
+}
+
+# Lines of run_panel_scenarios.sh, with continued lines (ending in a backslash) joined.
+script_lines <- function(script = run_script) {
+  if (!file.exists(script)) return(character())
+  strsplit(gsub("\\\\\n\\s*", " ", paste(readLines(script), collapse = "\n")), "\n")[[1]]
+}
+
+# The run each run of run_panel_scenarios.sh starts from: "run <name> ... --start "$R/<from>_agenda.csv"".
+script_starts <- function(script = run_script) {
+  lines <- script_lines(script)
+  runs <- regmatches(lines, regexec('^\\s*(?:PANEL=\\S+ )?run (\\w+) .*--start "?\\$R/(\\w+)_agenda\\.csv', lines, perl = TRUE))
+  runs <- Filter(length, runs)
+  setNames(sapply(runs, `[`, 3), sapply(runs, `[`, 2))
 }
 
 # Time limit (minutes) of each run in run_panel_scenarios.sh: "run <name> ... --time-limit <seconds>".
 run_script <- normalizePath("run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
 script_time_limits <- function(script = run_script) {
-  if (!file.exists(script)) return(c())
-  # Join continued lines (ending in a backslash) first.
-  lines <- strsplit(gsub("\\\\\n\\s*", " ", paste(readLines(script), collapse = "\n")), "\n")[[1]]
+  lines <- script_lines(script)
   runs <- regmatches(lines, regexec("^\\s*(?:PANEL=\\S+ )?run (\\w+) .*--time-limit (\\d+)", lines, perl = TRUE))
   runs <- Filter(length, runs)
   setNames(sapply(runs, function(m) as.numeric(m[3]) / 60), sapply(runs, `[`, 2))

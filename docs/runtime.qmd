@@ -23,16 +23,21 @@ viðmiðunarplani fá reglurnar 10 % og viðmiðunarplanið 20 %. Hin þrepin sk
 milli sín. Þrep sem klárast fyrr skilar ónotuðum tíma ekki áfram, svo heildartíminn getur orðið
 styttri en tímamörkin.
 
+Flestar sviðsmyndir byrja á lausn annarrar sviðsmyndar og halda áfram þaðan: 2a og 2d byrja á
+lausn 1, 2b, 2c og 3 á lausn 2a og 4 á lausn 3. Samanlagður tími leggur því saman reiknitíma allra
+keyrslna í keðjunni, t.d. 2d = 1 + 2d.
+
 ```{r}
 #| label: tbl-runtime
-#| tbl-cap: "Tímamörk, notaður reiknitími og bil í síðasta þrepi hverrar sviðsmyndar."
+#| tbl-cap: "Tímamörk, notaður reiknitími og bil í síðasta þrepi hverrar sviðsmyndar. Samanlagður tími bætir við reiknitíma keyrslnanna sem sviðsmyndin byrjar á."
 solver %>%
   arrange(scenario) %>%
   transmute(Sviðsmynd = as.character(scenario),
             `Tímamörk (mín.)` = num(limit_minutes),
             `Reiknitími (mín.)` = num(minutes),
+            `Samanlagður tími (mín.)` = num(total_minutes),
             `Bil (%)` = num(gap)) %>%
-  knitr::kable(align = c("l", "r", "r", "r"))
+  knitr::kable(align = c("l", "r", "r", "r", "r"))
 ```
 
 ## Þróun lausnar yfir tíma
