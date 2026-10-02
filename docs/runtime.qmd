@@ -47,7 +47,8 @@ nokkrum áföngum og hver byrjaði á lausn þess fyrri: tillaga starfsmanna (5,
 (17,3 mín.), keyrsla í 1 klst. (42,7 mín. notaðar), keyrsla með svigrúmi fyrir þrep 1 (`meetings_slack`
 2, 42,1 mín.) og loks lokakeyrsla í 3 klst. með sama svigrúmi (146,1 mín.). Samanlagt eru þetta
 253,2 mín., sem er talan í töflunni. Fleiri keyrslur voru gerðar og hentar (@tbl-runs-2d). Önnur sviðsmynd var ekki keyrð svona lengi, svo samanburðurinn
-er ekki alveg sanngjarn gagnvart þeim. Þróunin sem er sýnd hér að neðan er aðeins lokakeyrslan.
+er ekki alveg sanngjarn gagnvart þeim. Þróunin sem er sýnd hér að neðan er aðeins lokakeyrslan (146,1 mín.), svo tímarnir á
+myndunum leggjast saman í 146 mín. en ekki í 253 mín. Fyrri keyrslurnar eru ekki sýndar.
 
 ```{r}
 #| label: tbl-runs-2d
@@ -102,7 +103,13 @@ if (nrow(progress) > 0) {
   cat("::: {.panel-tabset}\n\n")
   for (s in levels(droplevels(progress$scenario))) {
     cat("#### ", sub("[.].*", "", s), "\n\n", sep = "")
-    print(plot_progress(filter(progress, scenario == s)) + labs(title = s))
+    info <- solver[as.character(solver$scenario) == s, ]
+    note <- if (nrow(info) && info$total_minutes > info$minutes + 0.05) {
+      sprintf("Aðeins síðasta keyrslan: %s mín. af %s mín. samtals", num(info$minutes), num(info$total_minutes))
+    } else {
+      sprintf("Keyrslan tók %s mín.", num(info$minutes))
+    }
+    print(plot_progress(filter(progress, scenario == s)) + labs(title = s, subtitle = note))
     cat("\n\n")
   }
   cat(":::\n")
