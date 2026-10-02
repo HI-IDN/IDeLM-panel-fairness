@@ -13,8 +13,9 @@ solver's progress lines (time, best solution, best bound, gap) for each step.
 Experiments the book refers to (EXPERIMENTS below) go to docs/data/experiments/, with their own
 solver.csv, so their numbers are computed in the book rather than typed in.
 
-Run from code/ after run_panel_scenarios.sh:  python export_docs_data.py
+Run from code/ after run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
 """
+import argparse
 import csv
 import glob
 import os
@@ -182,4 +183,8 @@ def write_progress(path, rows):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
+    parser.add_argument('--results', default=RESULTS,
+                        help='folder of the model results (default: %(default)s), e.g. a copy where long runs were made')
+    RESULTS = parser.parse_args().results
     main()
