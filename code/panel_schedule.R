@@ -471,34 +471,43 @@ plot_exit_sankey_interactive <- function(schedule) {
   scale_colours <- viridisLite::viridis(256, option = "magma", direction = -1, begin = 0.15, end = 0.9)
   colour_of <- function(value) scale_colours[pmin(256, 1 + floor(255 * value / max(top_value, 1)))]
 
-  # One polygon per member and meeting: the box of that meeting, with the S-curve leading into it. Its
-  # colour is the member's peel-off points after that meeting.
-  segment <- function(lode, i) {
-    flat <- function(y) tibble(x = c(lode$x[i] - half, lode$x[i] + half), y = y)
-    side <- function(y) {
-      if (i == 1) return(flat(y[1]))
-      t <- seq(0, 1, length.out = 16)
-      bind_rows(tibble(x = lode$x[i - 1] + half + (lode$x[i] - lode$x[i - 1] - 2 * half) * t,
-                       y = y[i - 1] + (y[i] - y[i - 1]) * (3 * t^2 - 2 * t^3)),
-                tibble(x = lode$x[i] + half, y = y[i]))
-    }
-    top <- side(lode$ymax)
-    bottom <- side(lode$ymin)
+  # Each band is drawn as small polygons: the box of the first meeting, then for every later meeting the
+  # S-curve leading into it, cut into a few slices that fade from the colour of the meeting before to the
+  # colour of this one, and the box of the meeting itself.
+  slices <- 5
+  n_meetings <- nlevels(flow$meeting)
+  per_member <- 1 + (n_meetings - 1) * (slices + 1)
+  s_curve <- function(t) 3 * t^2 - 2 * t^3
+  box_polygon <- function(lode, i) {
+    tibble(x = c(lode$x[i] - half, lode$x[i] + half, lode$x[i] + half, lode$x[i] - half),
+           y = c(lode$ymax[i], lode$ymax[i], lode$ymin[i], lode$ymin[i]))
+  }
+  slice_polygon <- function(lode, i, k) {  # slice k of the curve between meetings i - 1 and i
+    t <- seq((k - 1) / slices, k / slices, length.out = 4)
+    x0 <- lode$x[i - 1] + half
+    x1 <- lode$x[i] - half
+    edge <- function(y) tibble(x = x0 + (x1 - x0) * t, y = y[i - 1] + (y[i] - y[i - 1]) * s_curve(t))
+    top <- edge(lode$ymax)
+    bottom <- edge(lode$ymin)
     tibble(x = c(top$x, rev(bottom$x)), y = c(top$y, rev(bottom$y)))
   }
-  n_meetings <- nlevels(flow$meeting)
   figure <- plotly::plot_ly()
   band_colours <- character()
-  for (member in members) {  # traces member * n_meetings + 1 ...: the bands, one polygon per meeting
+  add_polygon <- function(figure, polygon, colour, outline) {
+    band_colours <<- c(band_colours, colour)
+    plotly::add_trace(figure, type = "scatter", mode = "lines", fill = "toself", x = polygon$x, y = polygon$y,
+                      fillcolor = colour, line = list(color = outline, width = 0.6), hoverinfo = "skip",
+                      showlegend = FALSE)
+  }
+  for (member in members) {  # the first traces: member * per_member + 1 ... are one member's polygons
     lode <- lodes[lodes$member == member, ]
-    for (i in seq_len(nrow(lode))) {
-      polygon <- segment(lode, i)
-      colour <- colour_of(lode$cumulative[i])
-      band_colours <- c(band_colours, colour)
-      figure <- plotly::add_trace(figure, type = "scatter", mode = "lines", fill = "toself",
-                                  x = polygon$x, y = polygon$y, fillcolor = colour,
-                                  line = list(color = "white", width = 0.6),
-                                  hoverinfo = "skip", showlegend = FALSE)
+    figure <- add_polygon(figure, box_polygon(lode, 1), colour_of(lode$cumulative[1]), "white")
+    for (i in seq_len(nrow(lode))[-1]) {
+      for (k in seq_len(slices)) {
+        value <- lode$cumulative[i - 1] + (lode$cumulative[i] - lode$cumulative[i - 1]) * (k - 0.5) / slices
+        figure <- add_polygon(figure, slice_polygon(lode, i, k), colour_of(value), colour_of(value))
+      }
+      figure <- add_polygon(figure, box_polygon(lode, i), colour_of(lode$cumulative[i]), "white")
     }
   }
   for (member in members) {  # the next traces: invisible points carrying the tooltips
@@ -552,11 +561,11 @@ plot_exit_sankey_interactive <- function(schedule) {
     htmlwidgets::onRender(
       "function(el, x, data) {
          var bands = [], k, lit = -1;
-         for (k = 0; k < data.n * data.meetings; k++) bands.push(k);
+         for (k = 0; k < data.n * data.per; k++) bands.push(k);
          function paint(m) {
            lit = m;
            Plotly.restyle(el, {fillcolor: bands.map(function(i) {
-             return (m < 0 || Math.floor(i / data.meetings) === m) ? data.colours[i] : data.grey; })}, bands);
+             return (m < 0 || Math.floor(i / data.per) === m) ? data.colours[i] : data.grey; })}, bands);
            var labels = {};
            data.member.forEach(function(r, j) {
              if (r < 0) return;
@@ -573,7 +582,7 @@ plot_exit_sankey_interactive <- function(schedule) {
            if (r >= 0) paint(r === lit ? -1 : r);
          });
          el.on('plotly_click', function(e) {
-           var p = e.points && e.points[0], first = data.n * data.meetings;
+           var p = e.points && e.points[0], first = data.n * data.per;
            if (!p || p.curveNumber < first || p.curveNumber >= first + data.n) return;
            if (p.x !== 1 && p.x !== data.meetings) return;
            var r = p.curveNumber - first;
@@ -581,7 +590,7 @@ plot_exit_sankey_interactive <- function(schedule) {
          });
          el.on('plotly_doubleclick', function() { paint(-1); });
        }", data = list(colours = band_colours, grey = grey, member = label_member,
-                       n = length(members), meetings = n_meetings))
+                       n = length(members), meetings = n_meetings, per = per_member))
 }
 
 # Heatmap view: members in rows, meetings in columns; the number is the slot after which they leave
