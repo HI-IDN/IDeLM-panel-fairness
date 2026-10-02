@@ -1,0 +1,4 @@
+scenario,version,minutes,gap
+rotation_none,13.0.3,60.0,22.5
+rotation_skip,13.0.3,60.0,24.8
+rotation_wait2,13.0.3,60.0,20.9

@@ -29,9 +29,10 @@ COLUMNS = {
 }
 # Experiments the book refers to: name in docs/data/experiments/ -> results prefix (in RESULTS).
 EXPERIMENTS = {
-    # Rotation rule on scenario 2, 60 minutes each from the same start: without the rule, the
-    # members of the last proposal skip the next meeting, or wait at most 2 there.
-    'rotation_none': 'final_long/free',
+    # Rotation rule on scenario 2, 60 minutes each from the same start (the staff's meetings):
+    # without the rule, the members of the last proposal skip the next meeting, or wait at most 2
+    # there (code/run_rotation.sh).
+    'rotation_none': 'rotation/free_none',
     'rotation_skip': 'rotation/free_skip',
     'rotation_wait2': 'rotation/free_wait2',
 }
