@@ -100,7 +100,7 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
 * **Fundir sem mætt er á** og **byrði**, $\alpha_r$ á hvern fund auk biðpunkta (@eq-burden). Líkanið
   heldur mestu byrðinni niðri.
-* **Fylgni funda og biðar** (Spearman) [@spearman1904] yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
+* **Fylgni funda og biðar** [@spearman1904] yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
   oftast bíða líka mest, sem er einmitt það sem sanngjörn dagskrá á að forðast.
 * **Öfug pör:** sá sem mætir á fleiri fundi ætti að fá að fara fyrr af þeim og bíða því minna
   samtals. Berum alla fagráðsmenn saman tvo og tvo. Ef A mætir á fleiri fundi en B *og* bíður
