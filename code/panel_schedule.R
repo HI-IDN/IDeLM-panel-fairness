@@ -414,6 +414,139 @@ plot_exit_alluvial <- function(schedule) {
     theme(panel.grid = element_blank(), legend.position = "bottom")
 }
 
+# One distinct colour per member: evenly spaced hues, alternating light and dark.
+member_colours <- function(members) {
+  setNames(grDevices::hcl(h = seq(15, 375, length.out = length(members) + 1)[seq_along(members)],
+                          c = 90, l = rep(c(45, 70), length.out = length(members))), members)
+}
+
+# Sankey (alluvial) view of the exit order: every member is one band through all meetings. In each
+# meeting the members are stacked by the slot after which they leave (not attending at the bottom,
+# last to leave at the top; R01, R02, ... within the same slot), so a band that rises leaves later
+# than before and a band that falls leaves earlier.
+plot_exit_sankey <- function(schedule) {
+  flow <- exit_flow(schedule) %>%
+    mutate(stratum = factor(leave, levels = rev(sort(unique(leave)))), order = as.integer(factor(member)))
+  ggplot(flow, aes(x = meeting, stratum = stratum, alluvium = member, y = 1, order = order)) +
+    ggalluvial::geom_alluvium(aes(fill = member), width = 1 / 3, alpha = 0.85, colour = "white",
+                              linewidth = 0.2) +
+    ggalluvial::geom_stratum(width = 1 / 3, fill = NA, colour = "grey40", linewidth = 0.3) +
+    geom_text(stat = ggalluvial::StatStratum, size = 2.6,
+              aes(label = if_else(after_stat(stratum) == "0", "–", as.character(after_stat(stratum))))) +
+    scale_fill_manual(values = member_colours(sort(unique(flow$member))), name = NULL) +
+    scale_y_continuous(breaks = NULL) +
+    labs(title = "Hvenær hver fagráðsmaður fer af hverjum fundi",
+         subtitle = "Tala = dagskrárliður þegar farið er (– = mætir ekki); ofar = fer seinna",
+         x = NULL, y = "Fagráðsmenn, í þeirri röð sem þeir fara") +
+    theme_panel +
+    theme(panel.grid = element_blank(), legend.position = "right")
+}
+
+# Interactive version for the HTML book, drawn with plotly from the ggalluvial layout: all bands
+# grey; clicking a member's code at the left or right edge lights their band up in their own
+# colour, and hovering a band at a meeting shows the member, the slot after which they leave and
+# their peel-off points so far (without changing which member is lit).
+plot_exit_sankey_interactive <- function(schedule) {
+  static <- plot_exit_sankey(schedule)
+  flow <- exit_flow(schedule) %>% mutate(x = as.integer(meeting))
+  lodes <- layer_data(static, 1) %>%
+    transmute(member = as.character(alluvium), x, ymin, ymax) %>%
+    left_join(flow, by = c("member", "x")) %>%
+    mutate(text = if_else(leave > 0,
+                          sprintf("%s<br>%s: fer eftir dagskrárlið %d<br>biðpunktar hingað til: %d",
+                                  member, meeting, leave, cumulative),
+                          sprintf("%s<br>%s: mætir ekki<br>biðpunktar hingað til: %d",
+                                  member, meeting, cumulative))) %>%
+    arrange(member, x)
+  strata <- layer_data(static, 2) %>%
+    transmute(x, ymin, ymax, absent = as.character(stratum) == "0",
+              label = if_else(absent, "–", as.character(stratum)))
+  members <- sort(unique(lodes$member))
+  colours <- member_colours(members)
+  grey <- "rgba(150,150,150,0.4)"
+  half <- 1 / 6  # half the width of a meeting column, as in the static figure
+
+  # Outline of one band: flat through each meeting column, an S-curve between two columns.
+  edge <- function(x, y) {
+    t <- seq(0, 1, length.out = 16)
+    bind_rows(lapply(seq_along(x), function(i) {
+      flat <- tibble(x = c(x[i] - half, x[i] + half), y = y[i])
+      if (i == length(x)) return(flat)
+      bind_rows(flat, tibble(x = x[i] + half + (x[i + 1] - x[i] - 2 * half) * t,
+                             y = y[i] + (y[i + 1] - y[i]) * (3 * t^2 - 2 * t^3)))
+    }))
+  }
+  figure <- plotly::plot_ly()
+  for (member in members) {  # traces 1..n: the bands
+    lode <- lodes[lodes$member == member, ]
+    top <- edge(lode$x, lode$ymax)
+    bottom <- edge(lode$x, lode$ymin)
+    figure <- plotly::add_trace(figure, type = "scatter", mode = "lines", fill = "toself",
+                                x = c(top$x, rev(bottom$x)), y = c(top$y, rev(bottom$y)),
+                                fillcolor = grey, line = list(color = "white", width = 0.6),
+                                hoveron = "fills", hoverinfo = "none", showlegend = FALSE)
+  }
+  for (member in members) {  # traces n+1..2n: invisible points carrying the tooltips
+    lode <- lodes[lodes$member == member, ]
+    middle <- (lode$ymin + lode$ymax) / 2
+    # In each meeting the full tooltip; halfway between two meetings just the member.
+    figure <- plotly::add_trace(figure, type = "scatter", mode = "markers",
+                                x = c(lode$x, head(lode$x, -1) + 0.5),
+                                y = c(middle, (head(middle, -1) + tail(middle, -1)) / 2),
+                                marker = list(size = 16, opacity = 0),
+                                text = c(lode$text, rep(member, nrow(lode) - 1)), hoverinfo = "text",
+                                showlegend = FALSE)
+  }
+  # Meeting columns: one box per leaving slot with its number; members who don't attend are faded.
+  boxes <- lapply(seq_len(nrow(strata)), function(i) {
+    list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i],
+         y1 = strata$ymax[i], line = list(color = "grey", width = 0.6),
+         fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0)")
+  })
+  note <- function(x, y, text, anchor = "center", clickable = FALSE) {
+    list(x = x, y = y, text = text, xanchor = anchor, showarrow = FALSE, font = list(size = 10, color = "#444"),
+         captureevents = clickable)
+  }
+  ends <- lodes %>% filter(x %in% range(x)) %>% mutate(first = x == min(x))
+  labels <- c(
+    lapply(seq_len(nrow(strata)), function(i) note(strata$x[i], (strata$ymin[i] + strata$ymax[i]) / 2,
+                                                   strata$label[i])),
+    lapply(seq_len(nrow(ends)), function(i) note(ends$x[i] + if (ends$first[i]) -half - 0.04 else half + 0.04,
+                                                 (ends$ymin[i] + ends$ymax[i]) / 2, ends$member[i],
+                                                 if (ends$first[i]) "right" else "left", clickable = TRUE)))
+  # For each annotation, the member it names (0-based index into members), or -1 for slot numbers.
+  label_member <- c(rep(-1L, nrow(strata)), match(ends$member, members) - 1L)
+  n_meetings <- nlevels(flow$meeting)
+  figure %>%
+    plotly::layout(shapes = boxes, annotations = labels, hovermode = "closest",
+                   xaxis = list(title = "", tickvals = seq_len(n_meetings), ticktext = levels(flow$meeting),
+                                range = c(0.45, n_meetings + 0.55), showgrid = FALSE, zeroline = FALSE),
+                   yaxis = list(title = "Fagráðsmenn, í þeirri röð sem þeir fara (ofar = seinna)",
+                                showticklabels = FALSE, showgrid = FALSE, zeroline = FALSE)) %>%
+    htmlwidgets::onRender(
+      "function(el, x, data) {
+         var bands = data.colours.map(function(c, i) { return i; }), lit = -1;
+         function paint(k) {
+           lit = k;
+           Plotly.restyle(el, {fillcolor: bands.map(function(i) { return i === k ? data.colours[i] : data.grey; })}, bands);
+           var labels = {};
+           data.member.forEach(function(r, j) {
+             if (r < 0) return;
+             labels['annotations[' + j + '].font.color'] = r === k ? data.colours[r] : '#444';
+             labels['annotations[' + j + '].font.size'] = r === k ? 12 : 10;
+           });
+           Plotly.relayout(el, labels);
+         }
+         // Clicking a member's code at either edge selects them; clicking it again, or a double
+         // click, clears the selection. Hovering only shows tooltips, so it never changes focus.
+         el.on('plotly_clickannotation', function(e) {
+           var r = data.member[e.index];
+           if (r >= 0) paint(r === lit ? -1 : r);
+         });
+         el.on('plotly_doubleclick', function() { paint(-1); });
+       }", data = list(colours = unname(colours), grey = grey, member = label_member))
+}
+
 # Heatmap view: members in rows, meetings in columns; the number is the slot after which they leave
 # (blank = not attending) and the colour is their peel-off points so far.
 plot_exit_heatmap <- function(schedule) {

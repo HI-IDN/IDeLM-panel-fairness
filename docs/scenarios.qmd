@@ -482,8 +482,13 @@ Hér er hver lausn skoðuð fund fyrir fund, með tveimur myndum í hverjum flip
 * **Hitakort:** hver lína er einn fagráðsmaður, raðað eftir biðpunktum yfir lotuna. Talan í hverjum
   reit er dagskrárliðurinn þar sem hann má fara (autt ef hann mætir ekki), og liturinn sýnir
   biðpunkta hans hingað til. Talan lengst til hægri er biðpunktar yfir alla lotuna.
-* **Línur:** hver fagráðsmaður er ein grá lína sem tengir þá fundi sem hann mætir á; músin yfir línu lýsir hana upp og sýnir hver hann er. Hæðin er
-  dagskrárliðurinn þar sem hann fer. Þannig sést hvernig hver og einn færist á milli snemma og seint.
+* **Flæðirit** (e. *Sankey*): hver fagráðsmaður er eitt grátt band í gegnum alla fundina. Á hverjum
+  fundi er fagráðsmönnum staflað í þeirri röð sem þeir fara: neðst þeir sem mæta ekki, efst þeir sem
+  fara síðastir, og þeir sem fara í sama dagskrárlið í röðinni R01–R21. Band sem fer upp á við
+  þýðir að viðkomandi fer seinna en á fundinum á undan, og band sem fer niður að hann fer fyrr.
+  Smelltu á kóða fagráðsmanns við vinstri eða hægri jaðarinn til að lýsa band hans upp í hans eigin
+  lit; smelltu aftur, eða tvísmelltu, til að hreinsa. Músin yfir bandi sýnir hver fagráðsmaðurinn er,
+  dagskrárliðinn og biðpunkta hans hingað til, án þess að skipta um þann sem er lýstur upp.
 
 Í sanngjarnri lausn ættu þeir sem hafa beðið lengi að fara fyrr á næstu fundum.
 
@@ -502,11 +507,11 @@ plot_exit_heatmap(schedules[["current"]])
 
 ```{r}
 #| label: fig-exit-current
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 1. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 1. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"current" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["current"]])
+plot_exit_sankey_interactive(schedules[["current"]])
 ```
 
 #### 2a. Næsti fundur festur
@@ -522,11 +527,11 @@ plot_exit_heatmap(schedules[["free"]])
 
 ```{r}
 #| label: fig-exit-free
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2a. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 2a. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free"]])
+plot_exit_sankey_interactive(schedules[["free"]])
 ```
 
 #### 2b. Án sanngirnisþreps
@@ -542,11 +547,11 @@ plot_exit_heatmap(schedules[["free_sum"]])
 
 ```{r}
 #| label: fig-exit-free-sum
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2b. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 2b. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_sum" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_sum"]])
+plot_exit_sankey_interactive(schedules[["free_sum"]])
 ```
 
 #### 2c. `leximin`
@@ -562,11 +567,11 @@ plot_exit_heatmap(schedules[["free_leximin"]])
 
 ```{r}
 #| label: fig-exit-free-leximin
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2c. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 2c. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_leximin" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_leximin"]])
+plot_exit_sankey_interactive(schedules[["free_leximin"]])
 ```
 
 #### 2d. Enginn verr settur
@@ -582,11 +587,11 @@ plot_exit_heatmap(schedules[["free_noworse"]])
 
 ```{r}
 #| label: fig-exit-free-noworse
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2d. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 2d. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_noworse" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_noworse"]])
+plot_exit_sankey_interactive(schedules[["free_noworse"]])
 ```
 
 #### 3. Mest 4 á fund
@@ -602,11 +607,11 @@ plot_exit_heatmap(schedules[["free_max4"]])
 
 ```{r}
 #| label: fig-exit-free-max4
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 3. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 3. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_max4" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_max4"]])
+plot_exit_sankey_interactive(schedules[["free_max4"]])
 ```
 
 #### 4. Frá byrjun
@@ -622,11 +627,11 @@ plot_exit_heatmap(schedules[["scratch"]])
 
 ```{r}
 #| label: fig-exit-scratch
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 4. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 4. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"scratch" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["scratch"]])
+plot_exit_sankey_interactive(schedules[["scratch"]])
 ```
 
 :::
