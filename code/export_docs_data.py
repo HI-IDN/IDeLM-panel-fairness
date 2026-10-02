@@ -23,6 +23,12 @@ import re
 
 RESULTS = '../data/tdf/results'
 OUT = '../docs/data'
+# Runs chosen by hand over the automatic pick of best_run, because their settings differ from the scenario's
+# (so their steps cannot be compared): scenario -> (run in results, minutes spent on the runs it was
+# started from). Used only when the run exists in the results folder.
+#   free_noworse (2d): the 3 h run with --meetings-slack 2, started from the 1 h run (42.7 min) of 2d, itself
+#   started from the first 2d run (17.3 min), started from the staff's plan (5.0 min); the slack run was 42.1 min.
+CHOSEN = {'free_noworse': ('long/best_long', 5.0 + 17.3 + 42.7 + 42.1)}
 SCENARIOS = ['current', 'free', 'free_sum', 'free_leximin', 'free_noworse', 'free_max4', 'scratch', 'assign_schedule']
 
 # File suffix -> columns to keep.
@@ -122,6 +128,10 @@ def main():
     logs = {os.path.basename(f)[:-4]: f for f in sorted(glob.glob(os.path.join(RESULTS, '*.log')))}
     logs.update({s: src + '.log' for s, src in chosen.items() if src and os.path.exists(src + '.log')})
     solver = [{'scenario': name, **solver_info(f)} for name, f in sorted(logs.items())]
+    for row in solver:
+        # Minutes spent on the runs this one was started from, when it is not the script's own chain.
+        if row['scenario'] in CHOSEN and chosen[row['scenario']] == os.path.join(RESULTS, CHOSEN[row['scenario']][0]):
+            row['prior_minutes'] = round(CHOSEN[row['scenario']][1], 1)
     write_solver(os.path.join(OUT, 'solver.csv'), solver)
     write_progress(os.path.join(OUT, 'progress.csv'),
                    [{'scenario': s, **row} for s in SCENARIOS if s in logs for row in solver_progress(logs[s])])
@@ -145,6 +155,8 @@ def best_run(scenario):
     (for example a longer run in results/long/). Runs are compared step by step on the values their
     stepwise objective reached (<run>_levels.csv), the way the model itself ranks solutions; only runs
     with the same steps are compared, and results/<scenario> is kept when no other run is comparable."""
+    if scenario in CHOSEN and os.path.exists(os.path.join(RESULTS, CHOSEN[scenario][0] + '_members.csv')):
+        return os.path.join(RESULTS, CHOSEN[scenario][0])
     runs = [os.path.join(RESULTS, scenario)] + sorted(
         p[:-len('_members.csv')] for p in glob.glob(os.path.join(RESULTS, '*', scenario + '_members.csv')))
     runs = [r for r in runs if os.path.exists(r + '_members.csv')]
@@ -170,9 +182,9 @@ def best_run(scenario):
 
 def write_solver(path, rows):
     with open(path, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=['scenario', 'version', 'minutes', 'limit_minutes', 'gap'])
+        writer = csv.DictWriter(f, fieldnames=['scenario', 'version', 'minutes', 'limit_minutes', 'gap', 'prior_minutes'])
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(rows)  # prior_minutes is blank unless set
 
 
 def write_progress(path, rows):

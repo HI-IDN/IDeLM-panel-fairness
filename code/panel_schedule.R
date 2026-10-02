@@ -215,6 +215,11 @@ read_solver_info <- function(results) {
     total
   }
   solver$total_minutes <- sapply(solver$scenario, chain_minutes)
+  # A run chosen by hand (see export_docs_data.py) carries the minutes of the runs it was started from.
+  if ("prior_minutes" %in% names(solver)) {
+    solver$total_minutes <- ifelse(is.na(solver$prior_minutes), solver$total_minutes,
+                                   solver$minutes + solver$prior_minutes)
+  }
   solver %>%
     transmute(scenario = factor(unlist(scenarios[scenario]), levels = unlist(scenarios)), minutes,
               total_minutes, limit_minutes = as.numeric(limit_minutes), gap)
