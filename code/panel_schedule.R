@@ -493,7 +493,9 @@ plot_exit_sankey_interactive <- function(schedule) {
     figure <- plotly::add_trace(figure, type = "scatter", mode = "markers",
                                 x = c(lode$x, head(lode$x, -1) + 0.5),
                                 y = c(middle, (head(middle, -1) + tail(middle, -1)) / 2),
-                                marker = list(size = 16, opacity = 0),
+                                # Bigger at the outer meetings: those points are what one clicks to select a member.
+                                marker = list(size = c(ifelse(lode$x %in% range(flow$x), 28, 16),
+                                                       rep(16, nrow(lode) - 1)), opacity = 0),
                                 text = c(lode$text, rep(member, nrow(lode) - 1)), hoverinfo = "text",
                                 showlegend = FALSE)
   }
@@ -537,14 +539,23 @@ plot_exit_sankey_interactive <- function(schedule) {
            });
            Plotly.relayout(el, labels);
          }
-         // Clicking a member's code at either edge selects them; clicking it again, or a double
-         // click, clears the selection. Hovering only shows tooltips, so it never changes focus.
+         // Clicking a member's band at the first or last meeting, or their code at either edge, selects
+         // them and lights up their path through all meetings; clicking again, or a double click,
+         // clears the selection. Hovering only shows tooltips, so it never changes focus.
          el.on('plotly_clickannotation', function(e) {
            var r = data.member[e.index];
            if (r >= 0) paint(r === lit ? -1 : r);
          });
+         el.on('plotly_click', function(e) {
+           var p = e.points && e.points[0];
+           if (!p || p.curveNumber < data.n || p.curveNumber >= 2 * data.n) return;
+           if (p.x !== data.first && p.x !== data.last) return;
+           var r = p.curveNumber - data.n;
+           paint(r === lit ? -1 : r);
+         });
          el.on('plotly_doubleclick', function() { paint(-1); });
-       }", data = list(colours = unname(colours), grey = grey, member = label_member))
+       }", data = list(colours = unname(colours), grey = grey, member = label_member,
+               n = length(members), first = 1L, last = n_meetings))
 }
 
 # Heatmap view: members in rows, meetings in columns; the number is the slot after which they leave
