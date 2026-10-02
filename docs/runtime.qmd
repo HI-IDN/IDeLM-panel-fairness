@@ -46,8 +46,33 @@ Sviðsmynd 2d fékk mestan tíma, því hún er sú sem skilar bestu niðurstö�
 nokkrum áföngum og hver byrjaði á lausn þess fyrri: tillaga starfsmanna (5,0 mín.), fyrsta keyrsla 2d
 (17,3 mín.), keyrsla í 1 klst. (42,7 mín. notaðar), keyrsla með svigrúmi fyrir þrep 1 (`meetings_slack`
 2, 42,1 mín.) og loks lokakeyrsla í 3 klst. með sama svigrúmi (146,1 mín.). Samanlagt eru þetta
-253,2 mín., sem er talan í töflunni. Önnur sviðsmynd var ekki keyrð svona lengi, svo samanburðurinn
+253,2 mín., sem er talan í töflunni. Fleiri keyrslur voru gerðar og hentar (@tbl-runs-2d). Önnur sviðsmynd var ekki keyrð svona lengi, svo samanburðurinn
 er ekki alveg sanngjarn gagnvart þeim. Þróunin sem er sýnd hér að neðan er aðeins lokakeyrslan.
+
+```{r}
+#| label: tbl-runs-2d
+#| tbl-cap: "Allar keyrslur sem tengjast sviðsmynd 2d, í þeirri röð sem þær voru gerðar. Tími er sá sem lausnarinn notaði. Keðjan er keyrslurnar sem hver byrjaði á lausn þeirrar á undan og skiluðu lokaplaninu."
+runs_2d <- tribble(
+  ~Keyrsla, ~`Tími (mín.)`, ~Staða,
+  "Tillaga starfsmanna (sviðsmynd 1)", 5.0, "í keðju",
+  "2d, fyrsta tilraun (endurtekin eftir leiðréttingu á líkaninu)", 20.0, "hent",
+  "2d, önnur tilraun", 17.3, "í keðju",
+  "Neðri mörk (21 útreikningur)", 18.0, "ekki áætlun",
+  "2d í 1 klst. keyrslu", 42.7, "í keðju",
+  "leximin án skilyrðisins um að enginn sé verr settur", 60.3, "hent",
+  "leximin fyrir alla fagráðsmenn", 84.2, "hent",
+  "2d með svigrúm 1 fyrir þrep 1", 42.1, "ekki valin",
+  "2d með svigrúm 2 fyrir þrep 1", 42.1, "í keðju",
+  "2d lokakeyrsla, 3 klst., svigrúm 2", 146.1, "í keðju, valin")
+chain_total <- sum(runs_2d$`Tími (mín.)`[startsWith(runs_2d$Staða, "í keðju")])
+all_total <- sum(runs_2d$`Tími (mín.)`)
+runs_2d %>%
+  mutate(`Tími (mín.)` = num(`Tími (mín.)`)) %>%
+  knitr::kable(align = c("l", "r", "l"))
+```
+
+Keðjan er alls `r num(chain_total)` mín. Ef keyrslur sem voru hentar eða ekki valdar eru taldar með, og
+neðri mörkin, fóru alls um `r num(all_total, 0)` mín. í sviðsmynd 2d.
 
 Svigrúmið leyfir þrepi 1 (fundir) að enda allt að 2 yfir besta gildi sínu. Lausnin notaði 1 af því
 (202,5 í stað 201,5), og í staðinn lækkaði mesta byrði úr 60 í 51 í sömu keðju. Fundir samtals eru
