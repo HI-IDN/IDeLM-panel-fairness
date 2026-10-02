@@ -2,6 +2,9 @@
 Copy what the book needs from the local model results into docs/data/, so the book can be rendered
 on GitHub without Gurobi or the gitignored results.
 
+Each scenario is taken from its best run: results/<scenario> or a run of the same name in a
+subfolder, such as a longer run in results/long/ (see best_run).
+
 Only whitelisted columns are copied, and only pseudonymised codes (R.., A.., M..) appear in them.
 The Gurobi logs are never copied: they hold licence details. Solver time, time limit, gap and
 version are summarised in solver.csv instead, and progress.csv keeps only the numbers of the
@@ -103,20 +106,24 @@ def solver_progress(log_file):
 def main():
     os.makedirs(OUT, exist_ok=True)
     copy('../data/tdf/members.csv', os.path.join(OUT, 'members.csv'), ['member', 'new'])
-    for s in SCENARIOS:
+    chosen = {s: best_run(s) for s in SCENARIOS}
+    for s, src in chosen.items():
+        if src is None:
+            continue
+        print(f'{s}: {os.path.relpath(src, RESULTS)}')
         for suffix, columns in COLUMNS.items():
-            src = os.path.join(RESULTS, s + suffix)
-            if os.path.exists(src):
-                copy(src, os.path.join(OUT, s + suffix), columns)
+            if os.path.exists(src + suffix):
+                copy(src + suffix, os.path.join(OUT, s + suffix), columns)
     for name, columns in ROLE_FILES.items():
         if os.path.exists(os.path.join(RESULTS, name)):
             copy(os.path.join(RESULTS, name), os.path.join(OUT, name), columns)
-    solver = [{'scenario': os.path.basename(f)[:-4], **solver_info(f)}
-              for f in sorted(glob.glob(os.path.join(RESULTS, '*.log')))]
+    # Each scenario's log is the chosen run's; other runs (roles, assignment) are taken as they are.
+    logs = {os.path.basename(f)[:-4]: f for f in sorted(glob.glob(os.path.join(RESULTS, '*.log')))}
+    logs.update({s: src + '.log' for s, src in chosen.items() if src and os.path.exists(src + '.log')})
+    solver = [{'scenario': name, **solver_info(f)} for name, f in sorted(logs.items())]
     write_solver(os.path.join(OUT, 'solver.csv'), solver)
     write_progress(os.path.join(OUT, 'progress.csv'),
-                   [{'scenario': s, **row} for s in SCENARIOS if os.path.exists(os.path.join(RESULTS, s + '.log'))
-                    for row in solver_progress(os.path.join(RESULTS, s + '.log'))])
+                   [{'scenario': s, **row} for s in SCENARIOS if s in logs for row in solver_progress(logs[s])])
     experiments = os.path.join(OUT, 'experiments')
     os.makedirs(experiments, exist_ok=True)
     solver = []
@@ -130,6 +137,34 @@ def main():
             solver.append({'scenario': name, **solver_info(src + '.log')})
     write_solver(os.path.join(experiments, 'solver.csv'), solver)
     print(f'{len(os.listdir(OUT))} files in {OUT}, {len(os.listdir(experiments))} in {experiments}')
+
+
+def best_run(scenario):
+    """The best run of a scenario: results/<scenario> or a run of the same name in a subfolder of results
+    (for example a longer run in results/long/). Runs are compared step by step on the values their
+    stepwise objective reached (<run>_levels.csv), the way the model itself ranks solutions; only runs
+    with the same steps are compared, and results/<scenario> is kept when no other run is comparable."""
+    runs = [os.path.join(RESULTS, scenario)] + sorted(
+        p[:-len('_members.csv')] for p in glob.glob(os.path.join(RESULTS, '*', scenario + '_members.csv')))
+    runs = [r for r in runs if os.path.exists(r + '_members.csv')]
+    if not runs:
+        return None
+
+    def levels(run):
+        if not os.path.exists(run + '_levels.csv'):
+            return None
+        with open(run + '_levels.csv', newline='', encoding='utf-8') as f:
+            rows = list(csv.DictReader(f))
+        # Rounded, as each step is held to its value within a small tolerance.
+        return [r['level'] for r in rows], tuple(round(float(r['value']), 3) for r in rows)
+
+    reached = {r: levels(r) for r in runs}
+    default = runs[0] if runs[0] == os.path.join(RESULTS, scenario) else None
+    steps = reached[default][0] if default and reached[default] else None
+    comparable = [r for r in runs if reached[r] and (steps is None or reached[r][0] == steps)]
+    if not comparable:
+        return runs[0]
+    return min(comparable, key=lambda r: reached[r][1])
 
 
 def write_solver(path, rows):
