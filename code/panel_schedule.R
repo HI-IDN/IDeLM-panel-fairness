@@ -183,10 +183,68 @@ summary_table <- function(runs) {
 # licence details); code/export_docs_data.py summarises them in solver.csv.
 read_solver_info <- function(results) {
   solver_file <- file.path(results, "solver.csv")
-  if (!file.exists(solver_file)) return(tibble(scenario = factor(), minutes = numeric(), gap = numeric()))
-  read_csv(solver_file, show_col_types = FALSE) %>%
+  if (!file.exists(solver_file)) {
+    return(tibble(scenario = factor(), minutes = numeric(), limit_minutes = numeric(), gap = numeric()))
+  }
+  solver <- read_csv(solver_file, show_col_types = FALSE) %>% filter(scenario %in% names(scenarios))
+  # Older summaries have no time limit; take it from the run script instead.
+  if (!"limit_minutes" %in% names(solver)) {
+    limits <- script_time_limits()
+    solver$limit_minutes <- if (length(limits)) unname(limits[solver$scenario]) else NA_real_
+  }
+  solver %>%
+    transmute(scenario = factor(unlist(scenarios[scenario]), levels = unlist(scenarios)), minutes,
+              limit_minutes = as.numeric(limit_minutes), gap)
+}
+
+# Time limit (minutes) of each run in run_panel_scenarios.sh: "run <name> ... --time-limit <seconds>".
+run_script <- normalizePath("run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
+script_time_limits <- function(script = run_script) {
+  if (!file.exists(script)) return(c())
+  # Join continued lines (ending in a backslash) first.
+  lines <- strsplit(gsub("\\\\\n\\s*", " ", paste(readLines(script), collapse = "\n")), "\n")[[1]]
+  runs <- regmatches(lines, regexec("^\\s*(?:PANEL=\\S+ )?run (\\w+) .*--time-limit (\\d+)", lines, perl = TRUE))
+  runs <- Filter(length, runs)
+  setNames(sapply(runs, function(m) as.numeric(m[3]) / 60), sapply(runs, `[`, 2))
+}
+
+# Step names of the stepwise objective, in the order they are solved.
+step_labels <- c(rules = "Reglur", reference = "Viðmiðunarplan", meetings = "Fundir (þrep 1)",
+                 worst = "Mesta byrði (þrep 2)", top1 = "leximin 1", top2 = "leximin 2", top3 = "leximin 3",
+                 waiting = "Heildarbið (þrep 3)")
+
+# The solver's progress for each step (code/export_docs_data.py: progress.csv): best solution found and
+# best bound over time. Empty when the file is missing.
+read_progress <- function(results) {
+  progress_file <- file.path(results, "progress.csv")
+  if (!file.exists(progress_file)) {
+    return(tibble(scenario = factor(), step = integer(), level = factor(), seconds = numeric(),
+                  incumbent = numeric(), bound = numeric(), gap = numeric()))
+  }
+  read_csv(progress_file, show_col_types = FALSE, na = c("", "-")) %>%
     filter(scenario %in% names(scenarios)) %>%
-    transmute(scenario = factor(unlist(scenarios[scenario]), levels = unlist(scenarios)), minutes, gap)
+    mutate(scenario = factor(unlist(scenarios[scenario]), levels = unlist(scenarios)),
+           level = factor(step_labels[level], levels = step_labels))
+}
+
+# Value of the best solution found and the best bound over time, one panel per step: the true optimum
+# of a step lies in the shaded band between them, which is the gap.
+plot_progress <- function(progress) {
+  progress <- progress %>% filter(!is.na(incumbent), !is.na(bound)) %>% mutate(minutes = seconds / 60) %>%
+    group_by(level) %>% mutate(next_minutes = lead(minutes)) %>% ungroup()
+  ggplot(progress, aes(x = minutes)) +
+    # The gap as steps, like the lines: each value holds until the next progress line.
+    geom_rect(data = filter(progress, !is.na(next_minutes)),
+              aes(xmin = minutes, xmax = next_minutes, ymin = pmin(bound, incumbent),
+                  ymax = pmax(bound, incumbent)), fill = "grey70", alpha = 0.4) +
+    geom_step(aes(y = incumbent, colour = "Besta lausn sem fannst")) +
+    geom_step(aes(y = bound, colour = "Neðra mark")) +
+    facet_wrap(~level, scales = "free", ncol = 2) +
+    scale_colour_manual(values = c("Besta lausn sem fannst" = "#b2182b", "Neðra mark" = "#2166ac"),
+                        name = NULL) +
+    labs(x = "Mínútur frá upphafi keyrslu", y = "Gildi markfalls í þrepinu") +
+    theme_panel +
+    theme(panel.grid.major.y = element_line(colour = "grey90"))
 }
 
 # Gurobi version used for the model runs, from solver.csv.

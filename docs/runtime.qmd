@@ -1,0 +1,66 @@
+# Reiknitími {.unnumbered #sec-runtime}
+
+```{r}
+#| label: setup-runtime
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+results <- "data"  # pseudonymised copies, see code/export_docs_data.py
+solver <- read_solver_info(results)
+progress <- read_progress(results)
+num <- function(x, digits = 1) ifelse(is.na(x), "–", format(round(x, digits), nsmall = digits, decimal.mark = ","))
+```
+
+Lausnarinn leitar að bestu lausn innan tímamarka. Á meðan heldur hann utan um tvær tölur í hverju
+þrepi markfallsins: **bestu lausn sem hefur fundist** og **neðra mark**, sem sannað er að engin lausn
+getur farið niður fyrir. Besta mögulega lausn liggur einhvers staðar á milli þeirra. Bilið er munurinn
+á þeim sem hlutfall af bestu lausn: 0 % þýðir að lausnin er sönnuð best, en 50 % að besta mögulega
+lausn gæti verið allt að helmingi lægri. Bilið er því óvissubil um gæði lausnarinnar, ekki
+mælikvarði á sanngirni. Lausnin getur verið nær bestu lausn en bilið gefur til kynna, því neðra
+markið hækkar oft hægt.
+
+Tímamörkunum er skipt á milli þrepa markfallsins: þrep 1 (fundir) fær 40 % tímans, og ef byrjað er á
+viðmiðunarplani fá reglurnar 10 % og viðmiðunarplanið 20 %. Hin þrepin skipta afganginum jafnt á
+milli sín. Þrep sem klárast fyrr skilar ónotuðum tíma ekki áfram, svo heildartíminn getur orðið
+styttri en tímamörkin.
+
+```{r}
+#| label: tbl-runtime
+#| tbl-cap: "Tímamörk, notaður reiknitími og bil í síðasta þrepi hverrar sviðsmyndar."
+solver %>%
+  arrange(scenario) %>%
+  transmute(Sviðsmynd = as.character(scenario),
+            `Tímamörk (mín.)` = num(limit_minutes),
+            `Reiknitími (mín.)` = num(minutes),
+            `Bil (%)` = num(gap)) %>%
+  knitr::kable(align = c("l", "r", "r", "r"))
+```
+
+## Þróun lausnar yfir tíma
+
+```{r}
+#| label: progress-note
+#| results: asis
+if (nrow(progress) == 0) {
+  cat("Þróun lausnarinnar yfir tíma verður sýnd hér þegar keyrslurnar hafa verið fluttar út á ný.\n")
+} else {
+  cat("Myndirnar sýna fyrir hverja sviðsmynd hvernig besta lausn og neðra mark hvers þreps þróast",
+      "yfir keyrsluna. Skyggða svæðið á milli þeirra er bilið. Þar sem línurnar mætast er lausn",
+      "þrepsins sönnuð best.\n")
+}
+```
+
+```{r}
+#| label: progress-tabs
+#| results: asis
+#| fig-width: 8
+#| fig-height: 7
+if (nrow(progress) > 0) {
+  cat("::: {.panel-tabset}\n\n")
+  for (s in levels(droplevels(progress$scenario))) {
+    cat("#### ", sub("[.].*", "", s), "\n\n", sep = "")
+    print(plot_progress(filter(progress, scenario == s)) + labs(title = s))
+    cat("\n\n")
+  }
+  cat(":::\n")
+}
+```
