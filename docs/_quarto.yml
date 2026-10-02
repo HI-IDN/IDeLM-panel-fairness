@@ -36,6 +36,7 @@ book:
     # Kept out of `appendices`: that numbers them A, B, ... and they read better as plain pages.
     - part: "Viðaukar"
       chapters:
+        - runtime.qmd
         - code.qmd
         - references.qmd
 

@@ -29,7 +29,7 @@ Gögnin koma úr tveimur áttum: núverandi tillögu að fundaskipan í kerfi T�
 hvaða fundi, ritstjóri, lesarar og vanhæfi) og dagskrá þeirra `r n_held` funda sem þegar hafa
 verið haldnir, sem hefur verið sent með tölvupósti.
 
-Allt í þessari bók er dulkóðað:
+Allt í þessari greinargerð er dulkóðað:
 
 * fagráðsmenn eru `R01`–`R`r nrow(members)`` og umsóknir `A001`–`A`r nrow(panel)``, úthlutað í
   slembiröð;
@@ -54,7 +54,7 @@ Lykillinn milli kóða og raunverulegra nafna er aðeins geymdur á tölvu höfu
   viðbótar hafa lesara en engan fund enn** (`r paste(filter(assigned, is.na(meeting))$application, collapse = ", ")`).
   Þær teljast með í álagi hvers fagráðsmanns og eru sýndar sem *Óúthlutað* á myndum um fundi, en
   ekki sem fundir sem mætt er á.
-* **Lesari 1 og lesari 2 fylgja stafrófinu.** Í `r sum(panel$readers_alphabetical == "1", na.rm = TRUE)`
+* **1. lesari og 2. lesari fylgja stafrófinu.** Í `r sum(panel$readers_alphabetical == "1", na.rm = TRUE)`
   af `r sum(!is.na(panel$readers_alphabetical))` umsóknum með tvo lesara eru þeir
   skráðir í stafrófsröð. Hver fær að tala næstur ræðst því af upphafsstöfum fagráðsmanna, ekki af úthlutuninni.
   Hvað álag varðar eru lesararnir tveir sameinaðir í eitt *lesarahlutverk*.
@@ -68,7 +68,7 @@ Lykillinn milli kóða og raunverulegra nafna er aðeins geymdur á tölvu höfu
 
 ```{r}
 #| label: tbl-spread
-#| tbl-cap: "Umsóknir á hvern fagráðsmann: bil og miðgildi eftir hlutverki. Lesari 1 og lesari 2 eru sameinaðir."
+#| tbl-cap: "Umsóknir á hvern fagráðsmann: bil og miðgildi eftir hlutverki. 1. lesari og 2. lesari eru sameinaðir."
 knitr::kable(mutate(spread, Role = tr(Role)), col.names = c("Hlutverk", "Minnst", "Miðgildi", "Mest"))
 ```
 
@@ -79,17 +79,32 @@ knitr::kable(mutate(spread, Role = tr(Role)), col.names = c("Hlutverk", "Minnst"
 plot_members(counts)
 ```
 
+::: {.panel-tabset}
+
+## Fjöldi
+
 ```{r}
 #| label: fig-spread
-#| fig-cap: "Dreifing milli fagráðsmanna: ritstjóri, lesari (lesari 1 og 2 sameinaðir) og samtals."
+#| fig-cap: "Dreifing milli fagráðsmanna: ritstjóri, lesari (1. og 2. lesari sameinaðir) og samtals."
 #| fig-height: 3.2
 plot_spread(counts)
 ```
 
+## Hlutfall
+
+```{r}
+#| label: fig-spread-share
+#| fig-cap: "Hlutfall ritstjóra- og lesarahlutverka af umsóknum hvers fagráðsmanns."
+#| fig-height: 2.6
+plot_spread(counts, share = TRUE)
+```
+
+:::
+
 ## Greiðslur
 
 Hver fagráðsmaður fær grunngjald, `r kr(pay_rates[["start"]])` kr., auk `r kr(pay_rates[["editor"]])` kr.
-fyrir hvert ritstjórahlutverk og `r kr(pay_rates[["reader"]])` kr. fyrir hvert lesarahlutverk (lesari 1
+fyrir hvert ritstjórahlutverk og `r kr(pay_rates[["reader"]])` kr. fyrir hvert lesarahlutverk (1. lesari
 og 2 fá það sama).
 
 ```{r}
@@ -98,7 +113,7 @@ og 2 fá það sama).
 #| fig-height: 6
 pay <- pay_table(counts)
 q <- quantile(pay$per_proposal / 1000, c(0.25, 0.5, 0.75))
-plot_pay(counts)
+plot_pay(counts, split_readers = FALSE)
 ```
 
 ```{r}
@@ -125,10 +140,10 @@ hægt að segja fyrr en tímanotkun hefur verið mæld.
    Skýringin er að hluta sú að ritstjórahlutverkin falla á þá reyndari: nýir fagráðsmenn hafa
    færri ritstjórahlutverk en fleiri lesarahlutverk (@tbl-new). Sumir nýir fá sitt eina
    ritstjórahlutverk ekki fyrr en seint í lotunni (M6), eftir að hafa fyrst verið lesarar.
-3. **Rými í umræðunni er ójafnt.** Sumir eru lesari 1 á allt að
-   `r max(counts$n[counts$role == "Reader 1"])` umsóknum en aðrir aldrei; sumir eru lesari 2 á
-   allt að `r max(counts$n[counts$role == "Reader 2"])` en aðrir aldrei. Þar sem lesari 1 og
-   lesari 2 fylgja stafrófinu fá fagráðsmenn með upphafsstafi framarlega í stafrófinu meira rými
+3. **Rými í umræðunni er ójafnt.** Sumir eru 1. lesari á allt að
+   `r max(counts$n[counts$role == "Reader 1"])` umsóknum en aðrir aldrei; sumir eru 2. lesari á
+   allt að `r max(counts$n[counts$role == "Reader 2"])` en aðrir aldrei. Þar sem 1. lesari og
+   2. lesari fylgja stafrófinu fá fagráðsmenn með upphafsstafi framarlega í stafrófinu meira rými
    til að tjá sig, en þeir aftarlega eru oftast síðastir og hafa lítið við að bæta.
 4. **Dagskrárröð er aðeins þekkt fyrir fundi sem eru búnir.** Tillagan í kerfi TÞS sýnir á hvaða
    fundi umsókn er, en ekki hvar hún er á dagskrá. Röðin er þekkt fyrir fyrstu `r n_held` fundina,

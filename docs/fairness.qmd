@@ -62,14 +62,19 @@ dagskrárliðum (tíma einnar umsóknar).
 * **Lágt** $\alpha_r$ þýðir að það er ódýrt að mæta: líkanið dreifir umsóknum hans og hann fer
   snemma.
 
-Í bili fá allir fagráðsmenn sama $\alpha$. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
-þeirra.
+Líkanið les $\alpha_r$ fyrir hvern og einn; þeir sem
+hafa ekki eigið gildi fá sjálfgefið gildi. Í bili fá allir fagráðsmenn sama $\alpha$, `r yaml::read_yaml("../code/models/panel_model.yml")$alpha` dagskrárliði. Eðlilegt næsta skref er að spyrja fagráðsmenn um mat
+þeirra. Í núverandi útgáfu líkansins hefur $\alpha_r$ minni áhrif en þetta gefur til kynna, því
+fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 
 ## Fundir sem fagráðsmaður kemst ekki á
 
 Sumir fagráðsmenn vita fyrir fram að þeir komast ekki á tiltekna fundi vegna annarra skuldbindinga.
 Líkanið getur tekið tillit til þess: umsóknir viðkomandi eru þá ekki settar á þá fundi, og líkanið
-reynir áfram að halda fjölda funda sem hann þarf að mæta á, og bið hans á þeim, í lágmarki.
+reynir áfram að halda fjölda funda sem hann þarf að mæta á, og bið hans á þeim, í lágmarki. Ef umsókn er
+fest á fund sem einhver fagráðsmanna hennar kemst ekki á, stoppar líkanið með villu sem nefnir
+umsóknina og fundinn, í stað þess að skila ógerlegu líkani; sama gildir ef hún er fest á fund áður
+en hún má koma fyrir.
 
 ## Vanhæfi
 
@@ -93,13 +98,52 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   á áður en síðasta umsókn hans er tekin fyrir. Biðpunktarnir safnast upp yfir lotuna.
 * **Biðpunktar á fund og á umsókn:** biðpunktar deilt með fjölda funda sem mætt er á, og með
   fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
-* **Fundir sem mætt er á** og **byrði á umsókn** (binding auk biðar), sem líkanið jafnar.
+* **Fundir sem mætt er á** og **byrði**, $\alpha_r$ á hvern fund auk biðpunkta (@eq-burden). Líkanið
+  heldur mestu byrðinni niðri.
+* **Fylgni funda og biðar** [@spearman1904] yfir alla fagráðsmenn. Jákvæð fylgni þýðir að þeir sem mæta
+  oftast bíða líka mest, sem er einmitt það sem sanngjörn dagskrá á að forðast.
+* **Öfug pör:** sá sem mætir á fleiri fundi ætti að fá að fara fyrr af þeim og bíða því minna
+  samtals. Berum alla fagráðsmenn saman tvo og tvo. Ef A mætir á fleiri fundi en B *og* bíður
+  samt lengur samtals, þá er A verr settur á báða vegu og parið er *öfugt*. Talið er hve mörg
+  slík pör eru; í sanngjarnri dagskrá ættu þau að vera fá.
+* **Gini-stuðull byrðar** [@gini1912]: einn tölustafur á bilinu 0 til 1 um hversu ójafnt byrðin dreifist; 0 þýðir
+  að allir bera jafnt.
+* **Raðaður byrðarvigur:** byrði allra fagráðsmanna, raðað frá þeim sem ber mest til þess sem ber
+  minnst. Tvö plön eru borin saman sæti fyrir sæti. Fyrst er litið á þann sem ber mest í hvoru
+  plani: það plan þar sem hann ber minna er sanngjarnara. Ef þeir bera jafnt er litið á þann sem ber
+  næstmest, og svo koll af kolli. Þetta kallast *leximin*-röð (stytting á *lexicographic maximin*,
+  eins og orðaröð í orðabók). Dæmi: plan með byrðina (10, 8, 3) er sanngjarnara en (10, 9, 1), því
+  þeir sem bera mest bera jafnt (10) en sá sem ber næstmest ber minna (8 á móti 9), þótt sá sem ber
+  minnst beri meira í fyrra planinu.
 
-## Sanngjarnt miðað við hvað?
+Allir mælikvarðarnir eru reiknaðir úr dagskránni sjálfri.
 
-Fagráðsmenn hafa ekki allir jafnmargar umsóknir og sá sem hefur 20 umsóknir getur ekki búist við
-jafnstuttum kvöldum og sá sem hefur 10. Byrði er því borin saman **á hverja umsókn**: byrði
-fagráðsmanns deilt með fjölda umsókna hans. Líkanið lágmarkar byrði á umsókn hjá þeim sem verst er settur.
+## Sanngjarnt miðað við hvað? {#sec-fairness-relative}
+
+Fagráðsmenn hafa ekki allir jafnmargar umsóknir. Spurningin er hvort byrðin eigi að vera jöfn **í
+heild** eða jöfn **á hverja umsókn** (eða á hvern fund).
+
+Ef byrði er borin saman á hverja umsókn, þ.e. byrði fagráðsmanns deilt með fjölda umsókna hans,
+lítur það sanngjarnt út en felur gallann sem greinargerðin byrjaði á. Sá sem hefur margar umsóknir
+þarf að mæta á marga fundi, og þegar biðinni er deilt með mörgum umsóknum virðist hún lítil, jafnvel
+þótt hann sitji lengi á hverjum fundi. Þá bíða þeir mest sem mæta oftast.
+
+Líkanið ber nú saman **heildarbyrði**: $\alpha_r$ fyrir hvern fund sem mætt er á, auk biðpunkta,
+óháð fjölda umsókna (@eq-burden). Eigin umsóknir teljast ekki með, því þær eru launuð vinna; það
+sem er ólaunað er bindingin og biðin. Afleiðingin er sú sem @sec-fairness lagði upp með: sá sem
+mætir á einum fundi fleiri en annar má bíða $\alpha_r$ dagskrárliðum skemur yfir lotuna.
+
+Þetta er gildismat, ekki stærðfræðileg niðurstaða:
+
+* Með **heildarbyrði** hafa fagráðsmaður með 23 umsóknir og fagráðsmaður með 10 sama þak. Sá fyrri
+  mætir oftar og má því bíða minna á hverjum fundi.
+* Með byrði **á hvern fund** sem mætt er á, eins og í APAP þar sem stig eru reiknuð á hvern vinnudag
+  (@sec-apap), væri hvert fundarkvöld metið eins hjá öllum, en sá sem mætir oft fengi ekki að fara
+  fyrr fyrir vikið.
+* Með byrði **á umsókn** fær sá sem les mikið afslátt af biðinni, sem var gallinn hér að ofan.
+
+Þessi greinargerð velur heildarbyrði. Byrði á fund er eðlilegur samanburður sem vert er að skoða
+(@sec-limitations).
 
 ## Tímabilið
 
@@ -121,7 +165,7 @@ Fagráðið breytist frá ári til árs, svo eðlilegt tímabil er ein lota. Fyr
 Fundaskipanin er seinni ákvörðunin af tveimur. Sú fyrri, hver er ritstjóri og hverjir lesarar á
 hverri umsókn, hefur sínar eigin sanngirnisspurningar (@sec-data):
 
-* svipað heildarálag og jafn fjöldi ritstjóra-, lesara 1- og lesara 2-hlutverka, svo allir fái
+* svipað heildarálag og jafn fjöldi ritstjóra-, 1. lesara- og 2. lesarahlutverka, svo allir fái
   svipað rými í umræðunni;
 * **nýir fagráðsmenn** með takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
   þeirra seinna í lotunni, eftir að þeir hafa fyrst verið lesarar.
@@ -131,4 +175,4 @@ sitja meðvitað lengri fundi, svo þeir fái að hlusta á umræður reyndari f
 aðferðafræðina við úrvinnslu umsókna. Í líkaninu má gera það með lægra $\alpha_r$ eða minni vigt á
 bið hjá nýjum fagráðsmönnum.
 
-Þessi bók byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.
+Þessi greinargerð byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.

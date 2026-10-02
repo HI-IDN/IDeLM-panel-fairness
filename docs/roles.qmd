@@ -13,17 +13,21 @@ if (have_roles) {
 ```
 
 Hér eru sömu fagráðsmenn á hverri umsókn og í tillögu starfsmanna, og fundir sem eru búnir eru
-óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Starfsmenn
-völdu þessa þrjá, svo nýir fagráðsmenn mega vera ritstjórar hvenær sem er í lotunni, en þó á mest
+óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Nýir
+fagráðsmenn eru ritstjórar á mest
 `r scales::percent(yaml::read_yaml("../code/models/panel_model.yml")$new_editor_share)` umsókna sinna.
-Líkanið velur líka hver er lesari 1, sem talar næstur á eftir ritstjóranum, og hver er lesari 2,
+Hér er ekki krafist að þeir bíði fram á miðja lotu, því starfsmenn völdu fagráðsmennina þrjá: umsókn
+með þremur nýjum sem er færð framar hefði þá engan mögulegan ritstjóra.
+Líkanið velur líka hver er 1. lesari, sem talar næstur á eftir ritstjóranum, og hver er 2. lesari,
 sem talar síðastur. Í tillögu starfsmanna ræður stafrófið því (@sec-data). Hér er það notað sem
 tækifæri til að gefa öllum svipað rými í umræðunni: hjá hverjum fagráðsmanni eiga hlutverk
-lesara 1 og lesara 2 að vera sem jöfnust.
+1. lesara og 2. lesara að vera sem jöfnust.
 
 Aðalmarkmiðið er sanngjörn greiðsla: ef hver umsókn tekur jafnlangan tíma, líka biðin á fundum, ætti
 greiðsla á umsókn að vera sem jöfnust meðal reyndra fagráðsmanna. Nýir fá aðeins minna á umsókn, því
 þeir eru sjaldnar ritstjórar og bera því minni ábyrgð.
+
+Endurúthlutun hlutverka byggir á dagskránni úr sviðsmynd 1 og breytist með henni.
 
 ## Jafnari greiðsla á umsókn
 
@@ -32,7 +36,7 @@ greiðsla á umsókn að vera sem jöfnust meðal reyndra fagráðsmanna. Nýir 
 #| tbl-cap: "Greiðslur í tillögu starfsmanna og eftir tilfærslu hlutverka (bil yfir fagráðsmenn)."
 #| eval: !expr have_roles
 assignment_summary(list(`Tillaga starfsmanna` = panel, `Endurúthlutun hlutverka` = reassigned)) %>%
-  select(-`Lesari 1`, -`Mesti munur lesara 1 og 2`, -`Ritstjóri á fleiri en einni umsókn á sama fundi`) %>%
+  select(-`1. lesari`, -`Mesti munur 1. og 2. lesara`, -`Ritstjóri á fleiri en einni umsókn á sama fundi`) %>%
   knitr::kable()
 ```
 
@@ -62,15 +66,15 @@ plot_pay(counts_roles)
 Fjöldi umsókna hvers fagráðsmanns breytist ekki, svo heildargreiðslan fylgir enn álaginu. En greiðsla
 á umsókn verður nær jöfn, því ritstjórahlutverkunum er dreift eftir álagi: sá sem hefur fáar
 umsóknir, og fær því meira af grunngjaldinu á hverja, fær færri ritstjórahlutverk. Í leiðinni er
-líka bestað hver er lesari 1 og hver lesari 2, svo allir fái meira rými til að ræða umsóknirnar.
-Lesari 1 fær yfirleitt meira að segja en lesari 2, því helstu punktarnir hafa oft þegar verið
-nefndir þegar kemur að lesara 2.
+líka bestað hver er 1. lesari og hver 2. lesari, svo allir fái meira rými til að ræða umsóknirnar.
+1. lesari fær yfirleitt meira að segja en 2. lesari, því helstu punktarnir hafa oft þegar verið
+nefndir þegar kemur að 2. lesara.
 
 ## Rými í umræðunni {#sec-voice}
 
 @tbl-voice sýnir hve stórt hlutfall af umsóknum hvers fagráðsmanns er í hverju hlutverki, sem bil frá
 þeim lægsta til þess hæsta. Eftir endurúthlutun dregst bilið saman í öllum hlutverkum, mest hjá
-lesara 1 og lesara 2: enginn er lengur alltaf síðastur að tala, og allir fá að tala næstir á eftir
+1. lesara og 2. lesara: enginn er lengur alltaf síðastur að tala, og allir fá að tala næstir á eftir
 ritstjóranum á um það bil helmingi lesaraumsókna sinna. Ritstjórahlutfallið jafnast líka, en síður,
 því nýir fagráðsmenn eru sjaldnar ritstjórar og því er dreift þannig að greiðsla á umsókn verði jöfn.
 
