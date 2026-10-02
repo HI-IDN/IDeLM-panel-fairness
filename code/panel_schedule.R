@@ -270,7 +270,13 @@ read_progress <- function(results) {
 # Value of the best solution found and the best bound over time, one panel per step: the true optimum
 # of a step lies in the shaded band between them, which is the gap.
 plot_progress <- function(progress) {
-  progress <- progress %>% filter(!is.na(incumbent), !is.na(bound)) %>% mutate(minutes = seconds / 60) %>%
+  # Times are from the start of the run; show each step from its own start. The first two steps (rules and
+  # reference plan) take seconds and show nothing of interest, so they are left out.
+  step_end <- progress %>% group_by(step) %>% summarise(end = max(seconds), .groups = "drop") %>%
+    mutate(start = lag(end, default = 0))
+  progress <- progress %>% filter(!is.na(incumbent), !is.na(bound), !level %in% step_labels[c("rules", "reference")]) %>%
+    left_join(step_end %>% select(step, start), by = "step") %>%
+    mutate(minutes = (seconds - start) / 60) %>%
     group_by(level) %>% mutate(next_minutes = lead(minutes)) %>% ungroup()
   ggplot(progress, aes(x = minutes)) +
     # The gap as steps, like the lines: each value holds until the next progress line.
@@ -282,7 +288,7 @@ plot_progress <- function(progress) {
     facet_wrap(~level, scales = "free", ncol = 2) +
     scale_colour_manual(values = c("Besta lausn sem fannst" = "#b2182b", "Neðra mark" = "#2166ac"),
                         name = NULL) +
-    labs(x = "Mínútur frá upphafi keyrslu", y = "Gildi markfalls í þrepinu") +
+    labs(x = "Mínútur frá upphafi þreps", y = "Gildi markfalls í þrepinu") +
     theme_panel +
     theme(panel.grid.major.y = element_line(colour = "grey90"))
 }

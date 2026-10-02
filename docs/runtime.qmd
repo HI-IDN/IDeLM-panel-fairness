@@ -40,6 +40,19 @@ solver %>%
   knitr::kable(align = c("l", "r", "r", "r", "r"))
 ```
 
+## Sviðsmynd 2d
+
+Sviðsmynd 2d fékk mestan tíma, því hún er sú sem skilar bestu niðurstöðunni. Hún var keyrð í
+nokkrum áföngum og hver byrjaði á lausn þess fyrri: tillaga starfsmanna (5,0 mín.), fyrsta keyrsla 2d
+(17,3 mín.), keyrsla í 1 klst. (42,7 mín. notaðar), keyrsla með svigrúmi fyrir þrep 1 (`meetings_slack`
+2, 42,1 mín.) og loks lokakeyrsla í 3 klst. með sama svigrúmi (146,1 mín.). Samanlagt eru þetta
+253,2 mín., sem er talan í töflunni. Önnur sviðsmynd var ekki keyrð svona lengi, svo samanburðurinn
+er ekki alveg sanngjarn gagnvart þeim. Þróunin sem er sýnd hér að neðan er aðeins lokakeyrslan.
+
+Svigrúmið leyfir þrepi 1 (fundir) að enda allt að 2 yfir besta gildi sínu. Lausnin notaði 1 af því
+(202,5 í stað 201,5), og í staðinn lækkaði mesta byrði úr 60 í 51 í sömu keðju. Fundir samtals eru
+jafn margir og áður.
+
 ## Þróun lausnar yfir tíma
 
 ```{r}
@@ -49,8 +62,9 @@ if (nrow(progress) == 0) {
   cat("Þróun lausnarinnar yfir tíma verður sýnd hér þegar keyrslurnar hafa verið fluttar út á ný.\n")
 } else {
   cat("Myndirnar sýna fyrir hverja sviðsmynd hvernig besta lausn og neðra mark hvers þreps þróast",
-      "yfir keyrsluna. Skyggða svæðið á milli þeirra er bilið. Þar sem línurnar mætast er lausn",
-      "þrepsins sönnuð best.\n")
+      "yfir keyrsluna. Hvert þrep er sýnt frá upphafi þess; reglur og viðmiðunarplan taka sekúndur og eru",
+      "ekki sýnd. Skyggða svæðið á milli línanna er bilið. Þar sem þær mætast er lausn þrepsins",
+      "sönnuð best.\n")
 }
 ```
 

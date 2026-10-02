@@ -45,7 +45,10 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
    d. **Enginn verr settur en í 1:** eins og 2c, en fyrst er umframbyrði hvers og eins miðað við
-      sviðsmynd 1 gerð sem minnst. Lausnin byrjar á plani sviðsmyndar 1.
+      sviðsmynd 1 gerð sem minnst. Lausnin byrjar á plani sviðsmyndar 1. Þetta afbrigði var keyrt
+      miklu lengur en hin (um 4 klst. samtals, @sec-runtime) og þrep 1 fékk svigrúm: það mátti fara
+      allt að 2 yfir besta gildi sitt (`meetings_slack`), til þess að lækka mestu byrðarnar. Fundir
+      samtals eru þó jafn margir og áður.
 3. **Eins og 2a, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi,
    líka á næsta fundi; þar sem það er ekki hægt öðruvísi er umsókn frestað.
 4. **Bestað frá byrjun:** ekkert er fest, hvorki M1 né M2. Líkanið skipuleggur alla lotuna frá
@@ -72,7 +75,7 @@ if (!have_results) {
 
 ```{r}
 #| label: tbl-scenarios
-#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru sett sérstaklega fyrir hverja sviðsmynd (5 mín. fyrir 1, 20 mín. fyrir 2a–3 og 30 mín. fyrir 4) og skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri. Hver keyrsla byrjar á lausn annarrar sviðsmyndar (t.d. 2a og 2d á lausn 1), svo *samanlagður tími* leggur saman reiknitíma allrar keðjunnar. Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað."
+#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru sett sérstaklega fyrir hverja sviðsmynd (5 mín. fyrir 1, 20 mín. fyrir 2a–2c og 3, 180 mín. fyrir síðustu keyrslu 2d og 30 mín. fyrir 4) og skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri. Hver keyrsla byrjar á lausn annarrar sviðsmyndar (t.d. 2a á lausn 1), svo *samanlagður tími* leggur saman reiknitíma allrar keðjunnar; fyrir 2d eru það allar keyrslurnar sem hún byggir á (@sec-runtime). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað."
 #| eval: !expr have_results
 solver <- read_solver_info(results)
 results_table <- summary_table(runs) %>%
@@ -133,7 +136,7 @@ cat(paste0(
 
 ",
 "* **Byrjunin skiptir miklu.** Engin sviðsmynd var leyst til enda innan tímamarka; bilið að neðri ",
-"marki er stórt (dálkurinn *Bil*). Sviðsmynd 2d, sem byrjaði á plani starfsmanna, er best þeirra sem halda fyrstu fundunum á flestum ",
+"marki er stórt (dálkurinn *Bil*). Sviðsmynd 2d, sem byrjaði á plani starfsmanna og fékk langmestan reiknitíma, er best þeirra sem halda fyrstu fundunum á flestum ",
 "mælikvörðum: mesta byrði ", res("2d", "Mesta byrði"), " á móti ", res(1, "Mesta byrði"),
 " í tillögu starfsmanna, ", res("2d", "Fundir samtals"), " fundarsetur á móti ", res(1, "Fundir samtals"),
 " og ", res("2d", "Biðpunktar samtals"), " biðpunktar á móti ", res(1, "Biðpunktar samtals"), ". ",
