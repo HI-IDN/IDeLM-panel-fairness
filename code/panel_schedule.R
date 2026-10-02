@@ -143,9 +143,12 @@ read_coi_present <- function(results) {
 plot_compare <- function(runs, value, title, fill_label, digits = 0) {
   runs <- droplevels(runs) %>% mutate(v = .data[[value]])
   order <- runs %>% filter(scenario == levels(scenario)[1]) %>% arrange(v) %>% pull(member)
+  # A "Samtals" row at the bottom (the first level is drawn lowest) with each scenario's total.
   runs <- runs %>%
-    mutate(member = factor(member, levels = order),
+    mutate(member = factor(member, levels = c("Samtals", order)),
            number = factor(sub("[.].*", "", scenario), levels = sub("[.].*", "", levels(scenario))))
+  totals <- runs %>% group_by(number) %>% summarise(v = sum(v), .groups = "drop") %>%
+    mutate(member = factor("Samtals", levels = levels(runs$member)))
   # Distinct colour steps rather than a smooth gradient, so neighbouring values are easy to tell
   # apart, blue (low) to red (high): one colour per value for a few whole numbers (meetings), otherwise binned.
   few_values <- all(runs$v == round(runs$v)) && n_distinct(runs$v) <= 9
@@ -160,9 +163,15 @@ plot_compare <- function(runs, value, title, fill_label, digits = 0) {
     geom_tile(colour = "white", linewidth = 0.8) +
     geom_text(aes(label = format(round(v, digits), nsmall = digits, decimal.mark = ","),
                   colour = abs(v - (min(v) + max(v)) / 2) > 0.4 * (max(v) - min(v))), size = 3) +
+    geom_tile(data = totals, aes(x = number, y = member), inherit.aes = FALSE,
+              fill = "grey92", colour = "white", linewidth = 0.8) +
+    geom_text(data = totals, aes(x = number, y = member, label = format(round(v, digits), nsmall = digits,
+                                                                      decimal.mark = ",")),
+              inherit.aes = FALSE, size = 3, fontface = "bold") +
     fill_scale +
     scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "black"), guide = "none") +
     scale_x_discrete(position = "top") +
+    scale_y_discrete(limits = levels(runs$member)) +
     labs(title = title, x = "Sviðsmynd", y = NULL) +
     theme_panel +
     theme(panel.grid = element_blank(), legend.position = "right")
