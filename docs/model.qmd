@@ -271,7 +271,7 @@ tibble(
            "$g$", "$q$", "$\\rho$"),
   Gildi = c(if (is.null(config$alpha_file)) paste(num(config$alpha), "dagskrárliðir fyrir alla")
             else paste(num(config$alpha), "dagskrárliðir, nema þeir sem eru í", config$alpha_file), num(config$max_per_meeting),
-            num(config$coi_penalty), paste(num(config$time_limit), "sek."),
+            num(config$coi_penalty), "sett fyrir hverja sviðsmynd, 5–30 mín. (@tbl-scenarios)",
             if (is.null(config$unavailable)) "engir skráðir ($U_r = \\emptyset$)" else config$unavailable,
             if (is.null(config$max_per_member)) "ekkert hámark" else num(config$max_per_member),
             if (is.null(config$soft_max_per_member)) "ekkert" else num(config$soft_max_per_member),
