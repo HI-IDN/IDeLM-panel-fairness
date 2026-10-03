@@ -20,16 +20,9 @@ pay_colours <- c("Start fee" = hi[["border"]], role_colours[c("Editor", "Reader"
 # One colour per scenario, in the order of `scenarios`.
 scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "coral", "engineering", "yellow")])
 
-# Low-to-high values (counts, peel-off points): light yellow through orange and coral to the HÍ
-# blue, so the high half (white text in the figures) is dark enough to read.
-hi_sequential <- function(n) {
-  stops <- c(0, 0.15, 0.3, 0.55, 1)
-  colours <- c(hi_tint(hi[["yellow"]], 0.6), hi[["orange"]], hi[["coral"]], hi[["blue"]], hi[["dark_blue"]])
-  channels <- t(grDevices::col2rgb(colours))
-  at <- seq(0, 1, length.out = n)
-  grDevices::rgb(approx(stops, channels[, 1], at)$y, approx(stops, channels[, 2], at)$y,
-                 approx(stops, channels[, 3], at)$y, maxColorValue = 255)
-}
+# Low-to-high values (counts, peel-off points): the magma scale, light yellow to dark purple. Not a
+# blue one, since blue is "low" in the diverging scale below.
+hi_sequential <- function(n) viridisLite::viridis(n, option = "magma", direction = -1, begin = 0.15, end = 0.9)
 # Below / above the middle: HÍ blue to white to coral (blue = low, as in the former RdBu).
 hi_diverging <- function(n) grDevices::colorRampPalette(c(hi[["blue"]], "#FFFFFF", hi[["coral"]]))(n)
 
