@@ -21,7 +21,7 @@ pay_colours <- c("Start fee" = hi[["border"]], role_colours[c("Editor", "Reader"
 scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "coral", "engineering", "yellow")])
 
 # Low-to-high values (counts, peel-off points): from a light tint to the dark HÍ blue.
-hi_sequential <- function(n) grDevices::colorRampPalette(c(hi_tint(hi[["blue"]], 0.92), hi[["blue"]],
+hi_sequential <- function(n) grDevices::colorRampPalette(c(hi_tint(hi[["blue"]], 0.8), hi[["blue"]],
                                                            hi[["dark_blue"]]))(n)
 # Below / above the middle: HÍ blue to white to coral (blue = low, as in the former RdBu).
 hi_diverging <- function(n) grDevices::colorRampPalette(c(hi[["blue"]], "#FFFFFF", hi[["coral"]]))(n)
