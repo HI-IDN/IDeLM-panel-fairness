@@ -391,6 +391,10 @@ class PanelScheduleModel:
         self.max_per_member = max_per_member
         self.soft_max_per_member = soft_max_per_member
         self.soft_max_weight = soft_max_weight
+        if soft_max_per_member and max_per_member and soft_max_per_member >= max_per_member:
+            # The hard limit already keeps everyone at or below the soft cap: nothing to penalise.
+            print(f'soft cap {soft_max_per_member} is not below the hard limit {max_per_member}: switched off')
+            self.soft_max_weight = 0.0
         self.rotate_wait = rotate_wait
         self.first_meeting_rule = first_meeting_rule
         self.target = target_per_meeting or {}

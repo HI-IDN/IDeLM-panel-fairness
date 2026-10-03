@@ -97,7 +97,7 @@ from the model variables, so it shows what the plan actually does.
 | Nothing is added to the next, announced meeting (`--next-meeting M3`); its proposals may be postponed at a cost | hard / cost `postpone_penalty` |
 | In the first meeting everyone attends with exactly one proposal (when it is still open) | hard |
 | A member has at most `max_per_member` = 5 own proposals in a meeting not yet held | hard |
-| … and preferably at most `soft_max_per_member` = 4 | cost `soft_max_weight` per extra proposal |
+| … and preferably at most `soft_max_per_member` = 4 (optional; switched off when it is not below the hard limit) | cost `soft_max_weight` per extra proposal |
 | Own proposals per meeting close to a target (3.5 experienced, 2.5 new) | cost `target_weight` |
 | A member with a conflict of interest has left before that proposal comes up | cost `coi_penalty` each time not |
 | Optional rotation (`--rotate-wait`): the members of the last proposal of a meeting leave early at the next meeting, or (`-1`) skip it | hard, experimental |
