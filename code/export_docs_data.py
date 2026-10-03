@@ -29,12 +29,15 @@ COLUMNS = {
 }
 # Experiments the book refers to: name in docs/data/experiments/ -> results prefix (in RESULTS).
 EXPERIMENTS = {
-    # Rotation rule on scenario 2, 60 minutes each from the same start (the staff's meetings):
-    # without the rule, the members of the last proposal skip the next meeting, or wait at most 2
-    # there (code/run_rotation.sh).
-    'rotation_none': 'rotation/free_none',
-    'rotation_skip': 'rotation/free_skip',
-    'rotation_wait2': 'rotation/free_wait2',
+    # Rotation rule on the best scenario-2 plan (scenario 2d with leximin, the no-worse-than step and
+    # --meetings-slack 2; code/run_rotation.sh): without the rule, then 60 minutes each from that plan
+    # with the rule: the members of the last proposal skip the next meeting, or wait at most 0, 1 or
+    # 2 proposals of others there (issue #7).
+    'rotation_none': 'long/best_long',
+    'rotation_skip': 'long/best_skip',
+    'rotation_wait0': 'long/best_wait0',
+    'rotation_wait1': 'long/best_wait1',
+    'rotation_wait2': 'long/best_wait2',
 }
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
