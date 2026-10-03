@@ -165,7 +165,6 @@ def member_measures(data, agenda, alpha):
     meeting), waiting (proposals of others sat through) and burden = alpha * meetings + waiting,
     the quantity the fairness steps compare. alpha is a number or {member: value}."""
     leave, own = defaultdict(int), defaultdict(int)
-    held = {data.fixed_meeting[p] for p in data.fixed_position}
     for p, (m, k) in agenda.items():
         for r in data.reviewers.get(p, ()):
             leave[r, m] = max(leave[r, m], k)
@@ -175,8 +174,7 @@ def member_measures(data, agenda, alpha):
         a = alpha[r] if isinstance(alpha, dict) else alpha
         meetings = [m for (s, m) in leave if s == r]
         # Slots before a late arrival are not waiting: a member's window opens at slot `first`.
-        slots = sum(leave[r, m] - (0 if m in held else data.windows.get((r, m), (1, None))[0] - 1)
-                    for m in meetings)
+        slots = sum(leave[r, m] - (data.windows.get((r, m), (1, None))[0] - 1) for m in meetings)
         n = len(data.proposals_of(r))
         waiting = slots - sum(own[r, m] for m in meetings)
         burden = a * len(meetings) + waiting
@@ -685,7 +683,7 @@ class PanelScheduleModel:
     def _stay(self, r, m):
         """Slots member r sits through in meeting m: up to the slot of their last proposal, minus
         the slots before the window opens for a late arrival (not waiting: they are not there)."""
-        free = 0 if m in self.held else self.data.windows.get((r, m), (1, None))[0] - 1
+        free = self.data.windows.get((r, m), (1, None))[0] - 1  # also in held meetings: they count
         return self.leave[r, m] - free * self.a[r, m] if free else self.leave[r, m]
 
     def burden(self, r):
