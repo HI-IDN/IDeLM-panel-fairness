@@ -15,6 +15,10 @@ scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
                free_max4 = "3. Eins og 2a, mest 4 á fund",
                scratch = "4. Bestað frá byrjun")
 scenario_colours <- setNames(scenario_palette, scenarios)
+# Agenda slots where a member has a conflict of interest: red if they have to step out, pink if
+# they are not in the meeting then (already left, or not attending).
+conflict_colour <- "#d7263d"
+conflict_away_colour <- "#f4a9b8"
 
 # Held meetings with a known agenda: per member, own proposals, slot of their last proposal (when
 # they may leave) and how many proposals of others they sat through before that.
@@ -28,6 +32,18 @@ held_meetings <- function(panel) {
     summarise(own = n(), leave = max(position), .groups = "drop") %>%
     mutate(waiting = leave - own) %>%
     left_join(length, by = "meeting")
+}
+
+# Conflicts of interest in held meetings: one row per conflicted member and proposal, and whether
+# the member was still in the meeting (own proposals left) when it was taken, so had to step out.
+held_conflicts <- function(panel) {
+  panel %>%
+    filter(!is.na(position), !is.na(coi)) %>%
+    mutate(position = as.integer(position)) %>%
+    separate_rows(coi, sep = ";") %>%
+    select(meeting, member = coi, position) %>%
+    left_join(held_meetings(panel) %>% select(meeting, member, leave), by = c("meeting", "member")) %>%
+    mutate(in_meeting = !is.na(leave) & leave >= position)
 }
 
 plot_held <- function(panel) {
@@ -58,6 +74,11 @@ plot_held <- function(panel) {
   running <- running %>% mutate(row = factor(paste(meeting, member, sep = "_"), levels = key$row))
   slots <- slots %>% mutate(row = factor(paste(meeting, member, sep = "_"), levels = levels(running$row)))
   present <- filter(running, !is.na(leave))
+  # Slots where a member has a conflict: they step out, or are not in the meeting then.
+  conflicts <- held_conflicts(panel) %>%
+    mutate(meeting = as.character(meeting),
+           colour = if_else(in_meeting, conflict_colour, conflict_away_colour)) %>%
+    inner_join(select(running, meeting, member, row), by = c("meeting", "member"))
   max_cum <- max(running$cumulative)
 
   # One panel per meeting, each as wide as its meeting plus one slot for the running total, so the
@@ -71,6 +92,8 @@ plot_held <- function(panel) {
                    linewidth = 2.5) +
       geom_tile(data = keep(slots), aes(x = position - 0.5, y = row), width = 0.9, height = 0.55,
                 fill = role_colours[["Editor"]]) +
+      geom_tile(data = keep(conflicts), aes(x = position - 0.5, y = row), width = 0.9, height = 0.55,
+                fill = keep(conflicts)$colour) +
       geom_vline(xintercept = n, linetype = "dashed", colour = "black") +
       # Running total in the extra slot to the right of the end of the meeting.
       geom_tile(aes(x = n + 0.5, fill = cumulative), width = 0.9, height = 0.85) +
@@ -93,14 +116,16 @@ plot_held <- function(panel) {
     "guide-box-bottom", return_all = TRUE)
   title <- cowplot::ggdraw() +
     cowplot::draw_label("Hvenær fagráðsmenn gátu farið af fundum sem eru búnir", x = 0.01, hjust = 0,
-                        y = 0.82, size = 14) +
+                        y = 0.86, size = 14) +
     cowplot::draw_label(paste0("Grá lína = tími á fundinum; blátt = eigin umsóknir; brotalína = fundarlok.
 ",
+                               "Rautt = vanhæfur og víkur af fundi; bleikt = vanhæfur en farinn eða ekki mættur.
+",
                                "Hægra megin: uppsafnaðir biðpunktar (umsóknir annarra sem setið var undir)"),
-                        x = 0.01, hjust = 0, y = 0.35, size = 11)
+                        x = 0.01, hjust = 0, y = 0.33, size = 11)
   body <- cowplot::plot_grid(plotlist = panels, nrow = 1, rel_widths = widths, align = "h", axis = "tb")
   axis <- cowplot::ggdraw() + cowplot::draw_label("Dagskrárliður (umsóknir teknar fyrir)", size = 11)
-  cowplot::plot_grid(title, body, axis, legend, ncol = 1, rel_heights = c(0.16, 1, 0.05, 0.12))
+  cowplot::plot_grid(title, body, axis, legend, ncol = 1, rel_heights = c(0.2, 1, 0.05, 0.12))
 }
 
 # The panel as scheduled by a model run: meetings (and agenda positions) from <prefix>_agenda.csv,
