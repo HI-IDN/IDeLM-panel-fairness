@@ -4,6 +4,7 @@
 # models/panel_model.py (<prefix>_agenda.csv and <prefix>_members.csv). Sourced by the book in
 # docs/; uses the helpers and theme from panel_workload.R.
 library(tidyverse)
+source("panel_palette.R")  # colours of all figures
 
 # Scenarios: result file prefix -> label, in the order they are compared.
 scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
@@ -13,8 +14,7 @@ scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
                free_noworse = "2d. Eins og 2c, enginn verr settur en í 1",
                free_max4 = "3. Eins og 2a, mest 4 á fund",
                scratch = "4. Bestað frá byrjun")
-scenario_colours <- setNames(c("#eb6834", "#2a78d6", "#8fb8ea", "#1f4f8f", "#e87ba4", "#1baf7a",
-                               "#4a3aa7"), scenarios)
+scenario_colours <- setNames(scenario_palette, scenarios)
 
 # Held meetings with a known agenda: per member, own proposals, slot of their last proposal (when
 # they may leave) and how many proposals of others they sat through before that.
@@ -75,8 +75,7 @@ plot_held <- function(panel) {
       # Running total in the extra slot to the right of the end of the meeting.
       geom_tile(aes(x = n + 0.5, fill = cumulative), width = 0.9, height = 0.85) +
       geom_text(aes(x = n + 0.5, label = cumulative, colour = cumulative > max_cum / 2), size = 3) +
-      scale_fill_viridis_c(option = "magma", direction = -1, begin = 0.2, end = 0.95,
-                           limits = c(0, max_cum), name = "Uppsafnaðir biðpunktar") +
+      scale_fill_gradientn(colours = hi_sequential(256), limits = c(0, max_cum), name = "Uppsafnaðir biðpunktar") +
       scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "black"), guide = "none") +
       scale_y_discrete(labels = function(x) sub(".*_", "", x), drop = TRUE) +
       scale_x_continuous(breaks = seq(0, n, 2), limits = c(0, n + 1), expand = c(0, 0)) +
@@ -150,19 +149,19 @@ plot_compare <- function(runs, value, title, fill_label, digits = 0) {
   totals <- runs %>% group_by(number) %>% summarise(v = sum(v), .groups = "drop") %>%
     mutate(member = factor("Samtals", levels = levels(runs$member)))
   # Distinct colour steps rather than a smooth gradient, so neighbouring values are easy to tell
-  # apart, blue (low) to red (high): one colour per value for a few whole numbers (meetings), otherwise binned.
+  # apart, light (low) to dark (high), the same scale as the other heatmaps: one colour per value for a few whole numbers (meetings), otherwise binned.
   few_values <- all(runs$v == round(runs$v)) && n_distinct(runs$v) <= 9
   if (few_values) {
     runs <- runs %>% mutate(fill = factor(v, levels = sort(unique(v))))
-    fill_scale <- scale_fill_brewer(palette = "RdBu", direction = -1, name = fill_label, guide = guide_legend(reverse = TRUE))
+    fill_scale <- scale_fill_manual(values = hi_sequential(nlevels(runs$fill)), name = fill_label, guide = guide_legend(reverse = TRUE))
   } else {
     runs <- runs %>% mutate(fill = v)
-    fill_scale <- scale_fill_fermenter(palette = "RdBu", direction = -1, n.breaks = 7, name = fill_label)
+    fill_scale <- scale_fill_stepsn(colours = hi_sequential(7), n.breaks = 7, name = fill_label)
   }
   ggplot(runs, aes(x = number, y = member, fill = fill)) +
     geom_tile(colour = "white", linewidth = 0.8) +
     geom_text(aes(label = format(round(v, digits), nsmall = digits, decimal.mark = ","),
-                  colour = abs(v - (min(v) + max(v)) / 2) > 0.4 * (max(v) - min(v))), size = 3) +
+                  colour = v > (min(v) + max(v)) / 2), size = 3) +
     geom_tile(data = totals, aes(x = number, y = member), inherit.aes = FALSE,
               fill = "grey92", colour = "white", linewidth = 0.8) +
     geom_text(data = totals, aes(x = number, y = member, label = format(round(v, digits), nsmall = digits,
@@ -286,7 +285,7 @@ plot_progress <- function(progress) {
     geom_step(aes(y = incumbent, colour = "Besta lausn sem fannst")) +
     geom_step(aes(y = bound, colour = "Neðra mark")) +
     facet_wrap(~level, scales = "free", ncol = 2) +
-    scale_colour_manual(values = c("Besta lausn sem fannst" = "#b2182b", "Neðra mark" = "#2166ac"),
+    scale_colour_manual(values = gap_colours,
                         name = NULL) +
     labs(x = "Mínútur frá upphafi þreps", y = "Gildi markfalls í þrepinu") +
     theme_panel +
@@ -360,9 +359,7 @@ plot_exit_flow <- function(schedule) {
   flow <- exit_flow(schedule) %>% filter(leave > 0)
   last <- flow %>% group_by(member) %>% slice_max(as.integer(meeting), n = 1) %>% ungroup()
   members <- sort(unique(flow$member))
-  # One distinct colour per member: evenly spaced hues, alternating light and dark.
-  colours <- setNames(grDevices::hcl(h = seq(15, 375, length.out = length(members) + 1)[seq_along(members)],
-                                     c = 90, l = rep(c(45, 70), length.out = length(members))), members)
+  colours <- member_colours(members)
   ggplot(flow, aes(x = meeting, y = leave, group = member, colour = member)) +
     geom_line(linewidth = 0.7, alpha = 0.85) +
     geom_point(size = 2) +
@@ -405,19 +402,13 @@ plot_exit_alluvial <- function(schedule) {
     ggalluvial::geom_flow(stat = "alluvium", lode.guidance = "frontback", alpha = 0.7, colour = NA) +
     ggalluvial::geom_stratum(fill = "grey95", colour = "grey60", width = 0.35) +
     geom_text(stat = ggalluvial::StatStratum, aes(label = after_stat(stratum)), size = 2.4) +
-    scale_fill_manual(values = c("Fæstir" = "#fbd08a", "Miðlungs" = "#e8615a", "Flestir" = "#4a1c6b"),
+    scale_fill_manual(values = tertile_colours,
                       name = "Biðpunktar yfir lotuna") +
     labs(title = "Hvenær fagráðsmenn fara af fundum",
          subtitle = "Hópar á hverjum fundi eftir því hvenær farið er; flæði litað eftir biðpunktum yfir lotuna",
          x = NULL, y = "Fagráðsmenn") +
     theme_panel +
     theme(panel.grid = element_blank(), legend.position = "bottom")
-}
-
-# One distinct colour per member: evenly spaced hues, alternating light and dark.
-member_colours <- function(members) {
-  setNames(grDevices::hcl(h = seq(15, 375, length.out = length(members) + 1)[seq_along(members)],
-                          c = 90, l = rep(c(45, 70), length.out = length(members))), members)
 }
 
 # Sankey (alluvial) view of the exit order: every member is one band through all meetings. In each
@@ -468,7 +459,7 @@ plot_exit_sankey_interactive <- function(schedule) {
   half <- 1 / 6  # half the width of a meeting column, as in the static figure
   # The heatmap's colour scale for peel-off points so far.
   top_value <- max(lodes$cumulative)
-  scale_colours <- viridisLite::viridis(256, option = "magma", direction = -1, begin = 0.15, end = 0.9)
+  scale_colours <- hi_sequential(256)
   colour_of <- function(value) scale_colours[pmin(256, 1 + floor(255 * value / max(top_value, 1)))]
 
   # Each band is drawn as small polygons: the box of the first meeting, then for every later meeting the
@@ -614,7 +605,7 @@ plot_exit_heatmap <- function(schedule) {
               inherit.aes = FALSE, size = 3, colour = "grey20") +
     annotate("text", x = c(n + 0.9, n + 1.8), y = length(order) + 0.9, label = c("Samtals", "Á fund"),
              size = 2.9, fontface = "bold", colour = "grey20") +
-    scale_fill_viridis_c(option = "magma", direction = -1, begin = 0.15, end = 0.9, na.value = "grey95",
+    scale_fill_gradientn(colours = hi_sequential(256), na.value = "grey95",
                          name = "Uppsafnaðir biðpunktar") +
     scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "black"), guide = "none") +
     scale_x_discrete(expand = expansion(add = c(0.6, 2.1))) +
@@ -642,6 +633,6 @@ plot_exit_flow_interactive <- function(schedule) {
                   marker = list(color = "rgba(150,150,150,0.6)", size = 6), showlegend = FALSE) %>%
     plotly::layout(xaxis = list(title = ""), yaxis = list(title = "Dagskrárliður", rangemode = "tozero"),
                    hovermode = "closest") %>%
-    plotly::highlight(on = "plotly_hover", off = "plotly_doubleclick", color = "#c2185b",
+    plotly::highlight(on = "plotly_hover", off = "plotly_doubleclick", color = hi_highlight,
                       opacityDim = 0.35, selected = plotly::attrs_selected(line = list(width = 3)))
 }
