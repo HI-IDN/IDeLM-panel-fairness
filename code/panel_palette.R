@@ -1,41 +1,36 @@
-# Colour palette of all figures: the HÍ design standard (https://honnun.hi.is/), the same colours
-# as docs/_extensions/tungufoss/haskoli-islands/theme/_tokens.scss. Sourced by panel_workload.R
-# and panel_schedule.R, so a colour is changed here and nowhere else.
+# Colour palette of all figures. Standard R palettes that are colour-blind friendly, so the colours
+# are the same everywhere and are changed here and nowhere else:
+#  * categories (roles, scenarios, members): Okabe-Ito, `grDevices::palette.colors()` (R >= 4.0);
+#  * low-to-high values: viridis "mako", a blue-green scale close to the colours of the HÍ design
+#    standard (https://honnun.hi.is/). Sourced by panel_workload.R and panel_schedule.R.
 
-hi <- c(blue = "#10099F", dark_blue = "#0A0668", turquoise = "#2DD2C0", green = "#00FFBA",
-        yellow = "#FAC55B", coral = "#FC8484", orange = "#FFA05F", engineering = "#EB7125",
-        ink = "#262626", muted = "#5D6872", border = "#E8E8E8", surface = "#F5F5F5")
+okabe <- grDevices::palette.colors(palette = "Okabe-Ito")
+names(okabe) <- c("black", "orange", "sky_blue", "green", "yellow", "blue", "vermillion", "purple", "grey")
 
-# Mix a colour with white: share = 0 is the colour itself, 1 is white.
-hi_tint <- function(colour, share) {
-  rgb <- grDevices::col2rgb(colour) / 255
-  grDevices::rgb(t(1 - (1 - share) * (1 - rgb)))
-}
-
-# Roles: the editor is the HÍ blue, the readers the warm colours.
-role_colours <- c("Editor" = hi[["blue"]], "Reader" = hi[["orange"]],
-                  "Reader 1" = hi[["orange"]], "Reader 2" = hi[["turquoise"]], "Total" = hi[["muted"]])
-pay_colours <- c("Start fee" = hi[["border"]], role_colours[c("Editor", "Reader", "Reader 1", "Reader 2")])
+# Roles: editor blue, readers orange and green.
+role_colours <- c("Editor" = okabe[["blue"]], "Reader" = okabe[["orange"]],
+                  "Reader 1" = okabe[["orange"]], "Reader 2" = okabe[["green"]], "Total" = okabe[["grey"]])
+pay_colours <- c("Start fee" = "grey85", role_colours[c("Editor", "Reader", "Reader 1", "Reader 2")])
 
 # One colour per scenario, in the order of `scenarios`.
-scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "coral", "engineering", "yellow")])
+scenario_palette <- unname(okabe[c("grey", "blue", "sky_blue", "green", "orange", "vermillion", "purple")])
 
-# Low-to-high values (counts, peel-off points, differences between scenarios): the magma scale,
-# light yellow to dark purple. Not a blue one, so blue does not mean both low and high.
-hi_sequential <- function(n) viridisLite::viridis(n, option = "magma", direction = -1, begin = 0.15, end = 0.9)
+# Low-to-high values (counts, peel-off points, differences between scenarios): light to dark.
+hi_sequential <- function(n) viridisLite::viridis(n, option = "mako", direction = -1, begin = 0.2, end = 0.9)
 
-# Few / medium / many (the Sankey groups): the same heat scale.
+# Few / medium / many (the Sankey groups): the same scale.
 tertile_colours <- setNames(hi_sequential(3), c("Fæstir", "Miðlungs", "Flestir"))
 
 # Lower bound and incumbent of the solver (the gap figure).
-gap_colours <- c("Besta lausn sem fannst" = hi[["engineering"]], "Neðra mark" = hi[["blue"]])
+gap_colours <- c("Besta lausn sem fannst" = okabe[["vermillion"]], "Neðra mark" = okabe[["blue"]])
 
 # Highlight in the interactive figures.
-hi_highlight <- hi[["engineering"]]
+hi_highlight <- okabe[["vermillion"]]
 
-# One distinct colour per member: the HÍ colours in turn, then the same in a lighter shade.
+# One colour per member. With this many members no palette is fully colour-blind safe, so the
+# Okabe-Ito colours are used in turn, then the same in a lighter shade; the codes label the bands.
 member_colours <- function(members) {
-  base <- unname(hi[c("blue", "turquoise", "orange", "coral", "yellow", "dark_blue", "green", "engineering")])
-  pool <- c(base, sapply(base, function(x) hi_tint(x, 0.45)))
-  setNames(rep_len(pool, length(members)), members)
+  base <- unname(okabe[-c(1, 9)])
+  lighter <- grDevices::rgb(t(1 - 0.55 * (1 - grDevices::col2rgb(base) / 255)))
+  setNames(rep_len(c(base, lighter), length(members)), members)
 }
