@@ -23,8 +23,9 @@ scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "cora
 # Low-to-high values (counts, peel-off points, differences between scenarios): the magma scale,
 # light yellow to dark purple. Not a blue one, so blue does not mean both low and high.
 hi_sequential <- function(n) viridisLite::viridis(n, option = "magma", direction = -1, begin = 0.15, end = 0.9)
-# Few / medium / many (the Sankey groups).
-tertile_colours <- c("Fæstir" = hi[["yellow"]], "Miðlungs" = hi[["coral"]], "Flestir" = hi[["blue"]])
+
+# Few / medium / many (the Sankey groups): the same heat scale.
+tertile_colours <- setNames(hi_sequential(3), c("Fæstir", "Miðlungs", "Flestir"))
 
 # Lower bound and incumbent of the solver (the gap figure).
 gap_colours <- c("Besta lausn sem fannst" = hi[["engineering"]], "Neðra mark" = hi[["blue"]])
