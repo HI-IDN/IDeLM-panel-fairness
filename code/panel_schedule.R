@@ -419,9 +419,8 @@ plot_exit_sankey <- function(schedule) {
   flow <- exit_flow(schedule) %>%
     mutate(stratum = factor(leave, levels = rev(sort(unique(leave)))), order = as.integer(factor(member)))
   ggplot(flow, aes(x = meeting, stratum = stratum, alluvium = member, y = 1, order = order)) +
-    ggalluvial::geom_alluvium(aes(fill = member), width = 1 / 3, alpha = 0.85, colour = "white",
-                              linewidth = 0.2) +
-    ggalluvial::geom_stratum(width = 1 / 3, fill = NA, colour = "grey40", linewidth = 0.3) +
+    ggalluvial::geom_alluvium(aes(fill = member), width = 1 / 3, alpha = 0.85, colour = NA) +
+    ggalluvial::geom_stratum(width = 1 / 3, fill = NA, colour = NA) +
     geom_text(stat = ggalluvial::StatStratum, size = 2.6,
               aes(label = if_else(after_stat(stratum) == "0", "–", as.character(after_stat(stratum))))) +
     scale_fill_manual(values = member_colours(sort(unique(flow$member))), name = NULL) +
@@ -484,21 +483,21 @@ plot_exit_sankey_interactive <- function(schedule) {
   }
   figure <- plotly::plot_ly()
   band_colours <- character()
-  add_polygon <- function(figure, polygon, colour, outline) {
+  add_polygon <- function(figure, polygon, colour) {
     band_colours <<- c(band_colours, colour)
     plotly::add_trace(figure, type = "scatter", mode = "lines", fill = "toself", x = polygon$x, y = polygon$y,
-                      fillcolor = colour, line = list(color = outline, width = 0.6), hoverinfo = "skip",
+                      fillcolor = colour, line = list(width = 0), hoverinfo = "skip",
                       showlegend = FALSE)
   }
   for (member in members) {  # the first traces: member * per_member + 1 ... are one member's polygons
     lode <- lodes[lodes$member == member, ]
-    figure <- add_polygon(figure, box_polygon(lode, 1), colour_of(lode$cumulative[1]), "white")
+    figure <- add_polygon(figure, box_polygon(lode, 1), colour_of(lode$cumulative[1]))
     for (i in seq_len(nrow(lode))[-1]) {
       for (k in seq_len(slices)) {
         value <- lode$cumulative[i - 1] + (lode$cumulative[i] - lode$cumulative[i - 1]) * (k - 0.5) / slices
-        figure <- add_polygon(figure, slice_polygon(lode, i, k), colour_of(value), colour_of(value))
+        figure <- add_polygon(figure, slice_polygon(lode, i, k), colour_of(value))
       }
-      figure <- add_polygon(figure, box_polygon(lode, i), colour_of(lode$cumulative[i]), "white")
+      figure <- add_polygon(figure, box_polygon(lode, i), colour_of(lode$cumulative[i]))
     }
   }
   for (member in members) {  # the next traces: invisible points carrying the tooltips
@@ -526,7 +525,7 @@ plot_exit_sankey_interactive <- function(schedule) {
   # Meeting columns: one box per leaving slot with its number; members who don't attend are faded.
   boxes <- lapply(seq_len(nrow(strata)), function(i) {
     list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i],
-         y1 = strata$ymax[i], line = list(color = "grey", width = 0.6),
+         y1 = strata$ymax[i], line = list(width = 0),
          fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0)")
   })
   note <- function(x, y, text, anchor = "center", clickable = FALSE) {
