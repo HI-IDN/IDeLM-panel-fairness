@@ -49,6 +49,7 @@ code/
   run_panel_scenarios.sh  all scenarios of the book
   run_experiments.py      parameter experiments (results in data/tdf/experiments/)
   export_docs_data.py     copies the results the book needs into docs/data/
+  panel_palette.R         colours of all figures (HÍ design standard)
   panel_workload.R        data figures and tables (ggplot2)
   panel_schedule.R        model figures and tables (ggplot2)
 data/
