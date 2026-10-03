@@ -149,19 +149,19 @@ plot_compare <- function(runs, value, title, fill_label, digits = 0) {
   totals <- runs %>% group_by(number) %>% summarise(v = sum(v), .groups = "drop") %>%
     mutate(member = factor("Samtals", levels = levels(runs$member)))
   # Distinct colour steps rather than a smooth gradient, so neighbouring values are easy to tell
-  # apart, blue (low) to red (high): one colour per value for a few whole numbers (meetings), otherwise binned.
+  # apart, light (low) to dark (high), the same scale as the other heatmaps: one colour per value for a few whole numbers (meetings), otherwise binned.
   few_values <- all(runs$v == round(runs$v)) && n_distinct(runs$v) <= 9
   if (few_values) {
     runs <- runs %>% mutate(fill = factor(v, levels = sort(unique(v))))
-    fill_scale <- scale_fill_manual(values = hi_diverging(nlevels(runs$fill)), name = fill_label, guide = guide_legend(reverse = TRUE))
+    fill_scale <- scale_fill_manual(values = hi_sequential(nlevels(runs$fill)), name = fill_label, guide = guide_legend(reverse = TRUE))
   } else {
     runs <- runs %>% mutate(fill = v)
-    fill_scale <- scale_fill_stepsn(colours = hi_diverging(7), n.breaks = 7, name = fill_label)
+    fill_scale <- scale_fill_stepsn(colours = hi_sequential(7), n.breaks = 7, name = fill_label)
   }
   ggplot(runs, aes(x = number, y = member, fill = fill)) +
     geom_tile(colour = "white", linewidth = 0.8) +
     geom_text(aes(label = format(round(v, digits), nsmall = digits, decimal.mark = ","),
-                  colour = abs(v - (min(v) + max(v)) / 2) > 0.4 * (max(v) - min(v))), size = 3) +
+                  colour = v > (min(v) + max(v)) / 2), size = 3) +
     geom_tile(data = totals, aes(x = number, y = member), inherit.aes = FALSE,
               fill = "grey92", colour = "white", linewidth = 0.8) +
     geom_text(data = totals, aes(x = number, y = member, label = format(round(v, digits), nsmall = digits,

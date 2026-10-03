@@ -20,12 +20,9 @@ pay_colours <- c("Start fee" = hi[["border"]], role_colours[c("Editor", "Reader"
 # One colour per scenario, in the order of `scenarios`.
 scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "coral", "engineering", "yellow")])
 
-# Low-to-high values (counts, peel-off points): the magma scale, light yellow to dark purple. Not a
-# blue one, since blue is "low" in the diverging scale below.
+# Low-to-high values (counts, peel-off points, differences between scenarios): the magma scale,
+# light yellow to dark purple. Not a blue one, so blue does not mean both low and high.
 hi_sequential <- function(n) viridisLite::viridis(n, option = "magma", direction = -1, begin = 0.15, end = 0.9)
-# Below / above the middle: HÍ blue to white to coral (blue = low, as in the former RdBu).
-hi_diverging <- function(n) grDevices::colorRampPalette(c(hi[["blue"]], "#FFFFFF", hi[["coral"]]))(n)
-
 # Few / medium / many (the Sankey groups).
 tertile_colours <- c("Fæstir" = hi[["yellow"]], "Miðlungs" = hi[["coral"]], "Flestir" = hi[["blue"]])
 
