@@ -97,7 +97,7 @@ from the model variables, so it shows what the plan actually does.
 | Nothing is added to the next, announced meeting (`--next-meeting M3`); its proposals may be postponed at a cost | hard / cost `postpone_penalty` |
 | In the first meeting everyone attends with exactly one proposal (when it is still open) | hard |
 | A member has at most `max_per_member` = 5 own proposals in a meeting not yet held | hard |
-| … and preferably at most `soft_max_per_member` = 4 | cost `soft_max_weight` per extra proposal |
+| … and preferably at most `soft_max_per_member` = 4 (optional; switched off when it is not below the hard limit) | cost `soft_max_weight` per extra proposal |
 | Own proposals per meeting close to a target (3.5 experienced, 2.5 new) | cost `target_weight` |
 | A member with a conflict of interest has left before that proposal comes up | cost `coi_penalty` each time not |
 | Optional rotation (`--rotate-wait`): the members of the last proposal of a meeting leave early at the next meeting, or (`-1`) skip it | hard, experimental |
@@ -130,6 +130,17 @@ Two further options apply to all the step modes:
 * `--meetings-slack s` holds step 1 at its value plus *s* instead of exactly. Step 1 otherwise
   treats a meeting attended as worth any amount of waiting, so α never gets to trade a meeting for
   α slots of waiting; a slack of one or two lets the later steps do that.
+* `--fewest-meetings R05 ...` (or `fewest_meetings` in the settings) adds a step before all the
+  others that minimises the number of meetings these members attend, and holds it. For a member who
+  has asked for as few meetings as possible, with the highest priority.
+* `--windows <csv>` (or `windows` in the settings) sets the times a member can be present within a
+  meeting: columns `member, meeting, from, to`, times as `HH:MM`, either left empty for an open end,
+  meeting `*` for every meeting. Times become slots through `meeting_start` and `slot_minutes`
+  (slot *k* runs from start + (*k* − 1)·d to start + *k*·d, and must lie wholly inside the window),
+  and `leave_margin_minutes` is taken off every end time so nobody is planned to the edge of when
+  they must leave. A member's own proposals then go in slots inside the window. The slots
+  before a late arrival are free (not counted as waiting), so someone who arrives late is not
+  penalised for the proposals they miss. `check_agenda.py --windows` checks it.
 * `--no-worse-than <agenda.csv>` adds two first steps. Step −1 minimises the rule penalties alone:
   a conflicted member present (one who still has an own proposal later in the meeting, so would
   have to step out and come back in) and postponed proposals. Step 0 then makes the total excess
@@ -201,8 +212,8 @@ Output: `<prefix>_panel.csv`, in the format of `panel.csv`, so it can be schedul
 Checks an agenda against the rules of its scenario, independently of the model: held meetings as
 they were, closed meetings as planned, nothing added to the next meeting, per-member limits.
 With `--keep-meetings` it checks that no proposal left its planned meeting, and with
-`--first-meeting-rule` that everyone has exactly one proposal in the first meeting; `--unavailable`
-and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable
+`--first-meeting-rule` that everyone has exactly one proposal in the first meeting; `--unavailable`,
+`--windows` and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable
 meetings and proposals edited by new members coming up too early (held meetings excepted). It also
 prints, without counting them as problems, the conflicted members present and the fairness measures of
 the agenda. `run_panel_scenarios.sh` runs it after every schedule.

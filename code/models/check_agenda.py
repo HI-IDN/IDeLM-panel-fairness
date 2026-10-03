@@ -32,7 +32,7 @@ import os
 import yaml
 
 from models.panel_model import (fairness_metrics, member_measures, read_alpha, read_new_members,
-                                read_panel, read_unavailable)
+                                read_panel, read_unavailable, read_windows)
 
 
 def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_meeting=None,
@@ -42,12 +42,16 @@ def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_
     taken from data.unavailable; not_before is {proposal: first meeting it may go to}."""
     problems = []
     held_meetings = {data.fixed_meeting[p] for p in data.fixed_position}
-    for p, m, _ in agenda:
+    for p, m, k in agenda:
         if m in held_meetings:
             continue
         away = [r for r in data.reviewers.get(p, ()) if m in data.unavailable.get(r, ())]
         if away:
             problems.append(f'{p} is in {m}, which {", ".join(away)} cannot attend')
+        for r in data.reviewers.get(p, ()):
+            first_slot, last_slot = data.windows.get((r, m), (1, None))
+            if k < first_slot or (last_slot is not None and k > last_slot):
+                problems.append(f'{p} is in {m} slot {k}, outside the time window of {r}')
         first = (not_before or {}).get(p)
         if first and int(m[1:]) < int(first[1:]):  # meetings are M1, M2, ... in date order
             problems.append(f'{p} is in {m}, before {first}')
@@ -147,6 +151,8 @@ def main():
     parser.add_argument('--alpha', type=float, default=2.0, help='cost of a meeting in the fairness measures')
     parser.add_argument('--alpha-file', help='CSV (member, alpha): alpha per member; others get --alpha')
     parser.add_argument('--unavailable', help='CSV of meetings members cannot attend (member, meeting)')
+    parser.add_argument('--windows', help='CSV of times members can be present within a meeting '
+                                          '(member, meeting, from, to)')
     parser.add_argument('--new-editor-from', nargs='?', const='settings',
                         help='meeting from which proposals edited by new members may come up (alone: '
                              'new_editor_from in the settings, M5)')
@@ -159,6 +165,11 @@ def main():
         data.fixed_meeting, data.fixed_position = {}, {}
     if args.unavailable:
         data.unavailable = read_unavailable(args.unavailable)
+    if args.windows:
+        with open(args.config, encoding='utf-8') as f:
+            settings = yaml.safe_load(f)
+        data.windows = read_windows(args.windows, data.meetings, settings['meeting_start'],
+                                    settings['slot_minutes'], settings.get('leave_margin_minutes', 0))
     not_before = {}
     if args.new_editor_from:
         with open(args.config, encoding='utf-8') as f:
