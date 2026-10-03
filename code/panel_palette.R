@@ -24,8 +24,9 @@ tertile_colours <- setNames(hi_sequential(3), c("Fæstir", "Miðlungs", "Flestir
 # Lower bound and incumbent of the solver (the gap figure).
 gap_colours <- c("Besta lausn sem fannst" = okabe[["vermillion"]], "Neðra mark" = okabe[["blue"]])
 
-# Highlight in the interactive figures.
-hi_highlight <- okabe[["vermillion"]]
+# Highlight in the interactive figures, where one line is selected at a time: dark blue (the HÍ
+# dark blue), which stands out from the grey lines.
+hi_highlight <- "#0A0668"
 
 # One colour per member. With this many members no palette is fully colour-blind safe, so the
 # Okabe-Ito colours are used in turn, then the same in a lighter shade; the codes label the bands.
