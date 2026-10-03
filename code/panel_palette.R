@@ -23,7 +23,7 @@ scenario_palette <- unname(hi[c("muted", "blue", "turquoise", "dark_blue", "cora
 # Low-to-high values (counts, peel-off points): light yellow through orange and coral to the HÍ
 # blue, so the high half (white text in the figures) is dark enough to read.
 hi_sequential <- function(n) {
-  stops <- c(0, 0.3, 0.5, 0.7, 1)
+  stops <- c(0, 0.15, 0.3, 0.55, 1)
   colours <- c(hi_tint(hi[["yellow"]], 0.6), hi[["orange"]], hi[["coral"]], hi[["blue"]], hi[["dark_blue"]])
   channels <- t(grDevices::col2rgb(colours))
   at <- seq(0, 1, length.out = n)
