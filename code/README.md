@@ -138,9 +138,9 @@ Two further options apply to all the step modes:
   meeting `*` for every meeting. Times become slots through `meeting_start` and `slot_minutes`
   (slot *k* runs from start + (*k* − 1)·d to start + *k*·d, and must lie wholly inside the window),
   and `leave_margin_minutes` is taken off every end time so nobody is planned to the edge of when
-  they must leave. A member's own proposals then go in slots inside the window. Waiting is still
-  counted from the first slot, so a late arrival is slightly overstated. `check_agenda.py --windows`
-  checks it.
+  they must leave. A member's own proposals then go in slots inside the window. The slots
+  before a late arrival are free (not counted as waiting), so someone who arrives late is not
+  penalised for the proposals they miss. `check_agenda.py --windows` checks it.
 * `--no-worse-than <agenda.csv>` adds two first steps. Step −1 minimises the rule penalties alone:
   a conflicted member present (one who still has an own proposal later in the meeting, so would
   have to step out and come back in) and postponed proposals. Step 0 then makes the total excess

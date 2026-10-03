@@ -165,6 +165,7 @@ def member_measures(data, agenda, alpha):
     meeting), waiting (proposals of others sat through) and burden = alpha * meetings + waiting,
     the quantity the fairness steps compare. alpha is a number or {member: value}."""
     leave, own = defaultdict(int), defaultdict(int)
+    held = {data.fixed_meeting[p] for p in data.fixed_position}
     for p, (m, k) in agenda.items():
         for r in data.reviewers.get(p, ()):
             leave[r, m] = max(leave[r, m], k)
@@ -173,7 +174,9 @@ def member_measures(data, agenda, alpha):
     for r in data.members:
         a = alpha[r] if isinstance(alpha, dict) else alpha
         meetings = [m for (s, m) in leave if s == r]
-        slots = sum(leave[r, m] for m in meetings)
+        # Slots before a late arrival are not waiting: a member's window opens at slot `first`.
+        slots = sum(leave[r, m] - (0 if m in held else data.windows.get((r, m), (1, None))[0] - 1)
+                    for m in meetings)
         n = len(data.proposals_of(r))
         waiting = slots - sum(own[r, m] for m in meetings)
         burden = a * len(meetings) + waiting
@@ -604,8 +607,8 @@ class PanelScheduleModel:
                 self.m.addConstr(self.leave[r, m] <= len(self.slots[m]) * self.a[r, m],
                                  name=f'leave_attend[{r},{m}]')
         # Time windows: where a member can only be present part of a meeting, their own proposals
-        # there go in slots inside the window (held meetings already happened). Waiting is still
-        # counted from the first slot, so a late arrival is slightly overstated.
+        # there go in slots inside the window (held meetings already happened). The slots before a
+        # late arrival are free: _stay leaves them out of the waiting.
         for (r, m), (first, last) in data.windows.items():
             if (r, m) not in self.leave or m in held:
                 continue
@@ -675,13 +678,19 @@ class PanelScheduleModel:
                         self.m.addConstr(self.a[r, nxt] <= 1 - last, name=f'rotate[{p},{r},{m}]')
                         continue
                     big_m = len(self.slots[nxt])
-                    waiting = self.leave[r, nxt] - self._own(r, nxt)
+                    waiting = self._stay(r, nxt) - self._own(r, nxt)
                     self.m.addConstr(waiting <= self.rotate_wait + big_m * (1 - last),
                                      name=f'rotate[{p},{r},{m}]')
 
+    def _stay(self, r, m):
+        """Slots member r sits through in meeting m: up to the slot of their last proposal, minus
+        the slots before the window opens for a late arrival (not waiting: they are not there)."""
+        free = 0 if m in self.held else self.data.windows.get((r, m), (1, None))[0] - 1
+        return self.leave[r, m] - free * self.a[r, m] if free else self.leave[r, m]
+
     def burden(self, r):
         """Commitment (alpha per meeting attended) plus waiting (slot of the last proposal)."""
-        return quicksum(self.alpha[r] * self.a[r, m] + self.leave[r, m] for m in self.meetings_of[r])
+        return quicksum(self.alpha[r] * self.a[r, m] + self._stay(r, m) for m in self.meetings_of[r])
 
     def unpaid(self, r, carry=True):
         """The burden the fairness steps compare: alpha per meeting attended plus waiting (proposals
@@ -722,7 +731,7 @@ class PanelScheduleModel:
         equity = 0
         for r in data.members:
             n = len(data.proposals_of(r))
-            waiting = quicksum(self.leave[r, m] for m in self.meetings_of[r]) - n
+            waiting = quicksum(self._stay(r, m) for m in self.meetings_of[r]) - n
             attended = quicksum(self.a[r, m] for m in self.meetings_of[r])
             share = 0  # c * attended[r]
             for m in self.meetings_of[r]:
@@ -755,7 +764,7 @@ class PanelScheduleModel:
         for r in self.new_members & set(self.data.members):
             for m in early:
                 if (r, m) in self.leave:
-                    total += self.leave[r, m] - self._own(r, m)
+                    total += self._stay(r, m) - self._own(r, m)
         return total
 
     def _set_objective(self):
@@ -768,7 +777,7 @@ class PanelScheduleModel:
         # Waiting = slots stayed minus own proposals = proposals of others sat through.
         for r in self.data.members:
             n = len(self.data.proposals_of(r))
-            waiting = quicksum(self.leave[r, m] for m in self.meetings_of[r]) - n
+            waiting = quicksum(self._stay(r, m) for m in self.meetings_of[r]) - n
             if self.max_waiting is not None:  # nobody waits longer than in a reference plan
                 self.m.addConstr(waiting <= self.max_waiting, name=f'max_waiting[{r}]')
             if self.fairness == 'total':
@@ -842,7 +851,7 @@ class PanelScheduleModel:
             # member present, a postponed proposal), then the total excess burden over that plan
             # (zero when nobody needs to be worse off). The rules go first because the excess step
             # would otherwise trade them for burden, and its value is held from then on.
-            waiting = quicksum(self.leave.values()) - sum(len(trio) for trio in self.data.reviewers.values())
+            waiting = quicksum(self._stay(r, m) for r, m in self.leave) - sum(len(trio) for trio in self.data.reviewers.values())
             rules = self.postpone_penalty * postponed + self.coi_penalty * quicksum(self.coi_present.values())
             meetings = (quicksum(self.a.values()) + rules
                         + len(self.data.members) * (self.target_weight * deviation + self.pair_weight * excess
