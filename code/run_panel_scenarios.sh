@@ -14,6 +14,14 @@ P=../data/tdf/panel.csv
 R=${RESULTS:-../data/tdf/results}
 mkdir -p "$R"
 
+# The round's real constraints, when their (gitignored) files exist: members' absences and time
+# windows, alpha per member by number of proposals, and the member who wants the fewest meetings.
+D=../data/tdf
+ROUND=""; CHECK_ROUND=""
+[ -f $D/unavailable.csv ] && { ROUND="$ROUND --unavailable $D/unavailable.csv --fewest-meetings ${FEWEST:-R02}"; CHECK_ROUND="$CHECK_ROUND --unavailable $D/unavailable.csv"; }
+[ -f $D/windows.csv ] && { ROUND="$ROUND --windows $D/windows.csv"; CHECK_ROUND="$CHECK_ROUND --windows $D/windows.csv"; }
+[ -f $D/alpha_tiers.csv ] && ROUND="$ROUND --alpha-file $D/alpha_tiers.csv"
+
 wanted() { [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" $1 "* ]]; }
 
 run() {  # run <name> <model options...>
@@ -22,7 +30,7 @@ run() {  # run <name> <model options...>
   echo "$(date +%H:%M) $name: start"
   # MODEL_OPTIONS come first, so options given for one run below take precedence.
   # shellcheck disable=SC2086  # MODEL_OPTIONS is a list of options
-  if python -m models.panel_model "${PANEL:-$P}" ${MODEL_OPTIONS:-} "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
+  if python -m models.panel_model "${PANEL:-$P}" ${MODEL_OPTIONS:-} $ROUND "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
     echo "$(date +%H:%M) $name: $(grep -E '^objective' "$R/$name.log")"
   else
     echo "$(date +%H:%M) $name: FAILED (see $R/$name.log)"
@@ -32,7 +40,7 @@ run() {  # run <name> <model options...>
 check() {  # check <name> <check options...>: the agenda follows the rules of its scenario
   local name=$1; shift
   wanted "$name" || return 0
-  python -m models.check_agenda "${PANEL:-$P}" "$R/${name}_agenda.csv" "$@" | tail -1 | sed "s/^/  $name check: /"
+  python -m models.check_agenda "${PANEL:-$P}" "$R/${name}_agenda.csv" $CHECK_ROUND "$@" | tail -1 | sed "s/^/  $name check: /"
 }
 
 roles() {  # roles <name> <role model options...>: reviewers and roles (models/role_model.py)
@@ -51,24 +59,25 @@ roles() {  # roles <name> <role model options...>: reviewers and roles (models/r
 # 1. The staff's meetings, fair order within each meeting.
 run current --keep-meetings --fix-meetings M3 --time-limit 300
 check current --closed M3 --max-per-member 6 --keep-meetings
-# 2. Next meeting (M3) fixed, later meetings re-optimised.
-run free --next-meeting M3 --start "$R/current_agenda.csv" --time-limit 1200
-check free --next-meeting M3 --max-per-member 5
+# 2. M1 and M2 held and M3 as announced (its order is free); later meetings re-optimised.
+# The caps on own proposals per meeting do not apply to M3, where the proposals are fixed.
+run free --fix-meetings M1 M2 M3 --start "$R/current_agenda.csv" --time-limit 1200
+check free --closed M3 --max-per-member 5
 # 2 for comparison: no fairness step, the fewest meetings and then the least total waiting.
-run free_sum --next-meeting M3 --fairness lexsum --start "$R/free_agenda.csv" --time-limit 1200
-check free_sum --next-meeting M3 --max-per-member 5
+run free_sum --fix-meetings M1 M2 M3 --fairness lexsum --start "$R/free_agenda.csv" --time-limit 1200
+check free_sum --closed M3 --max-per-member 5
 # 2 with leximin of the burden instead of only the worst-off member: the three largest burdens in
 # turn (leximin_levels in panel_model.yml; --leximin-levels 0 for all members, one solve each).
-run free_leximin --next-meeting M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
-check free_leximin --next-meeting M3 --max-per-member 5
+run free_leximin --fix-meetings M1 M2 M3 --fairness leximin --start "$R/free_agenda.csv" --time-limit 1200
+check free_leximin --closed M3 --max-per-member 5
 # As free_leximin, with first steps that keep every member at most as burdened as in scenario 1
 # (the staff's meetings) where the rules allow it. Warm-started from that plan, which has no excess.
-run free_noworse --next-meeting M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
+run free_noworse --fix-meetings M1 M2 M3 --fairness leximin --no-worse-than "$R/current_agenda.csv" \
   --start "$R/current_agenda.csv" --time-limit 1200
-check free_noworse --next-meeting M3 --max-per-member 5
+check free_noworse --closed M3 --max-per-member 5
 # 3. As 2, at most 4 own proposals per meeting.
-run free_max4 --next-meeting M3 --max-per-member 4 --start "$R/free_agenda.csv" --time-limit 1200
-check free_max4 --next-meeting M3 --max-per-member 4
+run free_max4 --fix-meetings M1 M2 M3 --max-per-member 4 --start "$R/free_agenda.csv" --time-limit 1200
+check free_max4 --closed M3 --max-per-member 4
 # 4. The whole round planned from the start (nothing fixed).
 run scratch --from-scratch --start "$R/free_max4_agenda.csv" --time-limit 1800
 check scratch --from-scratch --max-per-member 5 --first-meeting-rule
