@@ -22,15 +22,21 @@ ROUND=""; CHECK_ROUND=""
 [ -f $D/windows.csv ] && { ROUND="$ROUND --windows $D/windows.csv"; CHECK_ROUND="$CHECK_ROUND --windows $D/windows.csv"; }
 [ -f $D/alpha_tiers.csv ] && ROUND="$ROUND --alpha-file $D/alpha_tiers.csv"
 
+# The staff's plan (scenario 1) is given: it ignores the absences, so they are left out of its run
+# and check (a proposal fixed to a meeting its reviewer cannot attend would make the model infeasible).
+ROUND_STAFF=${ROUND//--unavailable $D\/unavailable.csv --fewest-meetings ${FEWEST:-R02}/}
+CHECK_STAFF=${CHECK_ROUND//--unavailable $D\/unavailable.csv/}
+
 wanted() { [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" $1 "* ]]; }
 
 run() {  # run <name> <model options...>
   local name=$1; shift
   wanted "$name" || return 0
+  local OPTS=$ROUND; [ "$name" = current ] && OPTS=$ROUND_STAFF
   echo "$(date +%H:%M) $name: start"
   # MODEL_OPTIONS come first, so options given for one run below take precedence.
   # shellcheck disable=SC2086  # MODEL_OPTIONS is a list of options
-  if python -m models.panel_model "${PANEL:-$P}" ${MODEL_OPTIONS:-} $ROUND "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
+  if python -m models.panel_model "${PANEL:-$P}" ${MODEL_OPTIONS:-} $OPTS "$@" --out "$R/$name" > "$R/$name.log" 2>&1; then
     echo "$(date +%H:%M) $name: $(grep -E '^objective' "$R/$name.log")"
   else
     echo "$(date +%H:%M) $name: FAILED (see $R/$name.log)"
@@ -40,7 +46,7 @@ run() {  # run <name> <model options...>
 check() {  # check <name> <check options...>: the agenda follows the rules of its scenario
   local name=$1; shift
   wanted "$name" || return 0
-  python -m models.check_agenda "${PANEL:-$P}" "$R/${name}_agenda.csv" $CHECK_ROUND "$@" | tail -1 | sed "s/^/  $name check: /"
+  python -m models.check_agenda "${PANEL:-$P}" "$R/${name}_agenda.csv" $([ "$name" = current ] && echo "$CHECK_STAFF" || echo "$CHECK_ROUND") "$@" | tail -1 | sed "s/^/  $name check: /"
 }
 
 roles() {  # roles <name> <role model options...>: reviewers and roles (models/role_model.py)
