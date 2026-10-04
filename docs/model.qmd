@@ -40,7 +40,8 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 * $R = R^e \cup R^n$, $R^e \cap R^n = \emptyset$: fagráðsmenn skiptast í reynda, $R^e$ (e. *experienced*),
   og nýja, $R^n$ (e. *new*).
 * $P_r \subseteq P$: umsóknir fagráðsmanns $r$ (sem ritstjóri eða lesari); $n_r = |P_r|$, þar af
-  $n^E_r$ sem ritstjóri og $n^L_r = n_r - n^E_r$ sem lesari (1. eða 2. lesari).
+  $n^{\text{ed}}_r$ sem ritstjóri (e. *editor*) og $n^{\text{rd}}_r = n_r - n^{\text{ed}}_r$ sem lesari
+  (e. *reader*, 1. eða 2. lesari).
 * $K = \{1, \dots, \bar K\}$: dagskrárliðir á fundi, þar sem $\bar K$ er mesti fjöldi umsókna sem
   fundur ræður við.
 * $\alpha_r$: kostnaður fagráðsmanns $r$ við að mæta á einn fund, í dagskrárliðum.
@@ -111,21 +112,21 @@ sjá @sec-fairness-relative.
 
 **Greiðslur**
 
-Greiðslureglan (lýst í orðum í @sec-data) er sett fram með grunngjaldi $f_0$, greiðslu $f_E$ fyrir
-hvert ritstjórahlutverk og $f_L$ fyrir hvert lesarahlutverk. Greiðsla fagráðsmanns $r$ fyrir lotuna
+Greiðslureglan (lýst í orðum í @sec-data) er sett fram með grunngjaldi $f_0$, greiðslu $f_{\text{ed}}$ fyrir
+hvert ritstjórahlutverk og $f_{\text{rd}}$ fyrir hvert lesarahlutverk. Greiðsla fagráðsmanns $r$ fyrir lotuna
 er
 
 $$
-G_r = f_0 + f_E \, n^E_r + f_L \, n^L_r
+G_r = f_0 + f_{\text{ed}} \, n^{\text{ed}}_r + f_{\text{rd}} \, n^{\text{rd}}_r
 $$ {#eq-pay}
 
 og greiðsla á umsókn
 
 $$
-\frac{G_r}{n_r} = f_L + (f_E - f_L) \, \frac{n^E_r}{n_r} + \frac{f_0}{n_r}.
+\frac{G_r}{n_r} = f_{\text{rd}} + (f_{\text{ed}} - f_{\text{rd}}) \, \frac{n^{\text{ed}}_r}{n_r} + \frac{f_0}{n_r}.
 $$ {#eq-pay-per-proposal}
 
-Greiðsla á umsókn er því á bilinu $f_L$ (eingöngu lesari) til $f_E$ (eingöngu ritstjóri), að
+Greiðsla á umsókn er því á bilinu $f_{\text{rd}}$ (eingöngu lesari) til $f_{\text{ed}}$ (eingöngu ritstjóri), að
 viðbættum hlut grunngjaldsins, $f_0 / n_r$. Greiðslan $G_r$ ræðst eingöngu af hlutverkum og breytist
 því ekki með fundaskipan.
 
