@@ -118,6 +118,13 @@ def main():
         for c in (pr['editor'], pr['reader1'], pr['reader2']):
             if c:
                 own_positions.setdefault((r['meeting'], c), []).append(int(r['position']))
+    # Consistency checks on codes, before any real value is looked up.
+    codes = [r['application'] for r in agenda]
+    assert len(codes) == len(set(codes)), 'a proposal appears twice in the agenda'
+    assert set(codes) <= set(panel), 'agenda has a proposal that is not in panel.csv'
+    for m in meetings:
+        slots = sorted(int(r['position']) for r in agenda if r['meeting'] == m)
+        assert slots == list(range(1, len(slots) + 1)), f'{m}: positions are not 1..n'
     wb = Workbook()
     ws = wb.active
     ws.title = 'Yfirlit'
@@ -192,7 +199,12 @@ def main():
             sheet.append([f'{m} (haldinn)' if m in held else m, date_text(date_of[m]) if m in date_of else '', pos, slot_time(pos), appl(a),
                           who(p['editor']), who(p['reader1']), who(p['reader2']), '; '.join(notes)])
         style_sheet(sheet, [14, 13, 6, 8, 60, 14, 14, 14, 48], head_row)
+    sheet_counts = {m: wb[m].max_row - 1 for m in meetings}
+    for m in meetings:
+        assert sheet_counts[m] == count.get(m, 0), f'{m}: sheet rows differ from the agenda'
+    assert sum(sheet_counts.values()) == len(agenda)
     wb.save(args.out)
+    print('checks passed: counts per meeting match the agenda, each proposal once, positions 1..n')
     print(f'{len(agenda)} scheduled proposals in {len(meetings)} meeting sheets; '
           f'{len(moved)} moved from {args.first_open}; {len(unscheduled)} not scheduled; wrote {args.out}')
 
