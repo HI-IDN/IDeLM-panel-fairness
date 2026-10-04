@@ -67,6 +67,17 @@ hafa ekki eigið gildi fá sjálfgefið gildi. Í bili fá allir fagráðsmenn s
 þeirra. Í núverandi útgáfu líkansins hefur $\alpha_r$ minni áhrif en þetta gefur til kynna, því
 fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 
+Við skipulag þeirra funda sem eftir eru í yfirstandandi lotu, með raunverulegum fjarvistum, prófuðum
+við að gefa þeim sem hafa flestar umsóknir hærra $\alpha_r$. Annars vegar $\alpha_r = 4$ fyrir þá tvo
+sem hafa 23 umsóknir hvor, hins vegar $\alpha_r = 4$ fyrir þá og $\alpha_r = 3$ fyrir þá tvo sem hafa 20,
+með hörðu hámarki um 4 eigin umsóknir hvers á fund. Fyrri tilraunin sýndi að hærra $\alpha_r$ færir
+bið frá þeim sem hafa margar umsóknir til annarra; sú síðari er sama hugmynd útvíkkuð til fleiri
+áþekkra fagráðsmanna og er hún sú sem hér er greint frá. Samanborið við $\alpha = 2$ fyrir alla fór
+heildarbið úr 670 í 716 punkta og mesta bið einhvers úr 55 í 48, en mesta byrði úr 71 í 62 (Gini-stuðull
+óbreyttur, 0,147). Mesta byrðin er ekki beinn samanburður, því $\alpha_r$ er hærra hjá þeim sem bera
+hana. Niðurstaðan er því málamiðlun: hærra $\alpha_r$ hjá þeim sem hafa flestar umsóknir léttir á þeim
+en kostar nokkra viðbótarbið hjá öðrum.
+
 ## Fundir sem fagráðsmaður kemst ekki á
 
 Sumir fagráðsmenn vita fyrir fram að þeir komast ekki á tiltekna fundi vegna annarra skuldbindinga.
