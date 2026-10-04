@@ -68,7 +68,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--agenda', required=True, help='agenda CSV (meeting, position, application)')
     ap.add_argument('--members', required=True, help='members CSV of the same run')
-    ap.add_argument('--coi', help='coi_present CSV of the same run (conflicted members present)')
+    ap.add_argument('--coi', help='accepted for compatibility; conflicts are read from the agenda itself')
     ap.add_argument('--panel', default='../data/tdf/panel.csv')
     ap.add_argument('--key', default='../data/tdf/panel_key.csv', help='pseudonym key (local, gitignored)')
     ap.add_argument('--raw', default='../data/tdf/TDF2026.csv', help='raw extract with titles and dates (local)')
@@ -85,7 +85,6 @@ def main():
     panel = {r['application']: r for r in read(args.panel)}
     agenda = read(args.agenda)
     members = read(args.members)
-    coi_present = {(r['application'], r['member']) for r in read(args.coi)} if args.coi else set()
 
     key = read(args.key)
     app_orig = {r['code']: r['original'] for r in key if r['kind'] == 'application'}
@@ -113,6 +112,12 @@ def main():
     unscheduled = sorted(a for a in panel if a not in scheduled)
     moved_to = {r['application']: r['meeting'] for r in agenda if r['application'] in moved}
 
+    own_positions = {}  # (meeting, member) -> positions of the member's own proposals
+    for r in agenda:
+        pr = panel[r['application']]
+        for c in (pr['editor'], pr['reader1'], pr['reader2']):
+            if c:
+                own_positions.setdefault((r['meeting'], c), []).append(int(r['position']))
     wb = Workbook()
     ws = wb.active
     ws.title = 'Yfirlit'
@@ -170,25 +175,23 @@ def main():
     header = ['Fundur', 'Dagsetning', 'Röð', 'Tími', 'Umsókn', 'Ritstjóri', '1. lesari', '2. lesari', 'Athugasemd']
     for m in meetings:
         sheet = wb.create_sheet(m)
-        if m in held:
-            sheet.append([f'{m} - haldinn'])
-            sheet['A1'].font = Font(bold=True)
-        head_row = sheet.max_row + 1
+        head_row = 1
         sheet.append(header)
         for (mm, pos), a in sorted((k, v) for k, v in placed.items() if k[0] == m):
             p = panel[a]
             notes = []
             if a in moved:
                 notes.append(f'færð af {args.first_open}')
-            conflicted = [c for c in p['coi'].split(';') if c]
-            for c in conflicted:
-                if (a, c) in coi_present:
-                    notes.append(f'{who(c)} er vanhæf(ur) en mætir á fundinn: víkur þegar umsókn er rædd')
-                else:
-                    notes.append(f'{who(c)} er vanhæf(ur): ekki á fundinum')
-            sheet.append([m, date_text(date_of[m]) if m in date_of else '', pos, slot_time(pos), appl(a),
+            for c in [c for c in p['coi'].split(';') if c]:
+                own = own_positions.get((m, c), [])
+                later = [q for q in own if q > pos]
+                if later:
+                    notes.append(f'{who(c)} er vanhæf(ur): bregður frá fundi (byrjar aftur {later[0] - pos} umsóknir)')
+                elif own:
+                    notes.append(f'{who(c)} er vanhæf(ur): farinn af fundinum')
+            sheet.append([f'{m} (haldinn)' if m in held else m, date_text(date_of[m]) if m in date_of else '', pos, slot_time(pos), appl(a),
                           who(p['editor']), who(p['reader1']), who(p['reader2']), '; '.join(notes)])
-        style_sheet(sheet, [8, 13, 6, 8, 60, 14, 14, 14, 48], head_row)
+        style_sheet(sheet, [14, 13, 6, 8, 60, 14, 14, 14, 48], head_row)
     wb.save(args.out)
     print(f'{len(agenda)} scheduled proposals in {len(meetings)} meeting sheets; '
           f'{len(moved)} moved from {args.first_open}; {len(unscheduled)} not scheduled; wrote {args.out}')
