@@ -74,6 +74,8 @@ def main():
     ap.add_argument('--meetings', default='M1,M2,M3,M4,M5,M6,M7,M8,M9')
     ap.add_argument('--held', default='M1,M2', help='meetings already held')
     ap.add_argument('--first-open', default='M3', help='the meeting proposals are moved from')
+    ap.add_argument('--author', default='Helga Ingimundardóttir, helgaingim@hi.is',
+                    help='author name and contact, written to the workbook properties and the Yfirlit sheet')
     ap.add_argument('--out', default='../data/tdf/results/fundaaaetlun_taeknithrounarsjodur_haust2026.xlsx')
     args = ap.parse_args()
 
@@ -121,6 +123,11 @@ def main():
         ('Mesta byrði eins fulltrúa (alfa × fundir + bið)', int(max(burden))),
         ('Lengd rauf (mín.)', SLOT_MINUTES),
     ]
+    if args.author:
+        wb.properties.creator = args.author
+        wb.properties.lastModifiedBy = args.author
+        ws.append(['Höfundur', args.author])
+        ws.append([])
     ws.append(['Lykiltölur', ''])
     for r in rows:
         ws.append(list(r))
@@ -145,7 +152,11 @@ def main():
     for a in unscheduled:
         ws.append([appl(a), 'á eftir að úthluta'])
     style_sheet(ws, [58, 16, 12, 14, 12], 1)
-    for r in (1, 6, member_header):
+    if args.author:
+        ws['A1'].font = Font(bold=True)
+        ws['A1'].fill = PatternFill(fill_type=None)
+    off = 2 if args.author else 0
+    for r in (1 + off, 6 + off, member_header):
         for cell in ws[r]:
             if cell.value is not None:
                 cell.font = Font(bold=True)
