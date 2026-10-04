@@ -12,7 +12,7 @@ Run from code/:
     python export_plan_xlsx.py --agenda ../data/tdf/results/round4_agenda.csv \
         --members ../data/tdf/results/round4_members.csv --coi ../data/tdf/results/round4_coi_present.csv \
 
-The output defaults to ../data/tdf/results/fundaaaetlun_taeknithrounarsjodur_haust2026.xlsx.
+The output defaults to ../data/tdf/results/fundaaetlun_taeknithrounarsjodur_haust2026.xlsx.
 """
 import argparse
 import csv
@@ -77,7 +77,7 @@ def main():
     ap.add_argument('--first-open', default='M3', help='the meeting proposals are moved from')
     ap.add_argument('--author', default='Helga Ingimundardóttir, helgaingim@hi.is',
                     help='author name and contact, written to the workbook properties and the Yfirlit sheet')
-    ap.add_argument('--out', default='../data/tdf/results/fundaaaetlun_taeknithrounarsjodur_haust2026.xlsx')
+    ap.add_argument('--out', default='../data/tdf/results/fundaaetlun_taeknithrounarsjodur_haust2026.xlsx')
     args = ap.parse_args()
 
     meetings = args.meetings.split(',')
