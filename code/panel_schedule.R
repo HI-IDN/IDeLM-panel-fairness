@@ -609,7 +609,8 @@ plot_exit_sankey_interactive <- function(schedule) {
 }
 
 # Heatmap view: members in rows, meetings in columns; the number is the slot after which they leave
-# (blank = not attending) and the colour is their peel-off points so far.
+# (blank = not attending) and the colour is their peel-off points so far. Below it, in the white space
+# next to the colour bar: histograms of peel-off points over the round and per meeting attended.
 plot_exit_heatmap <- function(schedule) {
   flow <- exit_flow(schedule)
   order <- flow %>% group_by(member) %>% summarise(total = max(cumulative), .groups = "drop") %>%
@@ -619,7 +620,7 @@ plot_exit_heatmap <- function(schedule) {
   totals <- flow %>% group_by(member) %>%
     summarise(total = max(cumulative), per_meeting = total / sum(leave > 0), .groups = "drop")
   n <- nlevels(flow$meeting)
-  ggplot(flow, aes(x = meeting, y = member)) +
+  heat <- ggplot(flow, aes(x = meeting, y = member)) +
     geom_tile(aes(fill = if_else(leave > 0, cumulative, NA_integer_)), colour = "white", linewidth = 0.6) +
     geom_text(aes(label = if_else(leave > 0, as.character(leave), ""),
                   colour = cumulative > max(cumulative) / 2), size = 2.8) +
@@ -630,7 +631,8 @@ plot_exit_heatmap <- function(schedule) {
     annotate("text", x = c(n + 0.9, n + 1.8), y = length(order) + 0.9, label = c("Samtals", "Á fund"),
              size = 2.9, fontface = "bold", colour = "grey20") +
     scale_fill_gradientn(colours = hi_sequential(256), na.value = "grey95",
-                         name = "Uppsafnaðir biðpunktar") +
+                         name = "Uppsafnaðir biðpunktar",
+                         guide = guide_colourbar(title.position = "top")) +
     scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "black"), guide = "none") +
     scale_x_discrete(expand = expansion(add = c(0.6, 2.1))) +
     scale_y_discrete(expand = expansion(add = c(0.6, 1.4))) +
@@ -639,8 +641,23 @@ plot_exit_heatmap <- function(schedule) {
                            "Hægra megin: biðpunktar yfir lotuna, samtals og á hvern fund sem mætt er á"),
          x = NULL, y = NULL) +
     theme_panel +
-    theme(panel.grid = element_blank(), legend.position = "bottom", legend.key.width = unit(40, "pt"),
-          legend.title.position = "top")
+    theme(panel.grid = element_blank(), legend.position = "bottom", legend.key.width = unit(30, "pt"))
+  bar <- cowplot::get_legend(heat)
+  hist_theme <- theme_panel + theme(panel.grid.major.y = element_line(colour = "grey92"))
+  bar_fill <- hi_sequential(3)[2]
+  per_member <- ggplot(totals, aes(x = total)) +
+    geom_histogram(binwidth = 5, boundary = 0, fill = bar_fill, colour = "white") +
+    scale_y_continuous(breaks = scales::breaks_pretty(), expand = expansion(mult = c(0, 0.05))) +
+    labs(x = "Biðpunktar yfir lotuna", y = "Fagráðsmenn") + hist_theme
+  per_attended <- flow %>% filter(leave > 0) %>%
+    ggplot(aes(x = waiting)) +
+    geom_histogram(binwidth = 2, boundary = 0, fill = bar_fill, colour = "white") +
+    scale_y_continuous(breaks = scales::breaks_pretty(), expand = expansion(mult = c(0, 0.05))) +
+    labs(x = "Biðpunktar á fund", y = "Fjöldi funda") + hist_theme
+  cowplot::plot_grid(heat + theme(legend.position = "none"),
+                     cowplot::plot_grid(bar, per_member, per_attended, nrow = 1, rel_widths = c(1, 1, 1),
+                                        align = "h", axis = "b"),
+                     ncol = 1, rel_heights = c(3.3, 1))
 }
 
 # Interactive version for the HTML book: all lines grey; hovering a line highlights that member and
