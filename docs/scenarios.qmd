@@ -28,18 +28,20 @@ if (have_plan) {
 ## Sviðsmyndir
 
 Núverandi tillaga starfsmanna TÞS að fundaskipan (hvaða umsókn er á hvaða fundi) er grunnurinn. Í
-öllum sviðsmyndum nema 4 eru M1 og M2 festir eins og þeir voru. Á fundum sem eru ekki búnir hefur enginn fagráðsmaður fleiri en
+öllum sviðsmyndum nema 1 og 4 eru fundir M1, M2 og M3 eins og þeir voru auglýstir: M1 og M2 í
+röðinni sem starfsmenn völdu, og M3 með auglýstum umsóknum, en röðin innan M3 er óþekkt og líkanið
+velur hana. Fundir M4–M9 eru frjálsir. Á fundum sem eru ekki búnir hefur enginn fagráðsmaður fleiri en
 $\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi. Sviðsmynd 1 er undantekning:
 hún heldur fundum starfsmanna, og þar er einn fagráðsmaður með 6 umsóknir á M3. Allar sviðsmyndir
 nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
 
 1. **Tillaga starfsmanna, sanngjörn röð:** sama fundasamsetning, en líkanið raðar umsóknum
    innbyrðis á hverjum fundi á sanngjarnan hátt.
-2. **Næsti fundur festur, restin bestuð:** á næsta fund (M3) má ekki bæta umsókn sem var ekki
-   auglýst, því fagráðsmenn hafa undirbúið sig fyrir auglýstu umsóknirnar. Auglýstri umsókn má þó
-   fresta á seinni fund, eins og við manneklu, en það kostar í markfallinu. Seinni fundir (M4–M9)
-   eru óskorðaðir: líkanið má raða umsóknum á þá upp á nýtt, þar á meðal umsóknum sem eru ekki enn
-   komnar á fund. Fjögur afbrigði eru borin saman, sem eru ólík aðeins í markfallinu:
+2. **Þrír fyrstu fundirnir festir, restin bestuð:** M1 og M2 eru eins og þeir voru haldnir og M3
+   hefur nákvæmlega þær umsóknir sem voru auglýstar, því fagráðsmenn hafa undirbúið sig fyrir þær;
+   aðeins röð umsókna innan M3 er frjáls. Seinni fundir (M4–M9) eru óskorðaðir: líkanið má raða
+   umsóknum á þá upp á nýtt, þar á meðal umsóknum sem eru ekki enn komnar á fund. Fjögur afbrigði
+   eru borin saman, sem eru ólík aðeins í markfallinu:
    a. **`lexburden`:** þrepamarkfallið, eins og því er lýst í kaflanum um líkanið.
    b. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
@@ -49,8 +51,9 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
       miklu lengur en hin (um 4 klst. samtals, sjá [Reiknitíma](runtime.qmd)) og þrep 1 fékk svigrúm: það mátti fara
       allt að 2 yfir besta gildi sitt (`meetings_slack`), til þess að lækka mestu byrðarnar. Fundir
       samtals eru þó jafn margir og áður.
-3. **Eins og 2a, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi,
-   líka á næsta fundi; þar sem það er ekki hægt öðruvísi er umsókn frestað.
+3. **Eins og 2a, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi
+   á fundum M4–M9. Á M3 er umsóknasafnið fast, svo þar gildir hámarkið ekki ef einhver á fleiri
+   auglýstar umsóknir.
 4. **Bestað frá byrjun:** ekkert er fest, hvorki M1 né M2. Líkanið skipuleggur alla lotuna frá
    grunni, með sömu skorðum og í sviðsmynd 2a, þar á meðal að allir mæti á fyrsta fund með eina
    umsókn hver. Þetta sýnir hvernig betra upphafsplan hefði getað litið út.
@@ -61,6 +64,13 @@ lotunnar. Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-l
 
 Í sviðsmynd 1 er næsti fundur alveg eins og í tillögu starfsmanna. Ef umsókn er frestað af öðrum
 ástæðum en líkanið sér, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
+
+::: {.callout-warning}
+**Niðurstöður bíða endurkeyrslu.** Tölur og myndir fyrir sviðsmyndir 2a–2d og 3 hér á eftir eru úr
+keyrslum þar sem M3 var ekki fastur að öllu leyti (auglýstri umsókn mátti fresta) og voru ekki keyrðar á
+nýjustu gögnunum. Þær verða keyrðar aftur með M1–M3 föstum, og þar til það er búið eru þær ekki
+endanlegar. Tölur sviðsmyndar 1 og 4 breytast ekki af þessari ástæðu.
+:::
 
 ```{r}
 #| label: no-results
@@ -75,7 +85,7 @@ if (!have_results) {
 
 ```{r}
 #| label: tbl-scenarios
-#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru sett sérstaklega fyrir hverja sviðsmynd (5 mín. fyrir 1, 20 mín. fyrir 2a–2c og 3, 180 mín. fyrir síðustu keyrslu 2d og 30 mín. fyrir 4) og skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri. Hver keyrsla byrjar á lausn annarrar sviðsmyndar (t.d. 2a á lausn 1), svo *samanlagður tími* leggur saman reiknitíma allrar keðjunnar; fyrir 2d eru það allar keyrslurnar sem hún byggir á (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað."
+#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru sett sérstaklega fyrir hverja sviðsmynd (5 mín. fyrir 1, 20 mín. fyrir 2a–2c og 3, 180 mín. fyrir síðustu keyrslu 2d og 30 mín. fyrir 4) og skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri. Hver keyrsla byrjar á lausn annarrar sviðsmyndar (t.d. 2a á lausn 1), svo *samanlagður tími* leggur saman reiknitíma allrar keðjunnar; fyrir 2d eru það allar keyrslurnar sem hún byggir á (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað. Línur 2a–2d og 3 bíða endurkeyrslu með M1–M3 föstum og eru ekki endanlegar."
 #| eval: !expr have_results
 solver <- read_solver_info(results)
 results_table <- summary_table(runs) %>%
@@ -249,7 +259,7 @@ takmarkað álag á meðan þeir eru að læra.
 ## Handvirkt plan og bestað plan {#sec-plans}
 
 Hér er tillaga starfsmanna TÞS, sem er gerð handvirkt, borin saman við bestaða lausn líkansins úr
-sviðsmynd 2a: engri umsókn er bætt á næsta fund (M3), og líkanið raðar umsóknum á seinni fundi. Í báðum plönum eru **sömu fagráðsmenn paraðir við sömu umsóknir**, í sömu
+sviðsmynd 2a: M3 hefur sömu umsóknir og auglýstar voru, og líkanið raðar umsóknum á seinni fundi. Í báðum plönum eru **sömu fagráðsmenn paraðir við sömu umsóknir**, í sömu
 hlutverkum; það eina sem breytist er **á hvaða fundi** umsókn er tekin fyrir og **í hvaða röð**.
 Að lokum er dregið saman hvaða mælikvarðar breytast.
 
