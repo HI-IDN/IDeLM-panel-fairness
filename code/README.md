@@ -246,6 +246,7 @@ the pip wheel's trial licence is too small). From `code/`:
 ```bash
 bash run_panel_scenarios.sh            # all scenarios, results in ../data/tdf/results/
 python export_docs_data.py             # pseudonymised copies the book reads (../docs/data/)
+python export_plan_xlsx.py --agenda ... --members ...  # Excel plan with real names/titles from the local key files (see its docstring; the xlsx stays under data/tdf/, never committed)
 ```
 
 `run_panel_scenarios.sh` takes environment variables: `RESULTS` (results folder), `MODEL_OPTIONS`
