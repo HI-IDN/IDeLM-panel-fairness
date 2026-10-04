@@ -500,8 +500,8 @@ Hér er hver lausn skoðuð fund fyrir fund, með tveimur myndum í hverjum flip
 
 ```{r}
 #| label: fig-exit-heat-current
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 1."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 1. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"current" %in% names(schedules)'
 plot_exit_heatmap(schedules[["current"]])
@@ -520,8 +520,8 @@ plot_exit_sankey_interactive(schedules[["current"]])
 
 ```{r}
 #| label: fig-exit-heat-free
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2a."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2a. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"free" %in% names(schedules)'
 plot_exit_heatmap(schedules[["free"]])
@@ -540,8 +540,8 @@ plot_exit_sankey_interactive(schedules[["free"]])
 
 ```{r}
 #| label: fig-exit-heat-free-sum
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2b."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2b. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"free_sum" %in% names(schedules)'
 plot_exit_heatmap(schedules[["free_sum"]])
@@ -560,8 +560,8 @@ plot_exit_sankey_interactive(schedules[["free_sum"]])
 
 ```{r}
 #| label: fig-exit-heat-free-leximin
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2c."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2c. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"free_leximin" %in% names(schedules)'
 plot_exit_heatmap(schedules[["free_leximin"]])
@@ -580,8 +580,8 @@ plot_exit_sankey_interactive(schedules[["free_leximin"]])
 
 ```{r}
 #| label: fig-exit-heat-free-noworse
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2d."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 2d. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"free_noworse" %in% names(schedules)'
 plot_exit_heatmap(schedules[["free_noworse"]])
@@ -600,8 +600,8 @@ plot_exit_sankey_interactive(schedules[["free_noworse"]])
 
 ```{r}
 #| label: fig-exit-heat-free-max4
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 3."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 3. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"free_max4" %in% names(schedules)'
 plot_exit_heatmap(schedules[["free_max4"]])
@@ -620,8 +620,8 @@ plot_exit_sankey_interactive(schedules[["free_max4"]])
 
 ```{r}
 #| label: fig-exit-heat-scratch
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 4."
-#| fig-height: 7
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 4. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
+#| fig-height: 9
 #| fig-width: 8
 #| eval: !expr '"scratch" %in% names(schedules)'
 plot_exit_heatmap(schedules[["scratch"]])
