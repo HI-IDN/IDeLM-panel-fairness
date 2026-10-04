@@ -42,7 +42,7 @@ def date_text(iso):
     return f'{d.day}.{d.month}.{d.year}'
 
 
-def style_sheet(ws, widths, header_row):
+def style_sheet(ws, widths, header_row, freeze=True):
     bold = Font(bold=True)
     fill = PatternFill('solid', fgColor='DDE6F0')
     for cell in ws[header_row]:
@@ -55,7 +55,8 @@ def style_sheet(ws, widths, header_row):
     for row in ws.iter_rows(min_row=header_row + 1):
         for cell in row:
             cell.alignment = Alignment(wrap_text=True, vertical='top')
-    ws.freeze_panes = ws.cell(row=header_row + 1, column=1)
+    if freeze:
+        ws.freeze_panes = ws.cell(row=header_row + 1, column=1)
     ws.page_setup.orientation = 'landscape'
     ws.page_setup.fitToWidth = 1
     ws.page_setup.fitToHeight = 0
@@ -151,7 +152,7 @@ def main():
     ws.append(['Umsóknir sem eiga eftir að fá úthlutun', 'Staða'])
     for a in unscheduled:
         ws.append([appl(a), 'á eftir að úthluta'])
-    style_sheet(ws, [58, 16, 12, 14, 12], 1)
+    style_sheet(ws, [58, 16, 12, 14, 12], 1, freeze=False)
     if args.author:
         ws['A1'].font = Font(bold=True)
         ws['A1'].fill = PatternFill(fill_type=None)
@@ -165,7 +166,6 @@ def main():
             for cell in row:
                 if cell.value is not None:
                     cell.font = Font(bold=True)
-    ws.freeze_panes = None
 
     header = ['Fundur', 'Dagsetning', 'Röð', 'Tími', 'Umsókn', 'Ritstjóri', '1. lesari', '2. lesari', 'Athugasemd']
     for m in meetings:
