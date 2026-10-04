@@ -68,7 +68,7 @@ hafa ekki eigið gildi fá sjálfgefið gildi. Í bili fá allir fagráðsmenn s
 fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 
 Við skipulag þeirra funda sem eftir eru í yfirstandandi lotu, með raunverulegum fjarvistum, tímagluggum
-innan funda (t.d. að fara fyrr) og hörðu hámarki um 4 eigin umsóknir hvers á fund, prófuðum við einnig
+innan funda (t.d. að fara fyrr), prófuðum við einnig
 að hækka $\alpha_r$ eftir fjölda umsókna: þeir sem hafa flestar umsóknir fá hærra gildi, þannig að
 fundum þeirra fækkar. Samanborið við sama $\alpha$ fyrir alla fór heildarbið úr 670 í 716 punkta,
 mesta bið einhvers úr 55 í 48 og mesta byrði úr 71 í 62, en Gini-stuðullinn var óbreyttur (0,147).
