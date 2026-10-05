@@ -150,5 +150,5 @@ hægt að segja fyrr en tímanotkun hefur verið mæld.
    úr tölvupóstum (@sec-fairness). Fagráðsmenn með aðeins eina eða tvær umsóknir á fundi geta
    samt þurft að sitja allan fundinn ef þeirra umsóknir koma síðast.
 
-Hvernig umsóknum er dreift á fundi, í tillögu starfsmanna og í bestuðu plani, er skoðað í
+Hvernig umsóknum er dreift á fundi, í bestuðu plani, er skoðað í
 @sec-plans. Forsendur, takmarkanir og næstu skref eru dregin saman í @sec-limitations.
