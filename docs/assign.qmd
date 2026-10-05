@@ -1,5 +1,11 @@
 # Hvað ef: jöfn úthlutun frá grunni {#sec-assign}
 
+::: {.callout-note}
+Þessi kafli hefur ekki verið keyrður aftur með leiðréttu gögnunum (ritstjóri og vanhæfi einnar umsóknar
+voru leiðrétt) og nýju reglunum (M1–M3 fastir, fjarvistir og tímagluggar). Tölur og myndir hér eru úr
+eldri keyrslum og verða uppfærðar.
+:::
+
 ```{r}
 #| label: setup-assign
 source("_setup.R")

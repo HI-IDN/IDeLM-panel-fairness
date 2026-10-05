@@ -47,10 +47,7 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
    d. **Enginn verr settur en í 1:** eins og 2c, en fyrst er umframbyrði hvers og eins miðað við
-      sviðsmynd 1 gerð sem minnst. Lausnin byrjar á plani sviðsmyndar 1. Þetta afbrigði var keyrt
-      miklu lengur en hin (um 4 klst. samtals, sjá [Reiknitíma](runtime.qmd)) og þrep 1 fékk svigrúm: það mátti fara
-      allt að 2 yfir besta gildi sitt (`meetings_slack`), til þess að lækka mestu byrðarnar. Fundir
-      samtals eru þó jafn margir og áður.
+      sviðsmynd 1 gerð sem minnst. Lausnin byrjar á plani sviðsmyndar 1.
 3. **Eins og 2a, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi
    á fundum M4–M9. Á M3 er umsóknasafnið fast, svo þar gildir hámarkið ekki ef einhver á fleiri
    auglýstar umsóknir.
@@ -65,11 +62,12 @@ lotunnar. Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-l
 Í sviðsmynd 1 er næsti fundur alveg eins og í tillögu starfsmanna. Ef umsókn er frestað af öðrum
 ástæðum en líkanið sér, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
 
-::: {.callout-warning}
-**Niðurstöður bíða endurkeyrslu.** Tölur og myndir fyrir sviðsmyndir 2a–2d og 3 hér á eftir eru úr
-keyrslum þar sem M3 var ekki fastur að öllu leyti (auglýstri umsókn mátti fresta) og voru ekki keyrðar á
-nýjustu gögnunum. Þær verða keyrðar aftur með M1–M3 föstum, og þar til það er búið eru þær ekki
-endanlegar. Tölur sviðsmyndar 1 og 4 breytast ekki af þessari ástæðu.
+::: {.callout-note}
+Sviðsmyndir 2a–2d og 3 eru keyrðar á nýjustu gögnum: M1–M3 fastir, fjarvistir og tímagluggar fagráðsmanna,
+hærra $\alpha_r$ hjá þeim sem hafa flestar umsóknir og forgangur þess sem vill fæsta fundi. Sviðsmynd 2a
+fékk 3 klst. reiknitíma en 2b–2d og 3 aðeins 20 mínútur og byrjuðu á lakari upphafslausn, svo samanburðurinn við
+2a er ekki fullkomlega sanngjarn; þær má endurkeyra frá lausn 2a. Sviðsmynd 4 og kaflar 6 og 7 (hlutverk og
+úthlutun) hafa ekki verið endurkeyrð með leiðréttu gögnunum og nýju reglunum, svo tölur þeirra eru eldri.
 :::
 
 ```{r}
@@ -85,13 +83,12 @@ if (!have_results) {
 
 ```{r}
 #| label: tbl-scenarios
-#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru sett sérstaklega fyrir hverja sviðsmynd (5 mín. fyrir 1, 20 mín. fyrir 2a–2c og 3, 180 mín. fyrir síðustu keyrslu 2d og 30 mín. fyrir 4) og skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri. Hver keyrsla byrjar á lausn annarrar sviðsmyndar (t.d. 2a á lausn 1), svo *samanlagður tími* leggur saman reiknitíma allrar keðjunnar; fyrir 2d eru það allar keyrslurnar sem hún byggir á (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað. Línur 2a–2d og 3 bíða endurkeyrslu með M1–M3 föstum og eru ekki endanlegar."
+#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru 3 klst. fyrir 2a, 20 mín. fyrir 2b–2d og 3 og 5 mín. fyrir 1, skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað. Sviðsmynd 4 er úr eldri keyrslu."
 #| eval: !expr have_results
 solver <- read_solver_info(results)
 results_table <- summary_table(runs) %>%
   mutate(`Vanhæfir viðstaddir` = coi_present[as.character(Sviðsmynd)],
          `Reiknitími (mín.)` = solver$minutes[match(as.character(Sviðsmynd), solver$scenario)],
-         `Samanlagður tími (mín.)` = solver$total_minutes[match(as.character(Sviðsmynd), solver$scenario)],
          `Bil (%)` = solver$gap[match(as.character(Sviðsmynd), solver$scenario)])
 # Distribution of each member's peel-off points, one small histogram per scenario.
 waiting_hist <- kableExtra::spec_hist(split(runs$waiting, droplevels(runs$scenario)), breaks = 8,
@@ -145,29 +142,24 @@ cat(paste0(
 "Helstu niðurstöður (@tbl-scenarios):
 
 ",
-"* **Byrjunin skiptir miklu.** Engin sviðsmynd var leyst til enda innan tímamarka; bilið að neðri ",
-"marki er stórt (dálkurinn *Bil*). Sviðsmynd 2d, sem byrjaði á plani starfsmanna og fékk langmestan reiknitíma, er best þeirra sem halda fyrstu fundunum á flestum ",
-"mælikvörðum: mesta byrði ", res("2d", "Mesta byrði"), " á móti ", res(1, "Mesta byrði"),
-" í tillögu starfsmanna, ", res("2d", "Fundir samtals"), " fundarsetur á móti ", res(1, "Fundir samtals"),
-" og ", res("2d", "Biðpunktar samtals"), " biðpunktar á móti ", res(1, "Biðpunktar samtals"), ". ",
-"Plan hennar er líka leyfilegt í sviðsmynd 2a, svo 2a hefði getað náð jafn langt með betri byrjun eða ",
-"meiri tíma.
+"* **Engin sviðsmynd var leyst til enda.** Bilið að neðri marki er 50–70 % (dálkurinn *Bil*) og 2a fékk ",
+"miklu lengri tíma (", res("2a", "Reiknitími (mín.)"), " mín.) en hinar (um 20 mín.), sem byrjuðu líka á lakari ",
+"upphafslausn. Munur á sviðsmyndum stafar því að hluta af leitinni en ekki aðeins af markfallinu.
 ",
-"* **Þrepamarkfallið eitt og sér eyðir ekki gallanum.** Fylgni funda og biðar er ",
-res(1, "Fylgni funda og biðar"), " í tillögu starfsmanna og ", res("2a", "Fylgni funda og biðar"),
-" í sviðsmynd 2a: þeir sem mæta oftast bíða enn mest, því þrep 2 ver aðeins þann verst setta. ",
-"Aðeins 2d lækkar hana að ráði (", res("2d", "Fylgni funda og biðar"), ").
+"* **2d er best á flestum mælikvörðum.** Mesta byrði er ", res("2d", "Mesta byrði"), " (2a: ",
+res("2a", "Mesta byrði"), "), biðpunktar samtals ", res("2d", "Biðpunktar samtals"), " (2a: ",
+res("2a", "Biðpunktar samtals"), ") og enginn vanhæfur er viðstaddur. Kostnaðurinn eru fleiri fundarsetur (",
+res("2d", "Fundir samtals"), " á móti ", res("2a", "Fundir samtals"), ").
 ",
-"* **Fæstir fundir kosta byrði.** `leximin` (2c) fann plan með fæstum fundum (",
-res("2c", "Fundir samtals"), "), en þar sem fundirnir eru festir fyrst varð mesta byrðin hærri (",
-res("2c", "Mesta byrði"), "). Þetta er verðið á því að setja fjölda funda ofar sanngirni.
+"* **Þrepamarkfallið eitt og sér eyðir ekki gallanum.** Fylgni funda og biðar er ", res("2a", "Fylgni funda og biðar"),
+" í 2a: þeir sem mæta oftast bíða enn mest, því þrep 2 ver aðeins þann verst setta. Aðeins 2d lækkar hana að ráði (",
+res("2d", "Fylgni funda og biðar"), ").
 ",
-"* **Bestun frá byrjun skilar ekki meiru.** Sviðsmynd 4, þar sem ekkert er fest, gefur mestu byrði ",
-res(4, "Mesta byrði"), " og ", res(4, "Biðpunktar samtals"), " biðpunkta, ekki betra en 2d. Með þessum ",
-"tímamörkum skiptir góð byrjun meira en að losa um fyrstu fundina.
+"* **Fæstir fundir kosta byrði.** Án sanngirnisþreps (2b) eru fundarsetur fæstar (", res("2b", "Fundir samtals"),
+"), en mesta byrðin er ", res("2b", "Mesta byrði"), ". Þetta er verðið á því að setja fjölda funda ofar sanngirni.
 ",
-"* **Vanhæfir viðstaddir:** ", res(1, "Vanhæfir viðstaddir"), " í tillögu starfsmanna, ",
-"en enginn í bestuðu sviðsmyndunum.
+"* **Mest 4 á fund (3) kostar mest.** Mesta byrði ", res(3, "Mesta byrði"), " og ", res(3, "Biðpunktar samtals"),
+" biðpunktar, verra en í 2a á báðum mælikvörðum.
 "))
 ```
 
