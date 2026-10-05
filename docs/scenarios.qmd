@@ -5,7 +5,8 @@
 source("_setup.R")
 source("../code/panel_schedule.R", chdir = TRUE)
 results <- "data"  # pseudonymised copies, see code/export_docs_data.py
-runs <- read_scenarios(results)
+# The staff's plan (scenario 1) is the reference of scenario 2d only; it is not reported or compared.
+runs <- read_scenarios(results) %>% filter(!startsWith(as.character(scenario), "1.")) %>% droplevels()
 have_results <- nlevels(droplevels(runs$scenario)) >= 2
 coi_present <- read_coi_present(results)
 # Gurobi version of the model runs (from the logs, summarised in data/solver.csv).
@@ -16,27 +17,27 @@ have_plan <- file.exists(file.path(results, "free_agenda.csv"))
 agenda_files <- file.path(results, paste0(names(scenarios), "_agenda.csv"))
 schedules <- lapply(agenda_files[file.exists(agenda_files)], function(f) panel_from_agenda(panel, f))
 names(schedules) <- names(scenarios)[file.exists(agenda_files)]
+schedules[["current"]] <- NULL
 if (have_plan) {
   optimised <- panel_from_agenda(panel, file.path(results, "free_agenda.csv"))
   attendance_opt <- attendance_table(optimised)
 }
 ```
 
-Í þessum kafla er úthlutun ritstjóra og lesara eins og í tillögu starfsmanna; líkanið í @sec-model
+Í þessum kafla er úthlutun ritstjóra og lesara gefin; líkanið í @sec-model
 ákveður aðeins á hvaða fundi hver umsókn er tekin fyrir og í hvaða röð.
 
 ## Sviðsmyndir
 
-Núverandi tillaga starfsmanna TÞS að fundaskipan (hvaða umsókn er á hvaða fundi) er grunnurinn. Í
-öllum sviðsmyndum nema 1 og 4 eru fundir M1, M2 og M3 eins og þeir voru auglýstir: M1 og M2 í
+Fundaskipan starfsmanna TÞS (hvaða umsókn er á hvaða fundi) er grunnurinn. Í
+öllum sviðsmyndum nema 4 eru fundir M1, M2 og M3 eins og þeir voru auglýstir: M1 og M2 í
 röðinni sem starfsmenn völdu, og M3 með auglýstum umsóknum, en röðin innan M3 er óþekkt og líkanið
 velur hana. Fundir M4–M9 eru frjálsir. Á fundum sem eru ekki búnir hefur enginn fagráðsmaður fleiri en
-$\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi. Sviðsmynd 1 er undantekning:
-hún heldur fundum starfsmanna, og þar er einn fagráðsmaður með 6 umsóknir á M3. Allar sviðsmyndir
+$\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi. Allar sviðsmyndir
 nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
 
-1. **Tillaga starfsmanna, sanngjörn röð:** sama fundasamsetning, en líkanið raðar umsóknum
-   innbyrðis á hverjum fundi á sanngjarnan hátt.
+1. **Tillaga starfsmanna** er aðeins viðmið fyrir sviðsmynd 2d; hún er hvorki sýnd hér né borin saman
+   við hinar sviðsmyndirnar.
 2. **Þrír fyrstu fundirnir festir, restin bestuð:** M1 og M2 eru eins og þeir voru haldnir og M3
    hefur nákvæmlega þær umsóknir sem voru auglýstar, því fagráðsmenn hafa undirbúið sig fyrir þær;
    aðeins röð umsókna innan M3 er frjáls. Seinni fundir (M4–M9) eru óskorðaðir: líkanið má raða
@@ -55,12 +56,10 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    grunni, með sömu skorðum og í sviðsmynd 2a, þar á meðal að allir mæti á fyrsta fund með eina
    umsókn hver. Þetta sýnir hvernig betra upphafsplan hefði getað litið út.
 
-Munurinn á 1 og 2a sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; 2a–2d sýna
-hvaða máli markfallið skiptir; sviðsmynd 4 sýnir hvað hefði unnist með því að besta frá upphafi
+Sviðsmyndir 2a–2d sýna hvaða máli markfallið skiptir, og 3 hvað hámark á umsóknir á fund kostar; sviðsmynd 4 sýnir hvað hefði unnist með því að besta frá upphafi
 lotunnar. Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
-Í sviðsmynd 1 er næsti fundur alveg eins og í tillögu starfsmanna. Ef umsókn er frestað af öðrum
-ástæðum en líkanið sér, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
+Ef umsókn er frestað af ástæðum sem líkanið sér ekki, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
 
 ::: {.callout-note}
 Sviðsmyndir 2a–2d og 3 eru keyrðar á nýjustu gögnum: M1–M3 fastir, fjarvistir og tímagluggar fagráðsmanna,
@@ -169,7 +168,7 @@ res("2d", "Fylgni funda og biðar"), ").
 
 ```{r}
 #| label: fig-meetings-attended
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í hverri sviðsmynd (dálkar 1–4, sjá sviðsmyndirnar hér að ofan), raðað eftir sviðsmynd 1."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í hverri sviðsmynd (dálkar 2a–4, sjá sviðsmyndirnar hér að ofan), raðað eftir sviðsmynd 2a."
 #| fig-height: 6.5
 #| eval: !expr have_results
 plot_compare(runs, "meetings", "Fundir sem mætt er á", "Fundir")
@@ -179,7 +178,7 @@ plot_compare(runs, "meetings", "Fundir sem mætt er á", "Fundir")
 
 ```{r}
 #| label: fig-waiting
-#| fig-cap: "Biðpunktar hvers fagráðsmanns yfir lotuna (umsóknir annarra sem setið er undir) í hverri sviðsmynd (dálkar 1–4), raðað eftir sviðsmynd 1."
+#| fig-cap: "Biðpunktar hvers fagráðsmanns yfir lotuna (umsóknir annarra sem setið er undir) í hverri sviðsmynd (dálkar 2a–4), raðað eftir sviðsmynd 2a."
 #| fig-height: 6.5
 #| eval: !expr have_results
 plot_compare(runs, "waiting", "Biðpunktar yfir lotuna", "Biðpunktar")
@@ -189,12 +188,12 @@ plot_compare(runs, "waiting", "Biðpunktar yfir lotuna", "Biðpunktar")
 
 ### Nýir og reyndir fagráðsmenn
 
-Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðsmenn í tillögu starfsmanna. Höfundur hefur merkt þá fagráðsmenn sem hún veit að eru nýir í þessari lotu
+Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðsmenn. Höfundur hefur merkt þá fagráðsmenn sem hún veit að eru nýir í þessari lotu
 (`r length(new_members)` af `r nrow(members)`: `r paste(new_members, collapse = ", ")`); sú merking byggir á minni (@sec-limitations).
 
 ```{r}
 #| label: tbl-new
-#| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum. Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í tillögu starfsmanna (sviðsmynd 1) og í bestu sviðsmyndinni sem bestar ekki frá grunni."
+#| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum. Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í bestu sviðsmyndinni sem bestar ekki frá grunni."
 #| eval: !expr have_results
 # Best scenario without planning from scratch: the lowest worst-off burden among scenarios 2-3.
 candidates <- runs %>%
@@ -203,10 +202,8 @@ candidates <- runs %>%
 best <- as.character(candidates$scenario[which.min(candidates$worst)])
 best_number <- sub("[.].*", "", best)
 waiting_in <- function(label) filter(runs, scenario == label) %>% select(member, waiting)
-staff_label <- levels(runs$scenario)[startsWith(levels(runs$scenario), "1.")]
 per_member <- members %>%
   left_join(attendance %>% select(member, meetings), by = "member") %>%
-  left_join(rename(waiting_in(staff_label), staff_wait = waiting), by = "member") %>%
   left_join(rename(waiting_in(best), best_wait = waiting), by = "member") %>%
   mutate(Hópur = if_else(member %in% new_members, "Nýir", "Reyndir"))
 # Medians, used in the text below.
@@ -214,12 +211,11 @@ new_table <- per_member %>%
   group_by(Hópur) %>%
   summarise(Fjöldi = n(), Ritstjóri = median(Editor), Lesari = median(Reader), Samtals = median(Total),
             `Fundir sem mætt er á` = median(meetings),
-            `Biðpunktar, svið 1` = median(staff_wait),
             !!paste0("Biðpunktar, svið ", best_number) := median(best_wait),
             .groups = "drop")
 # The table shows each measure as a small histogram per group (same scale in both rows).
 measures <- c("Ritstjóri" = "Editor", "Lesari" = "Reader", "Samtals" = "Total",
-              "Fundir sem mætt er á" = "meetings", "Biðpunktar, svið 1" = "staff_wait",
+              "Fundir sem mætt er á" = "meetings",
               "best" = "best_wait")
 names(measures)[names(measures) == "best"] <- paste0("Biðpunktar, svið ", best_number)
 hist_table <- per_member %>% count(Hópur, name = "Fjöldi")
@@ -233,55 +229,29 @@ for (m in names(measures)) {
                                   same_lim = TRUE))
 }
 hist_kable
-# For the text: median waiting of a group in scenario 1 (col 7) and in the best scenario (col 8).
+# For the text: median waiting of a group in the best scenario (col 7).
 wait_of <- function(group, col) new_table[[col]][new_table$Hópur == group]
 ```
 
 Nýir fagráðsmenn fá færri ritstjórahlutverk, eins og búast mátti við, en **ekki minna álag**: þeir
 fá miklu fleiri lesarahlutverk í staðinn og þurfa að mæta á fleiri fundi en reyndir fagráðsmenn
-(@tbl-new). Nýir bíða líka lengur: yfir alla lotuna er miðgildi biðpunkta
+(@tbl-new). Nýir bíða líka lengur: í bestu sviðsmyndinni sem bestar ekki frá grunni
+(`r if (have_results) best else ""`) er miðgildi biðpunkta yfir alla lotuna
 `r if (have_results) wait_of("Nýir", 7) else ""` hjá nýjum en `r if (have_results) wait_of("Reyndir", 7) else ""`
-hjá reyndum í tillögu starfsmanna. Í bestu sviðsmyndinni sem bestar ekki frá grunni
-(`r if (have_results) best else ""`) er það `r if (have_results) wait_of("Nýir", 8) else ""` og
-`r if (have_results) wait_of("Reyndir", 8) else ""`. Bestunin minnkar því bið beggja hópa lítillega en
-jafnar hana ekki milli þeirra, enda gerir líkanið ekki greinarmun á nýjum og reyndum þegar það
-jafnar biðina. Það er öfugt við það sem væri sanngjarnt, að nýir fagráðsmenn fái
+hjá reyndum. Bestunin jafnar biðina því ekki milli þeirra, enda gerir líkanið ekki greinarmun á nýjum og
+reyndum þegar það jafnar biðina. Það er öfugt við það sem væri sanngjarnt, að nýir fagráðsmenn fái
 takmarkað álag á meðan þeir eru að læra.
 
-## Handvirkt plan og bestað plan {#sec-plans}
+## Bestuð plön {#sec-plans}
 
-Hér er tillaga starfsmanna TÞS, sem er gerð handvirkt, borin saman við bestaða lausn líkansins úr
-sviðsmynd 2a: M3 hefur sömu umsóknir og auglýstar voru, og líkanið raðar umsóknum á seinni fundi. Í báðum plönum eru **sömu fagráðsmenn paraðir við sömu umsóknir**, í sömu
-hlutverkum; það eina sem breytist er **á hvaða fundi** umsókn er tekin fyrir og **í hvaða röð**.
-Að lokum er dregið saman hvaða mælikvarðar breytast.
-
-Í flipunum hér að neðan eru sömu tvær myndirnar sýndar fyrir tillögu starfsmanna og hverja
-sviðsmynd. Í tillögu starfsmanna eru sex umsóknir enn án fundar (*Óúthlutað*); í sviðsmyndunum
-hefur líkanið sett þær á fundi.
+Hér eru plönin úr sviðsmyndum 2a–4 sýnd: hversu margar umsóknir hver fagráðsmaður hefur á hverjum
+fundi og á hversu marga fundi hann þarf að mæta. Í öllum plönum eru **sömu fagráðsmenn paraðir við
+sömu umsóknir**, í sömu hlutverkum; það eina sem breytist er **á hvaða fundi** umsókn er tekin fyrir
+og **í hvaða röð**.
 
 ### Umsóknir á hvern fagráðsmann og fund
 
 ::: {.panel-tabset}
-
-#### Tillaga starfsmanna
-
-```{r}
-#| label: fig-meetings
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í tillögu starfsmanna."
-#| fig-height: 6
-#| eval: !expr TRUE
-plot_meetings(panel)
-```
-
-#### 1. Sanngjörn röð
-
-```{r}
-#| label: fig-meetings-current
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 1."
-#| fig-height: 6
-#| eval: !expr '"current" %in% names(schedules)'
-plot_meetings(schedules[["current"]])
-```
 
 #### 2a. Næsti fundur festur
 
@@ -349,26 +319,6 @@ plot_meetings(schedules[["scratch"]])
 
 ::: {.panel-tabset}
 
-#### Tillaga starfsmanna
-
-```{r}
-#| label: fig-attendance
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í tillögu starfsmanna."
-#| fig-height: 6
-#| eval: !expr TRUE
-plot_attendance(panel)
-```
-
-#### 1. Sanngjörn röð
-
-```{r}
-#| label: fig-attendance-current
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 1."
-#| fig-height: 6
-#| eval: !expr '"current" %in% names(schedules)'
-plot_attendance(schedules[["current"]])
-```
-
 #### 2a. Næsti fundur festur
 
 ```{r}
@@ -431,50 +381,6 @@ plot_attendance(schedules[["scratch"]])
 
 :::
 
-Í tillögu starfsmanna:
-
-* **Fyrsti fundurinn er jafn af ásettu ráði.** Á M1 hefur hver fagráðsmaður nákvæmlega eina
-  umsókn. Eftir það er dreifingin á fundi ójöfn: sumir hafa allt að
-  `r max_own_per_meeting(panel)` umsóknir á einum fundi.
-* **Sumir ljúka snemma, aðrir byrja seint.** Þegar raðað er eftir því hvenær umsóknir falla,
-  eins og í @fig-meetings, mynda fagráðsmenn skálínu: sumir hafa ekkert eftir M5–M7, á meðan aðrir
-  hafa ekkert milli M1 og M4 eða M5 og vinna mest af sinni vinnu í lokin.
-* **Fjöldi funda sem mæta þarf á er misjafn.** Fagráðsmenn mæta á milli
-  `r min(attendance$meetings)` og `r max(attendance$meetings)` af `r n_meetings` fundum
-  (miðgildi `r median(attendance$meetings)`; @fig-attendance). Nokkrir hafa umsókn á hverjum
-  einasta fundi. Mæting fylgir ekki einfaldlega álagi: fagráðsmenn með svipaðan fjölda umsókna
-  mæta á mjög misjafnan fjölda funda eftir því hvort umsóknir þeirra eru á fáum fundum eða dreifðar
-  yfir lotuna.
-
-### Hvað breytist
-
-```{r}
-#| label: tbl-plans
-#| tbl-cap: "Tillaga starfsmanna og bestað plan borin saman. Röðin innan funda er ekki hluti af tillögu starfsmanna, svo biðpunktar, byrði og vanhæfir viðstaddir eru reiknaðir með sanngjarnri röð innan funda hennar (sviðsmynd 1). Munurinn sýnir því aðeins áhrif þess að færa umsóknir á milli funda."
-#| eval: !expr have_plan
-staff_run <- filter(runs, startsWith(as.character(scenario), "1."))
-opt_run <- filter(runs, startsWith(as.character(scenario), "2a."))
-fmt <- function(x) format(round(x, 2), decimal.mark = ",")
-range_med <- function(x) sprintf("%d–%d (miðgildi %s)", min(x), max(x), fmt(median(x)))
-tibble(
-  Mælikvarði = c("Fundir sem mætt er á", "Mest eigin umsóknir á einum fundi",
-                 "Biðpunktar samtals", "Mest biðpunktar á umsókn", "Mesta byrði",
-                 "Vanhæfir viðstaddir"),
-  `Tillaga starfsmanna` = c(range_med(attendance$meetings), max_own_per_meeting(panel),
-                            sum(staff_run$waiting), fmt(max(staff_run$waiting_per_proposal)),
-                            fmt(max(staff_run$burden)),
-                            coi_present[[as.character(staff_run$scenario[1])]]),
-  `Bestað plan` = c(range_med(attendance_opt$meetings), max_own_per_meeting(optimised),
-                    sum(opt_run$waiting), fmt(max(opt_run$waiting_per_proposal)),
-                    fmt(max(opt_run$burden)),
-                    coi_present[[as.character(opt_run$scenario[1])]])
-) %>% knitr::kable()
-```
-
-Bestaða planið notar sömu umsóknir, sömu fagráðsmenn og sömu hlutverk; aðeins er breytt á hvaða
-fundi seinni umsóknir eru teknar fyrir og í hvaða röð. Það sem breytist er því eingöngu skipulag
-fundanna, sem starfsmenn gera nú handvirkt.
-
 Takmarkanir líkansins og næstu skref eru í @sec-limitations.
 
 ## Nánari skoðun á lausninni
@@ -497,26 +403,6 @@ Hér er hver lausn skoðuð fund fyrir fund, með tveimur myndum í hverjum flip
 Í sanngjarnri lausn ættu þeir sem hafa beðið lengi að fara fyrr á næstu fundum.
 
 ::: {.panel-tabset}
-
-#### 1. Sanngjörn röð
-
-```{r}
-#| label: fig-exit-heat-current
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 1. Súluritin neðst sýna dreifingu biðpunkta yfir lotuna og á hvern fund sem mætt er á."
-#| fig-height: 9
-#| fig-width: 8
-#| eval: !expr '"current" %in% names(schedules)'
-plot_exit_heatmap(schedules[["current"]])
-```
-
-```{r}
-#| label: fig-exit-current
-#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 1. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er og liturinn biðpunktar hingað til. Smelltu á kóða fagráðsmanns við jaðarinn til að sjá hans leið í gegnum alla fundina."
-#| fig-height: 6.5
-#| fig-width: 9
-#| eval: !expr '"current" %in% names(schedules)'
-plot_exit_sankey_interactive(schedules[["current"]])
-```
 
 #### 2a. Næsti fundur festur
 

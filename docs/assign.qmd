@@ -22,7 +22,6 @@ if (have_schedule) {
   scheduled <- panel_from_agenda(assigned, file.path(results, "assign_schedule_agenda.csv"))
   runs <- read_scenarios(results)
   compare <- bind_rows(
-    filter(runs, startsWith(as.character(scenario), "1.")),
     filter(runs, startsWith(as.character(scenario), "4.")),
     read_members(file.path(results, "assign_schedule"), "Jöfn úthlutun frá grunni")
   ) %>% mutate(scenario = factor(scenario, levels = unique(scenario)))
@@ -119,7 +118,7 @@ if (!have_schedule) {
 
 ```{r}
 #| label: tbl-assign-schedule
-#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við tillögu starfsmanna (sviðsmynd 1) og bestun frá byrjun með núverandi úthlutun (sviðsmynd 4)."
+#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við bestun frá byrjun með núverandi úthlutun (sviðsmynd 4)."
 #| eval: !expr have_schedule
 summary_table(compare) %>%
   rename(Skipulag = Sviðsmynd) %>%
