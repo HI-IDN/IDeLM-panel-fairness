@@ -50,7 +50,7 @@ EXPERIMENTS = {
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
 CODE = re.compile(r'^([RAM]\d+|-?\d+(\.\d+)?([eE][-+]?\d+)?|TRUE|FALSE|True|False|yes|no|)$', re.I)  # codes, numbers, flags
-LEVEL = re.compile(r'^(rules|reference|meetings|equity|worst|top\d+|waiting)$')  # step names of the model
+LEVEL = re.compile(r'^(priority|rules|reference|meetings|equity|worst|top\d+|waiting)$')  # step names of the model
 
 
 def copy(src, dst, columns):
