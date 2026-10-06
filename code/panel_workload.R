@@ -300,8 +300,12 @@ plot_meetings <- function(panel) {
   attending <- per_meeting %>% group_by(meeting) %>% summarise(k = sum(n > 0), .groups = "drop")
   meeting_label <- function(x) {
     k <- attending$k[match(x, as.character(attending$meeting))]
-    if_else(x == unassigned, tr(x), paste0(x, "\n", k))
+    if_else(x == unassigned, tr(x), paste0(x, "\n#", k))
   }
+  # Next to each member: how many meetings they attend.
+  attended <- per_meeting %>% filter(meeting != unassigned) %>% group_by(member) %>%
+    summarise(k = sum(n > 0), .groups = "drop")
+  member_label <- function(x) paste0(x, "  #", attended$k[match(x, as.character(attended$member))])
 
   ggplot(per_meeting, aes(x = meeting, y = member, fill = step)) +
     geom_tile(colour = "white", linewidth = 0.6) +
@@ -311,9 +315,11 @@ plot_meetings <- function(panel) {
     scale_fill_manual(values = c(none = "grey95", step_colours), breaks = as.character(levels_n),
                       name = "Umsóknir") +
     scale_x_discrete(labels = meeting_label) +
+    scale_y_discrete(labels = member_label) +
     labs(title = "Umsóknir á hvern fagráðsmann og fund",
          subtitle = paste("Raðað eftir því hvenær umsóknir viðkomandi eru teknar fyrir (snemma efst);",
-                          "grátt = engin.\nTala undir fundi = fjöldi fagráðsmanna sem mæta"),
+                          "grátt = engin.\n# undir fundi = fjöldi fagráðsmanna sem mæta;",
+                          "# við fagráðsmann = fjöldi funda sem hann mætir á"),
          x = NULL, y = NULL) +
     # The unassigned column sits in its own panel so it doesn't read as another meeting.
     facet_grid(cols = vars(fct_relevel(group, "Meeting")), scales = "free_x", space = "free_x") +

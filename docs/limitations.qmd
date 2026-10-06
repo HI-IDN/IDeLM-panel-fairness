@@ -14,7 +14,7 @@ skref.
 * **Hverjir eru nýir byggir á minni höfundar.** Höfundur merkti nýja fagráðsmenn eftir minni, og
   merkingin getur verið röng. Hún tekur heldur ekki tillit til reynslu úr öðrum flokkum sjóðsins:
   fagráðsmaður sem hefur setið árum saman í Sprota er varla nýgræðingur þótt hann sé nýr í
-  Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin í sviðsmynd 4 ber að lesa með
+  Vexti. Samanburður á nýjum og reyndum (@tbl-new) og markgildin á fund ber að lesa með
   það í huga.
 * **Lesari 1 og lesari 2 fylgja stafrófinu í yfirlitinu.** Gert er ráð fyrir að röð lesara í
   yfirlitinu ráði því hver talar næstur á fundi.
@@ -86,9 +86,17 @@ skref.
 * **Nýir fagráðsmenn** fá takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
   þeirra koma seinna í lotunni, eftir að þeir hafa öðlast reynslu sem lesarar. Reyndir fagráðsmenn
   deila þeim ritstjórahlutverkum sem eftir eru jafnt.
-* **Nýir fagráðsmenn læra á fundum.** Betra er að leyfa nýjum fagráðsmönnum að sitja meðvitað lengri
-  fundi, svo þeir fái að hlusta á umræður hinna reyndu, þar sem þeir heyra rökin og
-  aðferðafræðina við úrvinnslu umsókna.
+* **Markgildi biðar.** Líkanið lágmarkar byrði þess sem verst er settur, en hefur ekkert markgildi
+  fyrir biðina sjálfa. Með markgildi, líkt og í APAP (@sec-apap-objective), mætti stefna að því að
+  allir bíði um það bil jafnlengi. Það líkan er mun erfiðara að besta.
+* **Umbun fyrir bið.** Þar sem jöfn bið næst ekki má umbuna þeim sem bíða óþarflega mikið með
+  fleiri ritstjórahlutverkum, sem eru betur greidd. Endurúthlutun hlutverka (@sec-roles) jafnar nú
+  greiðslu á umsókn; hún gæti í staðinn jafnað greiðslu á hvern dagskrárlið sem setið er, og bætt
+  þannig upp viðveru sem annars er ólaunuð (@sec-equity).
+* **Nýir fagráðsmenn læra á fundum.** Betra er að láta nýja fagráðsmenn meðvitað bíða lengur á
+  fyrstu fundunum, svo þeir fái að hlusta á umræður hinna reyndu, þar sem þeir heyra rökin og
+  aðferðafræðina við úrvinnslu umsókna. Margir þeirra sitja hvort eð er lengur á fyrstu fundunum
+  til að læra.
 * **Vægi ritstjórahlutverks.** Ákveða hversu miklu þyngra ritstjórahlutverk vegur (samantektin og
   hærri greiðsla) en lesarahlutverk.
 * **Greiðsla fyrir fundarsetu.** Ekki er hægt að mæla hversu lengi fólk er að lesa og undirbúa sig,

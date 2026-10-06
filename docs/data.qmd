@@ -11,12 +11,8 @@ kr <- function(x) format(x, big.mark = ".", decimal.mark = ",", scientific = FAL
 n_held <- n_distinct(panel$meeting[!is.na(panel$position)])
 source("../code/panel_schedule.R", chdir = TRUE)
 # Conflicted members in held meetings: were they still present when the proposal came up?
-coi_held <- panel %>%
-  filter(!is.na(position), !is.na(coi)) %>%
-  mutate(position = as.integer(position)) %>%
-  separate_rows(coi, sep = ";") %>%
-  left_join(held_meetings(panel) %>% select(meeting, member, leave), by = c("meeting", "coi" = "member"))
-n_coi_present <- sum(!is.na(coi_held$leave) & coi_held$leave >= coi_held$position)
+coi_held <- held_conflicts(panel)
+n_coi_present <- sum(coi_held$in_meeting)
 ```
 
 Þessi kafli lýsir einni umsóknarlotu af raunverulegum gögnum fagráðsins. Hún er grunnlína fyrir

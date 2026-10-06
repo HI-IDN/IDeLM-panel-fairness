@@ -28,9 +28,10 @@ if (have_plan) {
 ## Sviðsmyndir
 
 Núverandi tillaga starfsmanna TÞS að fundaskipan (hvaða umsókn er á hvaða fundi) er grunnurinn. Í
-öllum sviðsmyndum nema 5 eru M1 og M2 festir eins og þeir voru. Í öllum sviðsmyndum hefur enginn
-fagráðsmaður fleiri en $\bar k = `r num(config$max_per_member)`$ eigin umsóknir á einum fundi, sem er
-það mesta í tillögu starfsmanna.
+öllum sviðsmyndum nema 4 eru M1 og M2 festir eins og þeir voru. Á fundum sem eru ekki haldnir hefur
+enginn fagráðsmaður fleiri en $\bar k = `r num(config$max_per_member)`$ eigin umsóknir, og helst ekki
+fleiri en $\tilde k = `r num(config$soft_max_per_member)`$. Sviðsmynd 1 heldur fundum starfsmanna
+óbreyttum, og þar hafa tveir fagráðsmenn 6 umsóknir á einum fundi.
 
 1. **Tillaga starfsmanna, sanngjörn röð:** sama fundasamsetning, en líkanið raðar umsóknum
    innbyrðis á hverjum fundi á sanngjarnan hátt.
@@ -41,15 +42,11 @@ fagráðsmaður fleiri en $\bar k = `r num(config$max_per_member)`$ eigin umsók
    komnar á fund.
 3. **Eins og 2, mest 4 á fund:** hámarkið er lækkað í $\bar k = 4$ eigin umsóknir á einum fundi,
    líka á næsta fundi; þar sem það er ekki hægt öðruvísi er umsókn frestað.
-4. **Eins og 2, markgildi á fund:** í stað harðs hámarks reynir líkanið að halda fjölda eigin
-   umsókna á hverjum fundi nálægt markgildi: `r num(config$target_experienced)` fyrir reynda og
-   `r num(config$target_new)` fyrir nýja fagráðsmenn. Nýir
-   fá þannig léttari fundi á meðan þeir eru að læra.
-5. **Bestað frá byrjun:** ekkert er fest, hvorki M1 né M2. Líkanið skipuleggur alla lotuna frá
+4. **Bestað frá byrjun:** ekkert er fest, hvorki M1 né M2. Líkanið skipuleggur alla lotuna frá
    grunni, með sömu skorðum og í sviðsmynd 2, þar á meðal að allir mæti á fyrsta fund með eina
    umsókn hver. Þetta sýnir hvernig betra upphafsplan hefði getað litið út.
 
-Munurinn á 1 og 2 sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; sviðsmynd 5
+Munurinn á 1 og 2 sýnir hvað það skilar að færa umsóknir á milli funda sem eftir eru; sviðsmynd 4
 sýnir hvað hefði unnist með því að besta frá upphafi lotunnar. Fleiri og styttri fundir eru ræddir
 sem framtíðarverkefni í @sec-limitations.
 
@@ -119,9 +116,9 @@ res(2, "Versta byrði á umsókn"), " á umsókn, biðpunktar samtals úr ", res
 " í ", res(2, "Biðpunktar samtals"), ", og vanhæfir viðstaddir úr ", res(1, "Vanhæfir viðstaddir"),
 " í ", res(2, "Vanhæfir viðstaddir"), ".
 ",
-"* **Betra upphafsplan hefði skilað mestu.** Bestað frá byrjun (5) gefur minnstu byrði verst setta ",
-"fagráðsmannsins (", res(5, "Versta byrði á umsókn"), ") og fæsta fundi sem mæta þarf á (",
-res(5, "Fundir sem mætt er á (bil)"), ").
+"* **Betra upphafsplan hefði skilað mestu.** Bestað frá byrjun (4) gefur minnstu byrði verst setta ",
+"fagráðsmannsins (", res(4, "Versta byrði á umsókn"), ") og fæsta fundi sem mæta þarf á (",
+res(4, "Fundir sem mætt er á (bil)"), ").
 ",
 "* **Allar bestaðar sviðsmyndir** halda vanhæfum fagráðsmönnum frá fundi þegar umsóknin er tekin fyrir.
 ") else ""`
@@ -132,7 +129,7 @@ res(5, "Fundir sem mætt er á (bil)"), ").
 
 ```{r}
 #| label: fig-meetings-attended
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í hverri sviðsmynd (dálkar 1–5, sjá sviðsmyndirnar hér að ofan), raðað eftir sviðsmynd 1."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í hverri sviðsmynd (dálkar 1–4, sjá sviðsmyndirnar hér að ofan), raðað eftir sviðsmynd 1."
 #| fig-height: 6.5
 #| eval: !expr have_results
 plot_compare(runs, "meetings", "Fundir sem mætt er á", "Fundir")
@@ -142,7 +139,7 @@ plot_compare(runs, "meetings", "Fundir sem mætt er á", "Fundir")
 
 ```{r}
 #| label: fig-waiting
-#| fig-cap: "Biðpunktar hvers fagráðsmanns yfir lotuna (umsóknir annarra sem setið er undir) í hverri sviðsmynd (dálkar 1–5), raðað eftir sviðsmynd 1."
+#| fig-cap: "Biðpunktar hvers fagráðsmanns yfir lotuna (umsóknir annarra sem setið er undir) í hverri sviðsmynd (dálkar 1–4), raðað eftir sviðsmynd 1."
 #| fig-height: 6.5
 #| eval: !expr have_results
 plot_compare(runs, "waiting", "Biðpunktar yfir lotuna", "Biðpunktar")
@@ -159,9 +156,9 @@ Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðs
 #| label: tbl-new
 #| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum. Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í tillögu starfsmanna (sviðsmynd 1) og í bestu sviðsmyndinni sem bestar ekki frá grunni."
 #| eval: !expr have_results
-# Best scenario without planning from scratch: the lowest worst-off burden among scenarios 2-4.
+# Best scenario without planning from scratch: the lowest worst-off burden among scenarios 2-3.
 candidates <- runs %>%
-  filter(sub("[.].*", "", as.character(scenario)) %in% c("2", "3", "4")) %>%
+  filter(sub("[.].*", "", as.character(scenario)) %in% c("2", "3")) %>%
   group_by(scenario) %>% summarise(worst = max(burden_per_proposal), .groups = "drop")
 best <- as.character(candidates$scenario[which.min(candidates$worst)])
 best_number <- sub("[.].*", "", best)
@@ -266,21 +263,11 @@ plot_meetings(schedules[["free"]])
 plot_meetings(schedules[["free_max4"]])
 ```
 
-#### 4. Markgildi á fund
-
-```{r}
-#| label: fig-meetings-free-target
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 4."
-#| fig-height: 6
-#| eval: !expr '"free_target" %in% names(schedules)'
-plot_meetings(schedules[["free_target"]])
-```
-
-#### 5. Frá byrjun
+#### 4. Frá byrjun
 
 ```{r}
 #| label: fig-meetings-scratch
-#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 5."
+#| fig-cap: "Fjöldi umsókna hvers fagráðsmanns á hverjum fundi í sviðsmynd 4."
 #| fig-height: 6
 #| eval: !expr '"scratch" %in% names(schedules)'
 plot_meetings(schedules[["scratch"]])
@@ -332,21 +319,11 @@ plot_attendance(schedules[["free"]])
 plot_attendance(schedules[["free_max4"]])
 ```
 
-#### 4. Markgildi á fund
-
-```{r}
-#| label: fig-attendance-free-target
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 4."
-#| fig-height: 6
-#| eval: !expr '"free_target" %in% names(schedules)'
-plot_attendance(schedules[["free_target"]])
-```
-
-#### 5. Frá byrjun
+#### 4. Frá byrjun
 
 ```{r}
 #| label: fig-attendance-scratch
-#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 5."
+#| fig-cap: "Fjöldi funda sem hver fagráðsmaður þarf að mæta á í sviðsmynd 4."
 #| fig-height: 6
 #| eval: !expr '"scratch" %in% names(schedules)'
 plot_attendance(schedules[["scratch"]])
@@ -407,8 +384,13 @@ Hér er hver lausn skoðuð fund fyrir fund, með tveimur myndum í hverjum flip
 * **Hitakort:** hver lína er einn fagráðsmaður, raðað eftir biðpunktum yfir lotuna. Talan í hverjum
   reit er dagskrárliðurinn þar sem hann má fara (autt ef hann mætir ekki), og liturinn sýnir
   biðpunkta hans hingað til. Talan lengst til hægri er biðpunktar yfir alla lotuna.
-* **Línur:** hver fagráðsmaður er ein grá lína sem tengir þá fundi sem hann mætir á; músin yfir línu lýsir hana upp og sýnir hver hann er. Hæðin er
-  dagskrárliðurinn þar sem hann fer. Þannig sést hvernig hver og einn færist á milli snemma og seint.
+* **Flæðirit** (e. *Sankey*): hver fagráðsmaður er eitt grátt band í gegnum alla fundina. Á hverjum
+  fundi er fagráðsmönnum staflað í þeirri röð sem þeir fara: neðst þeir sem mæta ekki, efst þeir sem
+  fara síðastir, og þeir sem fara í sama dagskrárlið í röðinni R01–R21. Band sem fer upp á við
+  þýðir að viðkomandi fer seinna en á fundinum á undan, og band sem fer niður að hann fer fyrr.
+  Smelltu á kóða fagráðsmanns við vinstri eða hægri jaðarinn til að lýsa band hans upp í hans eigin
+  lit; smelltu aftur, eða tvísmelltu, til að hreinsa. Músin yfir bandi sýnir hver fagráðsmaðurinn
+  er, dagskrárliðinn og biðpunkta hans hingað til, án þess að skipta um þann sem er lýstur upp.
 
 Í sanngjarnri lausn ættu þeir sem hafa beðið lengi að fara fyrr á næstu fundum.
 
@@ -427,11 +409,11 @@ plot_exit_heatmap(schedules[["current"]])
 
 ```{r}
 #| label: fig-exit-current
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 1. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 1. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"current" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["current"]])
+plot_exit_sankey_interactive(schedules[["current"]])
 ```
 
 #### 2. Næsti fundur festur
@@ -447,11 +429,11 @@ plot_exit_heatmap(schedules[["free"]])
 
 ```{r}
 #| label: fig-exit-free
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 2. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 2. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free"]])
+plot_exit_sankey_interactive(schedules[["free"]])
 ```
 
 #### 3. Mest 4 á fund
@@ -467,38 +449,18 @@ plot_exit_heatmap(schedules[["free_max4"]])
 
 ```{r}
 #| label: fig-exit-free-max4
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 3. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 3. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"free_max4" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_max4"]])
+plot_exit_sankey_interactive(schedules[["free_max4"]])
 ```
 
-#### 4. Markgildi á fund
-
-```{r}
-#| label: fig-exit-heat-free-target
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 4."
-#| fig-height: 7
-#| fig-width: 8
-#| eval: !expr '"free_target" %in% names(schedules)'
-plot_exit_heatmap(schedules[["free_target"]])
-```
-
-```{r}
-#| label: fig-exit-free-target
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 4. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
-#| fig-height: 6.5
-#| fig-width: 9
-#| eval: !expr '"free_target" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["free_target"]])
-```
-
-#### 5. Frá byrjun
+#### 4. Frá byrjun
 
 ```{r}
 #| label: fig-exit-heat-scratch
-#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 5."
+#| fig-cap: "Hvenær hver fagráðsmaður fer af hverjum fundi, og biðpunktar hingað til, í sviðsmynd 4."
 #| fig-height: 7
 #| fig-width: 8
 #| eval: !expr '"scratch" %in% names(schedules)'
@@ -507,11 +469,11 @@ plot_exit_heatmap(schedules[["scratch"]])
 
 ```{r}
 #| label: fig-exit-scratch
-#| fig-cap: "Hvenær hver fagráðsmaður fer af fundum sem hann mætir á, í sviðsmynd 5. Færðu músina yfir línu til að lýsa hana upp og sjá hver fagráðsmaðurinn er."
+#| fig-cap: "Í hvaða röð fagráðsmenn fara af hverjum fundi, í sviðsmynd 4. Hver fagráðsmaður er eitt band; ofar þýðir að hann fer seinna og neðst eru þeir sem mæta ekki (–). Talan er dagskrárliðurinn þegar farið er. Smelltu á kóða fagráðsmanns við jaðarinn til að lýsa band hans upp."
 #| fig-height: 6.5
 #| fig-width: 9
 #| eval: !expr '"scratch" %in% names(schedules)'
-plot_exit_flow_interactive(schedules[["scratch"]])
+plot_exit_sankey_interactive(schedules[["scratch"]])
 ```
 
 :::

@@ -7,6 +7,16 @@ source("../code/panel_schedule.R", chdir = TRUE)
 held <- held_meetings(panel)
 worst <- held %>% group_by(member) %>% summarise(waiting = sum(waiting), .groups = "drop") %>%
   arrange(desc(waiting))
+# Conflicted members still in the meeting when that proposal was taken (red in fig-held).
+stepped_out <- held_conflicts(panel) %>% filter(in_meeting)
+n_stepped_out <- nrow(stepped_out)
+by_meeting <- function(d) d %>% count(meeting) %>%
+  summarise(text = paste0(n, " á ", meeting, collapse = " og ")) %>% pull(text)
+stepped_out_by_meeting <- by_meeting(stepped_out)
+# Conflicted members who had left, or did not attend (pink in fig-held).
+away <- held_conflicts(panel) %>% filter(!in_meeting)
+n_away <- nrow(away)
+away_by_meeting <- by_meeting(away)
 ```
 
 ## Hvað gerðist á fyrstu tveimur fundunum
@@ -16,7 +26,7 @@ fagráðsmann hvenær umsóknir hans voru teknar fyrir og hversu lengi hann þur
 
 ```{r}
 #| label: fig-held
-#| fig-cap: "Fundirnir tveir sem eru búnir. Hver lína er einn fagráðsmaður: gráa línan er tími hans á fundinum, frá upphafi þar til síðasta umsókn hans er tekin fyrir; blátt merkir hans eigin umsóknir. Reitirnir hægra megin sýna uppsafnaða biðpunkta eftir hvern fund; fagráðsmenn sem mættu ekki halda stöðu sinni frá fyrri fundi."
+#| fig-cap: "Fundirnir tveir sem eru búnir. Hver lína er einn fagráðsmaður: gráa línan er tími hans á fundinum, frá upphafi þar til síðasta umsókn hans er tekin fyrir; blátt merkir hans eigin umsóknir rautt umsókn sem hann er vanhæfur í og þarf að víkja af fundi á meðan, og bleikt umsókn sem hann er vanhæfur í en er þá farinn eða mætti ekki. Reitirnir hægra megin sýna uppsafnaða biðpunkta eftir hvern fund; fagráðsmenn sem mættu ekki halda stöðu sinni frá fyrri fundi."
 #| fig-height: 6.8
 #| fig-width: 9
 plot_held(panel)
@@ -32,16 +42,100 @@ Biðin er ójöfn og hún safnast upp. Á fundunum tveimur sat sá fagráðsmað
 sat undir `r min(worst$waiting)`. Þeir sem voru síðastir á M1 voru oft síðastir aftur á M2.
 Ekkert í núverandi ferli man hver beið síðast.
 
+Rauðu reitirnir á @fig-held eru dagskrárliðir þar sem fagráðsmaður má ekki vera inni á fundinum:
+umsókn sem hann er vanhæfur í er tekin fyrir áður en síðasta umsókn hans sjálfs er afgreidd, svo
+hann þarf að bregða sér út og koma aftur. Þetta gerðist `r n_stepped_out` sinnum á fundunum tveimur
+(`r stepped_out_by_meeting`). Bleiku reitirnir sýna hitt tilvikið, þar sem enginn þarf að víkja:
+fagráðsmaðurinn er vanhæfur í umsókninni en er þegar farinn af fundinum, eða mætti alls ekki á
+hann. Þetta átti við `r n_away` sinnum (`r away_by_meeting`), og þannig ætti það helst alltaf að
+vera.
+
+## Sanngirni sem úthlutunarvandi {#sec-equity}
+
+Áður en nokkuð er bestað þarf að svara því *hvað* á að besta og *hvers vegna*. Sú spurning er ekki
+ný. Hún er viðfangsefni fræða um sanngjarna úthlutun (e. *equity*), og APAP-verkefnið hvílir á sama
+grunni (@sec-apap).
+
+@young1994equity skilgreinir *úthlutunarvanda* sem aðstæður þar sem hópur heldur sameiginlega á
+gæðum, byrðum eða kostnaði sem skipta þarf á milli einstaklinganna. Fagráðsfundur er slíkur vandi.
+Byrðin er fundartíminn: einhver á síðustu umsóknina á dagskrá og situr til loka, og það þarf að
+ákveða hver það er.
+
+**Byrðin er ódeilanleg.** Dagskrárlið verður ekki skipt: nákvæmlega ein umsókn er fyrst og
+nákvæmlega ein síðust. Young lýsir tveimur algengum leiðum til að skipta ódeilanlegum gæðum með
+sanngjörnum hætti. Önnur er að *skiptast á* (e. *rotation*), þannig að sanngirnin náist yfir röð
+úthlutana en ekki í hverri fyrir sig. Hin er *stigakerfi* sem raðar fólki eftir uppsöfnuðu
+tilkalli, líkt og stigin sem réðu því hverjir voru fyrst leystir úr bandaríska hernum eftir 1945 og
+stigin sem notuð eru við úthlutun nýrna. Hér er hvoru tveggja beitt: biðpunktarnir eru stigin, og
+röðin á dagskrá skiptist á milli funda þannig að stigin jafnist yfir lotuna.
+
+**Byrðin er röð.** Á fundi er ekki verið að úthluta einum gæðum heldur heilli röð: hver
+fagráðsmaður sem mætir fær sinn stað í henni. Biðpunktarnir breyta röðinni í mælikvarða sem hægt er
+að leggja saman og jafna yfir tíma.
+
+**Einn fundur getur ekki verið sanngjarn.** Algengt viðmið er að enginn öfundi annan af hlut hans
+(e. *envy-freeness*). Það gagnast ekki á einum fundi: allir sem eru seint á dagskrá vildu frekar
+vera snemma, og aðeins einn getur verið fyrstur. Rétta spurningin er hvort ávinningur og byrði
+jafnist yfir endurteknar úthlutanir [@ajtai1998fairness; @gross2019satisfaction;
+@hermelin2025fairness]. Lærdómurinn úr APAP er að það gerist ekki af sjálfu sér: sanngjarnar vikur
+lögðust ekki saman í sanngirni til lengri tíma, því fyrri byrði hafði engin áhrif á næstu
+úthlutun. Þess vegna er byrðin hér gerð upp yfir alla lotuna og fundir sem eru búnir taldir með
+(@sec-horizon).
+
+**Jafnt, í hlutfalli eða eftir forgangi?** Young greinir á milli þriggja meginreglna: *jafnræðis*
+(allir fá jafnt), *hlutfalls* (hver fær í hlutfalli við það sem greinir hann frá öðrum) og
+*forgangs* (sá sem á ríkast tilkall gengur fyrir). Hlutfallsreglan er kennd við Aristóteles: fara
+skal eins með þá sem eru jafnir, og misjafnt með þá sem eru ójafnir, í hlutfalli við þann mun sem
+máli skiptir. Vandinn er að ákveða hvaða munur skiptir máli. Í APAP var það fjöldi vinnudaga, svo
+stig voru borin saman á hvern vinnudag. Í fagráðinu fylgir greiðslan þegar hlutfallsreglunni: greitt
+er fyrir hverja umsókn og hvert hlutverk. Bindingin og biðin eru hins vegar ólaunaðar, og þá er
+ekki augljóst að sá sem hefur fleiri umsóknir eigi að bera meira af þeim. Þar stendur valið á milli
+hlutfalls og jafnræðis, sjá @sec-fair-relative.
+
+**Óhlutdrægni.** Þeir sem eru eins að því leyti sem máli skiptir eiga að fá sömu meðferð. Tvennt í
+núverandi verklagi stenst það illa. Röð lesara fylgir stafrófinu (@sec-data), svo upphafsstafir
+ráða því hver talar næstur. Og dagskránni er breytt fyrir þá sem senda póst og biðja um það, svo
+hluturinn ræðst af því hver biður. Regla sem er þekkt fyrir fram og reiknuð eins fyrir alla
+fjarlægir hvort tveggja. Skyld krafa er að reglan sé *óbjöguð*: yfir margar úthlutanir á frávik
+hvers og eins frá sínum hlut að jafnast út en ekki safnast upp. Það er það sem mælikvarðarnir hér
+að neðan fylgjast með yfir lotuna.
+
+**Sá verst setti.** Líkanið lágmarkar byrði þess fagráðsmanns sem verst er settur. Það er
+reglan sem kennd er við Rawls [@rawls1971justice]: fyrst er hugað að þeim sem ber mest, og það er
+ekki talið til ókosta að einhver annar sleppi vel. Sanngirni hefur sitt verð [@bertsimas2011price]:
+sanngjarnasta dagskráin er ekki endilega sú sem gefur minnsta heildarbið. Líkanið hefur því líka
+litla vigt á meðalbyrði, svo enginn bíði að óþörfu.
+
+**Bætur.** Þegar ekki er hægt að jafna byrðina sjálfa má bæta hana upp með öðru. Dagskrá þar sem
+allir bíða jafnlengi er ekki alltaf til, og erfitt er að finna hana. Þeir sem bíða óþarflega mikið
+gætu þá fengið fleiri ritstjórahlutverk, sem eru betur greidd, og þannig umbun fyrir viðveru sem
+annars er ólaunuð (@sec-roles, @sec-limitations).
+
+@tbl-design svarar fyrir fagráðið þeim spurningum sem @young1994equity setur fram um hverja
+úthlutunarreglu.
+
+| Spurning | Fagráðið |
+|---|---|
+| Hvaða form tekur úthlutunin? | Dagskrárröð á hverjum fundi; hver dagskrárliður er ódeilanlegur |
+| Hverjir eiga hlut að máli? | Fagráðsmenn sem eiga umsókn á fundinum |
+| Hvað er talið? | Binding (fundir sem mætt er á) og bið (biðpunktar) |
+| Hvaða meginregla? | Hlutfall (byrði á hverja umsókn) eða jafnræði (ólaunuð byrði óskipt), sjá @sec-fair-relative |
+| Hvað er þegar fast? | Fundir sem eru búnir, auglýstur næsti fundur, vanhæfi og fundir sem fagráðsmaður kemst ekki á |
+| Hvernig eru ólík sjónarmið sætt? | Vegið markfall: sá verst setti fyrst, síðan meðalbyrði, vanhæfi og frestanir (@sec-model) |
+| Hvaða hvata skapar reglan? | Minni ástæða er til að biðja um tilfærslur þegar röðin fylgir þekktri reglu. Ef fagráðsmenn gefa sjálfir upp $\alpha_r$ þarf að gæta þess að það borgi sig ekki að ýkja |
+
+: Spurningar @young1994equity um úthlutunarreglu, svarað fyrir fagráðið. {#tbl-design}
+
 ## Bið ein og sér er ekki réttur mælikvarði
 
 Freistandi er að mæla sanngirni eingöngu með bið innan fundar. Þá vantar hálfa byrðina.
-Fagráðsmaður sem á enga umsókn á fundi þarf alls ekki að mæta og getur ráðstafað kvöldinu að vild.
+Fagráðsmaður sem á enga umsókn á fundi þarf alls ekki að mæta og getur ráðstafað tímanum sínum að vild.
 Fagráðsmaður sem á umsókn á hverjum fundi er bundinn í hverri viku, jafnvel þótt hann sitji aðeins
 stutta stund.
 
 Byrði fagráðsmanns yfir lotuna hefur því tvo þætti:
 
-* **Binding:** hver fundur sem hann þarf að mæta á. Fundurinn bindur kvöldið, hvað sem gerist á
+* **Binding:** hver fundur sem hann þarf að mæta á. Fundurinn bindur eftirmiðdaginn, hvað sem gerist á
   honum.
 * **Bið:** hversu lengi hann þarf að sitja á hverjum fundi, þar til síðasta umsókn hans hefur
   verið tekin fyrir.
@@ -78,6 +172,11 @@ alfarið ekki á fundinum þegar sú umsókn er tekin fyrir, eða væri þegar f
 tryggja það: vanhæfur fagráðsmaður á annaðhvort ekki umsókn á þeim fundi eða allar umsóknir hans
 eru teknar fyrir á undan umsókninni sem hann er vanhæfur í.
 
+Þegar fagráðsmaður þarf að bregða sér af fundi kemur brot í flæði fundarins. Hann veit heldur ekki
+hvenær hann á að koma aftur, því að tíminn sem hver umsókn tekur er mjög misjafn: stundum nokkrar
+mínútur, stundum hátt í hálftíma. Ef hans eigin umsókn er of fljótt aftur á dagskrá er hætt við að
+hann sé ekki kominn til baka í tæka tíð, og þá þarf fundurinn að bíða eftir honum.
+
 Þetta er ekki alltaf hægt. Ef tveir fagráðsmenn eru vanhæfir hvor í umsókn hins, og báðar
 umsóknirnar eru á sama fundi, verður annar þeirra að vera viðstaddur. Þetta er því **mjúk skorða**: hvert
 frávik er leyft en kostar mikið í markfallinu, og líkanið gefur upp hversu mörg frávik eru eftir.
@@ -95,13 +194,33 @@ Til að bera saman dagskrár eru nokkrir mælikvarðar reiknaðir fyrir hvern fa
   fjölda eigin umsókna, svo bera megi saman fagráðsmenn með ólíkt álag.
 * **Fundir sem mætt er á** og **byrði á umsókn** (binding auk biðar), sem líkanið jafnar.
 
-## Sanngjarnt miðað við hvað?
+## Sanngjarnt miðað við hvað? {#sec-fair-relative}
 
 Fagráðsmenn hafa ekki allir jafnmargar umsóknir og sá sem hefur 20 umsóknir getur ekki búist við
-jafnstuttum kvöldum og sá sem hefur 10. Byrði er því borin saman **á hverja umsókn**: byrði
+jafnstuttum fundum og sá sem hefur 10. Byrði er því borin saman **á hverja umsókn**: byrði
 fagráðsmanns deilt með fjölda umsókna hans. Líkanið lágmarkar byrði á umsókn hjá þeim sem verst er settur.
 
-## Tímabilið
+Þetta val er ekki sjálfgefið. Biðpunktar telja aðeins umsóknir *annarra* og taka því ekki tillit
+til þess hversu margar umsóknir fagráðsmaður hefur sjálfur: það kostar ekkert að flytja sína eigin
+umsókn. Greitt er fyrir hverja umsókn (@sec-data), en bindingin og biðin eru ólaunaðar. Sé byrðinni
+deilt með fjölda umsókna má sá sem hefur flestar umsóknir bíða lengst, og það er spurning hvort
+það sé sanngjarnt. Hinn kosturinn er að bera saman byrðina óskipta, svo að enginn sitji uppi með
+meiri bindingu og bið en aðrir, hversu margar umsóknir sem hann hefur. Einnig má skoða
+**heildarviðveru** í stað biðar eingöngu: alla dagskrárliði sem fagráðsmaður situr, að hans eigin
+umsóknum meðtöldum.
+
+Bið og binding eru auk þess ólíkir kvarðar, og á milli þeirra er málamiðlun: færri fundir þýða
+lengri setu á hverjum fundi, og styttri seta þýðir fleiri fundi. $\alpha_r$ ræður því hvernig þetta
+tvennt er vegið saman og þar með hvað telst sanngjörn byrði. Til að finna gott hlutfall þarf
+næmnigreiningu: keyra líkanið fyrir nokkur gildi á $\alpha$ og skoða hvernig fundafjöldi og bið
+breytast hjá hverjum fagráðsmanni.
+
+Það sem vantar enn í líkanið er **markgildi biðar**, líkt og markgildi vikunnar í APAP
+(@sec-apap-objective), svo að allir bíði um það bil jafnlengi. Slíkt líkan er mun erfiðara að
+besta. Þar sem jöfn bið næst ekki má **umbuna** þeim sem bíða óþarflega mikið með því að gera þá
+oftar að ritstjórum, og bæta þannig upp viðveru sem annars er ólaunuð (@sec-limitations).
+
+## Tímabilið {#sec-horizon}
 
 Einn fundur getur ekki verið sanngjarn við alla, en röð funda getur það. Byrðin er því gerð upp
 yfir alla lotuna, svo að erfiður fundur er bættur upp síðar:
@@ -124,11 +243,13 @@ hverri umsókn, hefur sínar eigin sanngirnisspurningar (@sec-data):
 * svipað heildarálag og jafn fjöldi ritstjóra-, lesara 1- og lesara 2-hlutverka, svo allir fái
   svipað rými í umræðunni;
 * **nýir fagráðsmenn** með takmarkaðan fjölda umsókna og ritstjórahlutverka, og ritstjórahlutverk
-  þeirra seinna í lotunni, eftir að þeir hafa fyrst verið lesarar.
+  þeirra seinna í lotunni, eftir að þeir hafa fyrst verið lesarar;
+* **mest tveir nýir á hverri umsókn**, svo að minnst einn reynslubolti sé í hópnum.
 
-Fyrir nýja fagráðsmenn er löng seta ekki endilega byrði. Það getur verið betra að leyfa þeim að
-sitja meðvitað lengri fundi, svo þeir fái að hlusta á umræður reyndari fagráðsmanna: rökin og
-aðferðafræðina við úrvinnslu umsókna. Í líkaninu má gera það með lægra $\alpha_r$ eða minni vigt á
-bið hjá nýjum fagráðsmönnum.
+Fyrir nýja fagráðsmenn er löng seta ekki endilega byrði. Það getur verið betra að láta þá meðvitað
+bíða lengur á fyrstu fundunum, svo þeir fái að hlusta á umræður reyndari fagráðsmanna: rökin og
+aðferðafræðina við úrvinnslu umsókna. Margir sitja hvort eð er lengur á fyrstu fundunum til að
+læra. Í líkaninu má gera það með lægra $\alpha_r$ eða minni vigt á bið hjá nýjum fagráðsmönnum á
+fyrstu fundunum.
 
 Þessi bók byrjar á fundaskipaninni og tekur núverandi úthlutun hlutverka sem gefna.

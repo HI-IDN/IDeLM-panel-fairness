@@ -11,9 +11,13 @@ lýkur.
 
 Að vera framarlega í röðinni er ávinningur og að vera síðastur er ókostur, svo hvert sæti í
 röðinni gefur **stig**. APAP-líkanið raðar læknum í heimferðarröð á hverjum degi þannig að **yfir
-margra vikna tímabil** haldist stig hvers læknis á hvern vinnudag nálægt sameiginlegu marki.
+vikuna** haldist stig hvers læknis á hvern vinnudag nálægt sameiginlegu marki.
 Læknir sem var síðastur í gær er líklegur til að vera framarlega í dag. Einn dagur getur ekki
 verið sanngjarn við alla; röð daga getur það.
+
+Líkaninu, gögnunum og niðurstöðunum er lýst í heild í
+[greinargerð APAP-verkefnisins](https://hi-idn.github.io/IDeLM-APAP/) (á ensku). Hér er aðeins
+það rakið sem skiptir máli fyrir fagráðið.
 
 ## Líkanið í hnotskurn
 
@@ -22,13 +26,49 @@ verið sanngjarn við alla; röð daga getur það.
 * **Fastir þættir:** sumir læknar eru þegar bundnir tiltekinn dag (bakvakt, kvöldvakt,
   hjartaskurðaðgerðir, stjórnun, stjórnsýsla, annar vinnustaður). Þeim er úthlutað fyrir fram og
   þeir eru ekki í heimferðarröðinni, en vinnuálag þeirra telur samt.
-* **Jöfnuður:** heildarstig hvers læknis deilt með fjölda vinnudaga er haldið nálægt miðgildi.
-  Tvíundarbreytur merkja lækna sem víkja meira en 1, 0,5 eða 0,2 stig frá og markfallið refsar
-  fyrir þær, mest fyrir stærsta frávikið.
+* **Jöfnuður:** heildarstig hvers læknis deilt með fjölda vinnudaga er haldið nálægt markgildi
+  vikunnar. Tvíundarbreytur merkja lækna sem eru innan 1, 0,5 eða 0,2 stiga frá markgildinu og
+  markfallið umbunar fyrir þær (sjá @sec-apap-objective).
 * **Aðrar reglur:** óskir eru virtar, hlutverkum í hjartaskurðaðgerðum og stjórnun er dreift
   jafnt, enginn gegnir báðum sama dag og enginn stýrir tvo daga í röð.
-* **Tímabil:** líkanið er keyrt viku fyrir viku og ber stigasögu hvers læknis áfram, svo að
-  ósanngirni fyrr á tímabilinu er bætt upp síðar.
+* **Tímabil:** líkanið er keyrt viku fyrir viku og hver vika er jöfnuð út af fyrir sig. Stig eru
+  ekki borin á milli vikna, svo að læknir sem er ítrekað aðeins yfir markgildinu fær það ekki bætt
+  upp síðar. Þetta er meginniðurstaða APAP-verkefnisins: sanngirni innan viku tryggir ekki
+  sanngirni til lengri tíma.
+
+## Markfallið {#sec-apap-objective}
+
+[Markfall APAP](https://hi-idn.github.io/IDeLM-APAP/#objective) hefur þrjá liði og er hámarkað:
+
+$$
+\max \;\; \underbrace{\sum_{\varepsilon \in E} \varepsilon \sum_{d \in D} y^\varepsilon_d}_{\text{jöfnuður}}
+\;-\; \beta \, \underbrace{(M^w + M^z + M^{wz})}_{\text{dreifing hlutverka}}
+\;+\; \gamma \, \underbrace{\sum_{t \in T^w} \sum_{d \in L_t \cap H} z_{dt}}_{\text{stjórnandi af vaktinni}}
+$$
+
+Hér er $D$ mengi lækna og $E = \{1;\ 0{,}5;\ 0{,}2\}$ vikmörkin þrjú. $y^\varepsilon_d$ er 1 ef stig
+læknis $d$ á hvern vinnudag eru innan $\pm\varepsilon$ frá markgildi vikunnar. $M^w$, $M^z$ og
+$M^{wz}$ eru mesti fjöldi skipta sem einhver einn læknir sinnir hjartaskurðaðgerðum, stjórnun og
+hvoru tveggja samanlagt í vikunni. $z_{dt}$ er 1 ef læknir $d$ stýrir virka daginn $t$, og
+$L_t \cap H$ eru þeir læknar á bakvakt eða kvöldvakt þann dag sem mega stýra. Vigtirnar eru
+$\beta = 0{,}01$ og $\gamma = 0{,}001$.
+
+Á mannamáli:
+
+* **Jöfnuður** ræður mestu. Líkanið telur hversu margir læknar eru nálægt markgildi vikunnar, og
+  því nær, því betra: læknir innan 1 stigs gefur 1, innan 0,5 stiga gefur 0,5 til viðbótar og
+  innan 0,2 stiga enn 0,2, samtals mest 1,7. Læknir sem er meira en 1 stig frá gefur ekkert.
+  Markgildið er ekki ákveðið fyrir fram. Líkanið velur það sjálft þar sem flestir lenda innan
+  vikmarkanna, og það verður nálægt miðgildi hópsins.
+* **Dreifing hlutverka**, með lítilli vigt $\beta$, gerir út um jafntefli. Liðurinn lækkar þegar
+  sá sem oftast sinnir hjartaskurðaðgerðum eða stjórnun í vikunni gerir það sjaldnar, svo að
+  hlutverkin lendi ekki öll á sama lækni.
+* **Stjórnandi af vaktinni**, með enn minni vigt $\gamma$, telur þá daga sem stjórnandinn kemur
+  úr hópi lækna á bakvakt eða kvöldvakt, því að þeir eru hvort eð er lengi fram eftir.
+
+Munurinn á fagráðslíkaninu sést strax í fyrsta liðnum. APAP *telur* hversu margir eru nálægt
+markinu en horfir ekki á hversu langt sá verst setti er frá því. Fagráðslíkanið lágmarkar í
+staðinn byrði þess sem verst er settur (@sec-model).
 
 ## Hvað flyst yfir á fagráðið
 
@@ -38,11 +78,11 @@ verið sanngjarn við alla; röð daga getur það.
 | Dagur | Fundur |
 | Skurðstofa sem tekur óþekktan tíma | Umsóknir teknar fyrir ein í einu |
 | Heimferðarröð (1., 2., …) | Dagskrárliður síðustu umsóknar fagráðsmanns: hvenær hann má fara |
-| Stig sem safnast yfir vikur | Byrði sem safnast yfir fundi umsóknarlotunnar |
+| Stig sem safnast yfir daga vikunnar | Byrði sem safnast yfir fundi umsóknarlotunnar |
 | Fyrir fram úthlutaðar skyldur (bakvakt, stjórnsýsla, …) | Fastir þættir: fundir sem þegar eru haldnir, vanhæfi, fundir sem fagráðsmaður kemst ekki á |
 | Dagar sem ekki er unnið | Fundir sem fagráðsmaður þarf ekki að mæta á |
 
 Síðasta línan er þar sem vandamálin eru ólíkust. Læknir sem er ekki í vinnu er einfaldlega í
 fríi; í APAP eru stigin því deilt með fjölda vinnudaga. Í fagráðinu er það ávinningur í sjálfu sér
-að *þurfa ekki að mæta* á fund: kvöldið er frjálst. @sec-fairness byggir sanngirnismælikvarðann í
+að *þurfa ekki að mæta* á fund: eftirmiðdagurinn er frjáls. @sec-fairness byggir sanngirnismælikvarðann í
 kringum þetta.
