@@ -9,6 +9,9 @@ venv/
 .idea/
 .vscode/
 
+# Local working notes
+/TODO.md
+
 # R
 .Rhistory
 .RData
