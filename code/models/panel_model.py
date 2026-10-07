@@ -823,10 +823,7 @@ class PanelScheduleModel:
             excess = over.sum() / len(self.data.members)
         # Soft cap: over[r, m] >= own proposals - soft_max_per_member, in the same meetings.
         above_cap = 0
-        # A soft cap at or above the hard cap can never bind, so it is not switched on.
-        soft_binds = not (self.max_per_member and self.soft_max_per_member
-                          and self.soft_max_per_member >= self.max_per_member)
-        if self.soft_max_per_member and self.soft_max_weight and soft_binds:
+        if self.soft_max_per_member and self.soft_max_weight:
             over = {}
             for r in self.data.members:
                 for m in self._limited(r):
