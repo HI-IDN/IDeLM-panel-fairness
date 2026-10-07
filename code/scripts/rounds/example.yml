@@ -1,0 +1,18 @@
+# One round of runs, in order (run with: python scripts/run_round.py scripts/rounds/example.yml, from code/).
+# Each run writes <results>/<name>_agenda.csv etc. and a log; the next run may start from an earlier one.
+# Copy this file to scripts/rounds/<your round>.yml; files holding real data stay under data/tdf/ (gitignored).
+panel: ../data/tdf/panel.csv
+results: ../data/tdf/results
+common: >-            # options for every run
+  --unavailable ../data/tdf/unavailable.csv --windows ../data/tdf/windows.csv
+  --fairness lexburden --meetings-slack 2
+runs:
+  - name: round_a
+    options: --fix-meetings M1 M2 M3 --fewest-meetings R01
+    time_limit: 600            # seconds
+    check: --closed M3 --max-per-member 4
+  - name: round_b
+    start: round_a             # warm start from the agenda of that run
+    options: --fix-meetings M1 M2 M3 --fewest-meetings R01
+    time_limit: 10800
+    check: --closed M3 --max-per-member 4

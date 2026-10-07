@@ -9,6 +9,11 @@ total_weight: 0.01    # weight of the total burden next to the worst-off member'
 coi_penalty: 1.0      # objective penalty each time a conflicted member is present
 time_limit: 600       # solver time limit in seconds
 unavailable: null     # CSV of meetings members cannot attend (member, meeting), or null for none
+windows: null         # CSV of times members can be present within a meeting (member, meeting, from, to), or null
+meeting_start: '16:00'  # start of every meeting, to turn the times in windows into slots
+slot_minutes: 11      # minutes per proposal, likewise
+leave_margin_minutes: 15  # taken off every end time in windows: nobody is planned to the edge
+fewest_meetings: []   # members whose number of meetings is minimised first of all (step modes)
 max_per_member: 5     # most own proposals of one member in a meeting not yet held (null: no limit)
 soft_max_per_member: 4  # soft cap on own proposals in a meeting; each one above costs soft_max_weight
 soft_max_weight: 0.5    # weight of the proposals above the soft cap, per member

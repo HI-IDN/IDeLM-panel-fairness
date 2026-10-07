@@ -27,6 +27,10 @@ Meetings that have already been held are fixed: their proposals stay in that mee
 order is fixed too when an agenda is given. Their burden counts towards the round, just like APAP
 carries points from earlier days.
 
+Members can be present for only part of a meeting (a time window: leaves by a fixed time, arrives
+late); their own proposals then go in slots inside it. Members listed in fewest_meetings have their
+number of meetings minimised before anything else.
+
 Members can be unavailable for some meetings (other obligations); none of their proposals are
 then scheduled there. A member with a conflict of interest in a proposal is never present when it
 is discussed: they either don't attend that meeting or have left before it comes up.
@@ -63,6 +67,7 @@ class PanelData:
     fixed_position: dict = field(default_factory=dict)  # proposal -> slot, when agenda known
     unavailable: dict = field(default_factory=dict)     # member -> meetings they can't attend
     coi: dict = field(default_factory=dict)             # proposal -> members with a conflict
+    windows: dict = field(default_factory=dict)         # (member, meeting) -> (first slot, last slot)
 
     @property
     def members(self):
@@ -107,6 +112,34 @@ def read_unavailable(unavailable_file):
     return unavailable
 
 
+def _minutes(clock):
+    hours, minutes = clock.strip().split(':')
+    return 60 * int(hours) + int(minutes)
+
+
+def read_windows(windows_file, meetings, meeting_start, slot_minutes, margin=0):
+    """Times a member can be present within a meeting: columns member, meeting, from, to. Times are
+    HH:MM, either may be empty (open end); meeting '*' means every meeting. Slot k takes
+    [start + (k - 1) * d, start + k * d), and a member can have a proposal in it only if the whole
+    slot lies inside their window. Returns {(member, meeting): (first slot, last slot)}, the last
+    slot None for no limit. The margin (minutes) is taken off every end time, so nobody is planned
+    to the edge of when they have to leave."""
+    start, windows = _minutes(meeting_start), {}
+    with open(windows_file, newline='', encoding='utf-8-sig') as f:
+        for row in csv.DictReader(f):
+            first, last = 1, None
+            if row['from'].strip():
+                first = max(1, -(-(_minutes(row['from']) - start) // slot_minutes) + 1)  # ceiling
+            if row['to'].strip():
+                last = (_minutes(row['to']) - margin - start) // slot_minutes
+            for m in (meetings if row['meeting'].strip() == '*' else [row['meeting'].strip()]):
+                old_first, old_last = windows.get((row['member'], m), (1, None))
+                windows[row['member'], m] = (max(first, old_first),
+                                             old_last if last is None else
+                                             last if old_last is None else min(last, old_last))
+    return windows
+
+
 def read_new_members(members_file):
     """Codes of new panel members: columns member, new (TRUE/FALSE). The file stays local
     (gitignored); without it no member counts as new."""
@@ -140,7 +173,8 @@ def member_measures(data, agenda, alpha):
     for r in data.members:
         a = alpha[r] if isinstance(alpha, dict) else alpha
         meetings = [m for (s, m) in leave if s == r]
-        slots = sum(leave[r, m] for m in meetings)
+        # Slots before a late arrival are not waiting: a member's window opens at slot `first`.
+        slots = sum(leave[r, m] - (data.windows.get((r, m), (1, None))[0] - 1) for m in meetings)
         n = len(data.proposals_of(r))
         waiting = slots - sum(own[r, m] for m in meetings)
         burden = a * len(meetings) + waiting
@@ -244,9 +278,11 @@ class PanelScheduleModel:
                  new_members=(), learning_weight=0.001, learning_until=None, soft_max_per_member=None,
                  soft_max_weight=0.0,
                  rotate_wait=None, meetings_slack=0.0, leximin_levels=3, reference_burden=None,
-                 carry=None):
+                 carry=None, fewest_meetings=()):
         """
         alpha:              cost of attending a meeting, in slots; a number or {member: value}
+        fewest_meetings:    members whose number of meetings is minimised first of all (step modes):
+                            a step before every other, held at its value afterwards
         max_per_meeting:    most proposals one meeting can handle
         total_weight:       weight of the total burden next to the worst-off member's burden
         keep_meetings:      keep every proposal in its current meeting and only choose the order
@@ -262,7 +298,8 @@ class PanelScheduleModel:
                             value means they don't attend the next meeting at all (not applied to the
                             announced next meeting, whose agenda stays)
         soft_max_per_member: soft cap on own proposals in one meeting (same meetings); each
-                            proposal above it costs soft_max_weight in the objective
+                            proposal above it costs soft_max_weight in the objective; it is only
+                            switched on when it is below the hard cap max_per_member
         first_meeting_rule: in the first meeting everyone attends with exactly one proposal, unless
                             that meeting is already closed
         target_per_meeting: {member: target} number of own proposals per meeting attended (e.g. 3.5
@@ -355,6 +392,10 @@ class PanelScheduleModel:
         self.max_per_member = max_per_member
         self.soft_max_per_member = soft_max_per_member
         self.soft_max_weight = soft_max_weight
+        if soft_max_per_member and max_per_member and soft_max_per_member >= max_per_member:
+            # The hard limit already keeps everyone at or below the soft cap: nothing to penalise.
+            print(f'soft cap {soft_max_per_member} is not below the hard limit {max_per_member}: switched off')
+            self.soft_max_weight = 0.0
         self.rotate_wait = rotate_wait
         self.first_meeting_rule = first_meeting_rule
         self.target = target_per_meeting or {}
@@ -367,6 +408,10 @@ class PanelScheduleModel:
         self.leximin_levels = leximin_levels
         self.reference_burden = reference_burden
         self.carry = carry or {}
+        unknown = [r for r in fewest_meetings if r not in data.members]
+        if unknown:
+            raise ValueError(f'fewest_meetings: not members of the panel: {unknown}')
+        self.fewest_meetings = list(fewest_meetings)
         if reference_burden is not None and fairness not in STEP_MODES:
             raise ValueError('reference_burden needs a fairness mode solved in steps')
 
@@ -567,6 +612,21 @@ class PanelScheduleModel:
                 self.m.addConstr(self.leave[r, m] >= own, name=f'leave_own[{r},{m}]')
                 self.m.addConstr(self.leave[r, m] <= len(self.slots[m]) * self.a[r, m],
                                  name=f'leave_attend[{r},{m}]')
+        # Time windows: where a member can only be present part of a meeting, their own proposals
+        # there go in slots inside the window (held meetings already happened). The slots before a
+        # late arrival are free: _stay leaves them out of the waiting.
+        for (r, m), (first, last) in data.windows.items():
+            if (r, m) not in self.leave or m in held:
+                continue
+            for p in data.proposals_of(r):
+                if m in self.allowed[p]:
+                    if first > 1:
+                        self.m.addConstr(self._slot(p, m) >= first * self._placed(p, m),
+                                         name=f'window_from[{r},{p},{m}]')
+                    if last is not None:
+                        self.m.addConstr(self._slot(p, m) <= last, name=f'window_to[{r},{p},{m}]')
+            if last is not None:
+                self.m.addConstr(self.leave[r, m] <= last, name=f'window_leave[{r},{m}]')
         if self.fairness in BAND_MODES:
             self._exact_leave()
         if self.rotate_wait is not None:
@@ -624,13 +684,19 @@ class PanelScheduleModel:
                         self.m.addConstr(self.a[r, nxt] <= 1 - last, name=f'rotate[{p},{r},{m}]')
                         continue
                     big_m = len(self.slots[nxt])
-                    waiting = self.leave[r, nxt] - self._own(r, nxt)
+                    waiting = self._stay(r, nxt) - self._own(r, nxt)
                     self.m.addConstr(waiting <= self.rotate_wait + big_m * (1 - last),
                                      name=f'rotate[{p},{r},{m}]')
 
+    def _stay(self, r, m):
+        """Slots member r sits through in meeting m: up to the slot of their last proposal, minus
+        the slots before the window opens for a late arrival (not waiting: they are not there)."""
+        free = self.data.windows.get((r, m), (1, None))[0] - 1  # also in held meetings: they count
+        return self.leave[r, m] - free * self.a[r, m] if free else self.leave[r, m]
+
     def burden(self, r):
         """Commitment (alpha per meeting attended) plus waiting (slot of the last proposal)."""
-        return quicksum(self.alpha[r] * self.a[r, m] + self.leave[r, m] for m in self.meetings_of[r])
+        return quicksum(self.alpha[r] * self.a[r, m] + self._stay(r, m) for m in self.meetings_of[r])
 
     def unpaid(self, r, carry=True):
         """The burden the fairness steps compare: alpha per meeting attended plus waiting (proposals
@@ -671,7 +737,7 @@ class PanelScheduleModel:
         equity = 0
         for r in data.members:
             n = len(data.proposals_of(r))
-            waiting = quicksum(self.leave[r, m] for m in self.meetings_of[r]) - n
+            waiting = quicksum(self._stay(r, m) for m in self.meetings_of[r]) - n
             attended = quicksum(self.a[r, m] for m in self.meetings_of[r])
             share = 0  # c * attended[r]
             for m in self.meetings_of[r]:
@@ -704,7 +770,7 @@ class PanelScheduleModel:
         for r in self.new_members & set(self.data.members):
             for m in early:
                 if (r, m) in self.leave:
-                    total += self.leave[r, m] - self._own(r, m)
+                    total += self._stay(r, m) - self._own(r, m)
         return total
 
     def _set_objective(self):
@@ -717,7 +783,7 @@ class PanelScheduleModel:
         # Waiting = slots stayed minus own proposals = proposals of others sat through.
         for r in self.data.members:
             n = len(self.data.proposals_of(r))
-            waiting = quicksum(self.leave[r, m] for m in self.meetings_of[r]) - n
+            waiting = quicksum(self._stay(r, m) for m in self.meetings_of[r]) - n
             if self.max_waiting is not None:  # nobody waits longer than in a reference plan
                 self.m.addConstr(waiting <= self.max_waiting, name=f'max_waiting[{r}]')
             if self.fairness == 'total':
@@ -791,7 +857,7 @@ class PanelScheduleModel:
             # member present, a postponed proposal), then the total excess burden over that plan
             # (zero when nobody needs to be worse off). The rules go first because the excess step
             # would otherwise trade them for burden, and its value is held from then on.
-            waiting = quicksum(self.leave.values()) - sum(len(trio) for trio in self.data.reviewers.values())
+            waiting = quicksum(self._stay(r, m) for r, m in self.leave) - sum(len(trio) for trio in self.data.reviewers.values())
             rules = self.postpone_penalty * postponed + self.coi_penalty * quicksum(self.coi_present.values())
             meetings = (quicksum(self.a.values()) + rules
                         + len(self.data.members) * (self.target_weight * deviation + self.pair_weight * excess
@@ -818,6 +884,9 @@ class PanelScheduleModel:
                     excess.append(e)
                 excess = quicksum(excess)
                 self.levels[:0] = [('rules', rules, rules), ('reference', excess, excess)]
+            if self.fewest_meetings:
+                few = quicksum(self.a[r, m] for r in self.fewest_meetings for m in self.meetings_of[r])
+                self.levels.insert(0, ('priority', few, few))
             self.m.setObjective(self.levels[0][1], GRB.MINIMIZE)
             return
         fair = 0 if self.fairness == 'sum' else self.z
@@ -904,7 +973,7 @@ class PanelScheduleModel:
         # The meetings step gets 40% of the time (with a reference plan, the rules step 10% and the
         # reference step 20%); the other steps share the rest equally.
         names = [name for name, _, _ in self.levels]
-        first = {'rules': 0.1, 'reference': 0.2, 'meetings': 0.4}
+        first = {'priority': 0.05, 'rules': 0.1, 'reference': 0.2, 'meetings': 0.4}
         rest = (1 - sum(first.get(n, 0) for n in names)) / max(1, sum(n not in first for n in names))
         shares = [first.get(n, rest) for n in names]
         for (name, objective, held), share in zip(self.levels, shares):
@@ -1052,13 +1121,17 @@ def main():
                         help='Gurobi MIPFocus (1: focus on finding good solutions quickly)')
     parser.add_argument('--start', help='agenda CSV to warm-start from (e.g. the order-only solution)')
     parser.add_argument('--unavailable', help='CSV of meetings members cannot attend (member, meeting)')
+    parser.add_argument('--windows', help='CSV of times members can be present within a meeting '
+                                          '(member, meeting, from, to; HH:MM, empty: open; meeting *: all)')
+    parser.add_argument('--fewest-meetings', nargs='+', metavar='MEMBER',
+                        help='step modes: first of all, minimise the number of meetings these members attend')
     parser.add_argument('--out', required=True, help='output prefix, e.g. ../data/tdf/results/free')
     args = parser.parse_args()
     with open(args.config, encoding='utf-8') as f:
         config = yaml.safe_load(f)
     # Command-line options override the settings file.
     for name in ('alpha', 'max_per_meeting', 'time_limit', 'unavailable', 'max_per_member', 'coi_penalty',
-                 'postpone_penalty', 'leximin_levels', 'meetings_slack', 'alpha_file'):
+                 'postpone_penalty', 'leximin_levels', 'meetings_slack', 'alpha_file', 'windows'):
         if getattr(args, name) is not None:
             config[name] = getattr(args, name)
 
@@ -1078,6 +1151,14 @@ def main():
     if config.get('unavailable'):
         data.unavailable = read_unavailable(config['unavailable'])
         print(f'{sum(map(len, data.unavailable.values()))} member-meeting unavailabilities')
+    if config.get('windows'):
+        data.windows = read_windows(config['windows'], data.meetings, config['meeting_start'],
+                                    config['slot_minutes'], config.get('leave_margin_minutes', 0))
+        print(f'{len(data.windows)} member-meeting time windows '
+              f"(meetings start {config['meeting_start']}, {config['slot_minutes']} min per slot)")
+    fewest = args.fewest_meetings or config.get('fewest_meetings') or []
+    if fewest and args.fairness not in STEP_MODES:
+        parser.error('--fewest-meetings needs a fairness mode solved in steps')
     print(f'{len(data.fixed_position)} proposals fixed by the agenda of held meetings')
     targets = None
     if args.target or args.fairness in STEP_MODES:  # in steps, the targets are part of the first step
@@ -1138,7 +1219,7 @@ def main():
                                rotate_wait=args.rotate_wait,
                                meetings_slack=float(config.get('meetings_slack') or 0.0),
                                leximin_levels=config.get('leximin_levels', 3),
-                               reference_burden=reference, carry=carry)
+                               reference_burden=reference, carry=carry, fewest_meetings=fewest)
     model.m.Params.MIPFocus = args.mip_focus
     if args.start:
         model.set_start(read_agenda(args.start))

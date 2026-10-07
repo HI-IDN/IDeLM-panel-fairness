@@ -46,7 +46,7 @@ code/
     panel_model.py     meetings and order (Gurobi); settings in panel_model.yml
     role_model.py      editor / reader roles, or a full assignment from scratch
     check_agenda.py    checks an agenda against the rules
-  run_panel_scenarios.sh  all scenarios of the book
+  scripts/                run_panel_scenarios.sh (all scenarios of the book), run_round.py (a round from a YAML file)
   run_experiments.py      parameter experiments (results in data/tdf/experiments/)
   export_docs_data.py     copies the results the book needs into docs/data/
   panel_palette.R         colours of all figures (Okabe-Ito and viridis)
@@ -68,7 +68,7 @@ licence that is too small for the full instance.
 ```bash
 pip install -r requirements.txt
 cd code
-bash run_panel_scenarios.sh    # solve all scenarios (results in data/tdf/results/)
+bash scripts/run_panel_scenarios.sh    # solve all scenarios (results in data/tdf/results/)
 python export_docs_data.py     # pseudonymised copies for the book (docs/data/)
 cd ../docs
 quarto render                  # build the book (GitHub Actions does this on push to main)

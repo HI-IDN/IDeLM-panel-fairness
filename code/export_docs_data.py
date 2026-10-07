@@ -13,7 +13,7 @@ solver's progress lines (time, best solution, best bound, gap) for each step.
 Experiments the book refers to (EXPERIMENTS below) go to docs/data/experiments/, with their own
 solver.csv, so their numbers are computed in the book rather than typed in.
 
-Run from code/ after run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
+Run from code/ after scripts/run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
 """
 import argparse
 import csv
@@ -50,7 +50,7 @@ EXPERIMENTS = {
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
 CODE = re.compile(r'^([RAM]\d+|-?\d+(\.\d+)?([eE][-+]?\d+)?|TRUE|FALSE|True|False|yes|no|)$', re.I)  # codes, numbers, flags
-LEVEL = re.compile(r'^(rules|reference|meetings|equity|worst|top\d+|waiting)$')  # step names of the model
+LEVEL = re.compile(r'^(priority|rules|reference|meetings|equity|worst|top\d+|waiting)$')  # step names of the model
 
 
 def copy(src, dst, columns):
