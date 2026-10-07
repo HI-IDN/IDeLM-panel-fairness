@@ -136,6 +136,8 @@ def main():
         ('Mesta bið eins fulltrúa (raufar)', int(max(waiting))),
         ('Mesta byrði eins fulltrúa (alfa × fundir + bið)', int(max(burden))),
         ('Lengd rauf (mín.)', SLOT_MINUTES),
+        ('Keyrsla líkansins', os.path.basename(args.agenda).replace('_agenda.csv', '')),
+        ('Skjal útbúið', dt.date.today().isoformat()),
     ]
     if args.author:
         wb.properties.creator = args.author
@@ -170,7 +172,7 @@ def main():
         ws['A1'].font = Font(bold=True)
         ws['A1'].fill = PatternFill(fill_type=None)
     off = 2 if args.author else 0
-    for r in (1 + off, 6 + off, member_header):
+    for r in (1 + off, 2 + len(rows) + off, member_header):
         for cell in ws[r]:
             if cell.value is not None:
                 cell.font = Font(bold=True)
