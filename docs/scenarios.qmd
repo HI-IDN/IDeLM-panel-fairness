@@ -45,8 +45,7 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    eru borin saman, sem eru ólík aðeins í markfallinu:
    a. **`lexburden`:** þrepamarkfallið, eins og því er lýst í kaflanum um líkanið. Þetta er **tillagan sem
       send var Rannís**: fyrst færri fundir, síðan minnsta mesta byrði og loks minnst heildarbið, með
-      fjarvistum, tímamörkum, hærra $\alpha_r$ fyrir þá sem hafa flestar umsóknir (4 fyrir þá sem hafa
-      flestar, 3 fyrir næstu, 2 fyrir aðra) og forgangi þess sem vill fæsta fundi.
+      fjarvistum, tímamörkum, hærra $\alpha_r$ fyrir þá sem hafa flestar umsóknir ($\alpha_r = 4$ fyrir 22 umsóknir eða fleiri, 3 fyrir 20–21 umsókn, 2 fyrir aðra) og forgangi þess sem vill fæsta fundi.
    b. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
