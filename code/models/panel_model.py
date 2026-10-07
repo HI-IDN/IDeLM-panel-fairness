@@ -298,7 +298,8 @@ class PanelScheduleModel:
                             value means they don't attend the next meeting at all (not applied to the
                             announced next meeting, whose agenda stays)
         soft_max_per_member: soft cap on own proposals in one meeting (same meetings); each
-                            proposal above it costs soft_max_weight in the objective
+                            proposal above it costs soft_max_weight in the objective; it is only
+                            switched on when it is below the hard cap max_per_member
         first_meeting_rule: in the first meeting everyone attends with exactly one proposal, unless
                             that meeting is already closed
         target_per_meeting: {member: target} number of own proposals per meeting attended (e.g. 3.5
@@ -822,7 +823,10 @@ class PanelScheduleModel:
             excess = over.sum() / len(self.data.members)
         # Soft cap: over[r, m] >= own proposals - soft_max_per_member, in the same meetings.
         above_cap = 0
-        if self.soft_max_per_member and self.soft_max_weight:
+        # A soft cap at or above the hard cap can never bind, so it is not switched on.
+        soft_binds = not (self.max_per_member and self.soft_max_per_member
+                          and self.soft_max_per_member >= self.max_per_member)
+        if self.soft_max_per_member and self.soft_max_weight and soft_binds:
             over = {}
             for r in self.data.members:
                 for m in self._limited(r):
