@@ -67,6 +67,15 @@ hafa ekki eigið gildi fá sjálfgefið gildi. Í bili fá allir fagráðsmenn s
 þeirra. Í núverandi útgáfu líkansins hefur $\alpha_r$ minni áhrif en þetta gefur til kynna, því
 fjöldi funda er ákveðinn í fyrsta þrepi, áður en $\alpha_r$ kemur við sögu (@sec-model).
 
+Við skipulag þeirra funda sem eftir eru í yfirstandandi lotu, með raunverulegum fjarvistum, tímagluggum
+innan funda (t.d. að fara fyrr), prófuðum við einnig
+að hækka $\alpha_r$ eftir fjölda umsókna: þeir sem hafa flestar umsóknir fá hærra gildi, þannig að
+fundum þeirra fækkar. Samanborið við sama $\alpha$ fyrir alla fór heildarbið úr 670 í 716 punkta,
+mesta bið einhvers úr 55 í 48 og mesta byrði úr 71 í 62, en Gini-stuðullinn var óbreyttur (0,147).
+Mesta byrðin er ekki beinn samanburður, því $\alpha_r$ er hærra hjá þeim sem bera hana. Hærra
+$\alpha_r$ hjá þeim sem hafa flestar umsóknir léttir því á þeim en kostar nokkra viðbótarbið hjá öðrum.
+Í sviðsmyndum 2a–2d og 3 í @sec-scenarios er $\alpha_r$ stillt á þennan hátt.
+
 ## Fundir sem fagráðsmaður kemst ekki á
 
 Sumir fagráðsmenn vita fyrir fram að þeir komast ekki á tiltekna fundi vegna annarra skuldbindinga.

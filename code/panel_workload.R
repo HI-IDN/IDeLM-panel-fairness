@@ -28,8 +28,7 @@ load_new_members <- function(file) {
   }
   invisible(new_members)
 }
-role_colours <- c("Editor" = "#2a78d6", "Reader" = "#eb6834",
-                  "Reader 1" = "#eb6834", "Reader 2" = "#1baf7a", "Total" = "grey35")
+source("panel_palette.R")  # role_colours, pay_colours and the other figure colours
 
 theme_panel <- theme_minimal(base_size = 11) +
   theme(panel.grid.major.y = element_blank(), panel.grid.minor = element_blank(),
@@ -162,8 +161,6 @@ plot_spread <- function(counts, share = FALSE) {
 
 # Pay per round (ISK): a start fee per member, plus a fee per proposal by role.
 pay_rates <- c(start = 38000, editor = 23000, reader = 15000)
-pay_colours <- c("Start fee" = "grey60", "Editor" = "#2a78d6", "Reader" = "#eb6834", "Reader 1" = "#eb6834",
-                 "Reader 2" = "#1baf7a")
 
 pay_table <- function(counts, rates = pay_rates) {
   member_table(counts) %>%
@@ -300,11 +297,10 @@ plot_meetings <- function(panel) {
     arrange(desc(centre), total)
   per_meeting <- per_meeting %>% mutate(member = factor(member, levels = centre$member))
 
-  # Counts are small integers, so each gets its own step (yellow = 1 ... purple = max) to make
+  # Counts are small integers, so each gets its own step (light = 1 ... dark blue = max) to make
   # differences easy to see; meetings without any of the member's proposals are light grey.
   levels_n <- seq_len(max(per_meeting$n))
-  step_colours <- setNames(viridisLite::viridis(length(levels_n), direction = -1, end = 0.95),
-                           levels_n)
+  step_colours <- setNames(hi_sequential(length(levels_n)), levels_n)
   per_meeting <- per_meeting %>%
     mutate(step = factor(if_else(n == 0, "none", as.character(n)), levels = c("none", levels_n)))
 

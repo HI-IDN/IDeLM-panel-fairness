@@ -85,6 +85,9 @@ gróft mat á því hversu flókinn hann er í framkvæmd:
 * *miðlungs*: nýr hluti líkansins eða ný gögn sem þarf að safna;
 * *mikið*: nýtt líkan, nýjar aðferðir eða tenging við kerfi sjóðsins.
 
+Strax á næstunni er að keyra líkanið áfram á þeim fundum sem eftir eru í yfirstandandi lotu, með
+raunverulegum fjarvistum og tímamörkum, og fara yfir tillöguna með starfsmönnum áður en hún er birt.
+
 ### Sanngirni í líkaninu {#sec-next-fairness}
 
 Óháð rýni á þrepamarkfallinu (@sec-model) benti á eftirfarandi rannsóknarspurningar. Þær sem merktar
