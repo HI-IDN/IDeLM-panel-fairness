@@ -44,7 +44,13 @@ runs:
     options: --fix-meetings M1 M2 M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
     time_limit: 10800
     check: --closed M3 --max-per-member 4
-    note: round6 continued from this for 3 more hours (same settings, 6 hours in all); it is the plan sent to the funder
-# After the last run (round6, the second 3 hours of round5) the book's scenarios were rerun on the same data:
+    note: largest burden 70, Gini 0.143, total waiting 718
+  - name: round6               # the same settings, 3 more hours from round5; the plan sent to the funder
+    start: round5
+    options: --fix-meetings M1 M2 M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
+    time_limit: 10800
+    check: --closed M3 --max-per-member 4
+    note: a different plan from round5 (33 of 116 proposals in another meeting); largest burden 66, Gini 0.123, total waiting 726
+# After round6 the book's scenarios were rerun on the same data:
 #   RESULTS=../data/tdf/results/book MODEL_OPTIONS="--fairness lexburden --meetings-slack 2" \
 #   ONLY="current free free_sum free_leximin free_noworse free_max4" bash scripts/run_panel_scenarios.sh
