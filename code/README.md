@@ -258,6 +258,10 @@ RESULTS=../data/tdf/results/final \
 MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_panel_scenarios.sh
 ```
 
+The runs of the real round (rounds 1 to 6, with their options, start runs and notes) are in
+`scripts/runs.yml` and are run with `python scripts/run_runs.py round5a round5 round6` (`--list` shows
+them, `--dry-run` prints the commands). A new round is a new entry in the file.
+
 | Scenario | What is free |
 |---|---|
 | `current` | the staff's meetings; only the order within each meeting |
