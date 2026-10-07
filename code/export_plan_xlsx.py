@@ -76,6 +76,9 @@ def main():
     ap.add_argument('--meetings', default='M1,M2,M3,M4,M5,M6,M7,M8,M9')
     ap.add_argument('--held', default='M1,M2', help='meetings already held')
     ap.add_argument('--first-open', default='M3', help='the meeting proposals are moved from')
+    ap.add_argument('--postponed', nargs='*', default=[], help='codes of proposals taken off a meeting that has been held')
+    ap.add_argument('--postponed-note', default='frestað af M3: aðeins tveir af þremur höfðu lesið umsóknina',
+                    help='comment on those proposals')
     ap.add_argument('--author', default=os.environ.get('PLAN_AUTHOR', ''),
                     help='author name and contact, written to the workbook properties and the Yfirlit sheet')
     ap.add_argument('--out', default='../data/tdf/results/fundaaetlun_taeknithrounarsjodur_haust2026.xlsx')
@@ -111,6 +114,7 @@ def main():
                    if m == args.first_open and a in scheduled
                    and not any(r['application'] == a and r['meeting'] == args.first_open for r in agenda))
     unscheduled = sorted(a for a in panel if a not in scheduled)
+    moved = sorted(set(moved) | set(args.postponed))
     moved_to = {r['application']: r['meeting'] for r in agenda if r['application'] in moved}
 
     own_positions = {}  # (meeting, member) -> positions of the member's own proposals
@@ -191,7 +195,7 @@ def main():
             p = panel[a]
             notes = []
             if a in moved:
-                notes.append(f'færð af {args.first_open}')
+                notes.append(args.postponed_note if a in args.postponed else f'færð af {args.first_open}')
             for c in [c for c in p['coi'].split(';') if c]:
                 own = own_positions.get((m, c), [])
                 later = [q for q in own if q > pos]
