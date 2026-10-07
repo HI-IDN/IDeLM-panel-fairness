@@ -13,5 +13,8 @@ numpy>=1.24
 # Extract the application overview from the panel's PDF exports (local, one-off)
 pdfplumber>=0.11
 
+# Excel export of the plan (export_plan_xlsx.py)
+openpyxl>=3.1
+
 # Development
 pylint

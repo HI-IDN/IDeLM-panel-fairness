@@ -17,15 +17,15 @@ mkdir -p "$R"
 # The round's real constraints, when their (gitignored) files exist: members' absences and time
 # windows, alpha per member by number of proposals, and the member who wants the fewest meetings.
 D=../data/tdf
-ROUND=""; CHECK_ROUND=""
-[ -f $D/unavailable.csv ] && { ROUND="$ROUND --unavailable $D/unavailable.csv --fewest-meetings ${FEWEST:-R02}"; CHECK_ROUND="$CHECK_ROUND --unavailable $D/unavailable.csv"; }
+ROUND=""; CHECK_ROUND=""; ROUND_STAFF=""; CHECK_STAFF=""
+# The staff's plan (scenario 1) is given: it ignores the absences, so they and the windows are left
+# out of its run and check (a proposal fixed to a meeting its reviewer cannot attend would make the
+# model infeasible, and tight windows could make its fixed meetings infeasible).
+[ -f $D/unavailable.csv ] && { ROUND="$ROUND --unavailable $D/unavailable.csv"; CHECK_ROUND="$CHECK_ROUND --unavailable $D/unavailable.csv"; }
 [ -f $D/windows.csv ] && { ROUND="$ROUND --windows $D/windows.csv"; CHECK_ROUND="$CHECK_ROUND --windows $D/windows.csv"; }
-[ -f $D/alpha_tiers.csv ] && ROUND="$ROUND --alpha-file $D/alpha_tiers.csv"
-
-# The staff's plan (scenario 1) is given: it ignores the absences, so they are left out of its run
-# and check (a proposal fixed to a meeting its reviewer cannot attend would make the model infeasible).
-ROUND_STAFF=${ROUND//--unavailable $D\/unavailable.csv --fewest-meetings ${FEWEST:-R02}/}
-CHECK_STAFF=${CHECK_ROUND//--unavailable $D\/unavailable.csv/}
+[ -f $D/alpha_tiers.csv ] && { ROUND="$ROUND --alpha-file $D/alpha_tiers.csv"; ROUND_STAFF="$ROUND_STAFF --alpha-file $D/alpha_tiers.csv"; }
+# The member who wants the fewest meetings (a code, e.g. FEWEST=R01); needs a fairness mode in steps.
+[ -n "${FEWEST:-}" ] && ROUND="$ROUND --fewest-meetings $FEWEST"
 
 wanted() { [ -z "${ONLY:-}" ] || [[ " $ONLY " == *" $1 "* ]]; }
 

@@ -270,6 +270,21 @@ MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_pan
 | `roles`, `roles_presence`, `roles_presence_free` | roles on the staff's meetings or on `free` |
 | `assign`, `assign_schedule` | reviewers chosen from scratch, then meetings and order for them |
 
+### One round, step by step (`run_round.py`)
+
+For a round that is not the book's scenarios (say the plan for the remaining meetings of the real
+round), list the runs in a YAML file and run them in order from `code/`:
+
+```bash
+python run_round.py rounds/example.yml            # or: nohup python run_round.py rounds/my_round.yml > round.log &
+```
+
+`rounds/example.yml` shows the format: shared options (`common`), then each run with its options,
+time limit, the run to warm-start from (`start`) and the options for `check_agenda`. The runs go one
+after the other in the foreground, and each prints start, done and the check's last line with the
+time, so waiting is only leaving the terminal open (or `nohup`). A failed run stops the round.
+Keep a round file with real values (member codes are fine, real names never) under `data/tdf/`.
+
 Each schedule starts from the solution of the one before (`--start`). Gurobi logs are written next
 to the results and are never committed (they contain licence details).
 

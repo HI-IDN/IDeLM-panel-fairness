@@ -408,7 +408,10 @@ class PanelScheduleModel:
         self.leximin_levels = leximin_levels
         self.reference_burden = reference_burden
         self.carry = carry or {}
-        self.fewest_meetings = [r for r in fewest_meetings if r in data.members]
+        unknown = [r for r in fewest_meetings if r not in data.members]
+        if unknown:
+            raise ValueError(f'fewest_meetings: not members of the panel: {unknown}')
+        self.fewest_meetings = list(fewest_meetings)
         if reference_burden is not None and fairness not in STEP_MODES:
             raise ValueError('reference_burden needs a fairness mode solved in steps')
 
