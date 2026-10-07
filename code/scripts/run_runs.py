@@ -8,6 +8,7 @@ import argparse
 import datetime
 import os
 import re
+import shlex
 import subprocess
 import sys
 
@@ -21,11 +22,12 @@ def now():
 
 
 def build(name, cfg, results_dir):
-    d, run = cfg['defaults'], cfg['runs'][name]
+    d, run = cfg['defaults'], next(r for r in cfg['runs'] if r['name'] == name)
+    split = lambda v: shlex.split(v) if isinstance(v, str) else list(v or [])
     results = results_dir or d['results']
     model = run.get('model', 'panel_model')
-    model_opts = list(d.get('options', [])) + list(run.get('options', []))
-    check_opts = list(run.get('check', []))
+    model_opts = split(d.get('options')) + split(run.get('options'))
+    check_opts = split(run.get('check'))
     for key in run.get('files', []):
         f = cfg['files'][key]
         if not os.path.exists(f['path']):
@@ -47,18 +49,19 @@ def build(name, cfg, results_dir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('runs', nargs='*')
-    ap.add_argument('--list', action='store_true', help='list the runs with their notes')
+    ap.add_argument('--list', action='store_true', help='list the runs')
     ap.add_argument('--dry-run', action='store_true', help='print the commands only')
     ap.add_argument('--results', help='results folder (default from runs.yml)')
     ap.add_argument('--config', default=os.path.join(HERE, 'runs.yml'))
     args = ap.parse_args()
     with open(args.config, encoding='utf-8') as f:
         cfg = yaml.safe_load(f)
+    runs = {r['name']: r for r in cfg['runs']}
     if args.list:
-        for n, r in cfg['runs'].items():
-            print(f'{n:16} start={r.get("start", "-"):8} {r.get("note", "")}')
+        for n, r in runs.items():
+            print(f'{n:16} start={r.get("start", "-")}')
         return
-    unknown = [n for n in args.runs if n not in cfg['runs']]
+    unknown = [n for n in args.runs if n not in runs]
     if unknown or not args.runs:
         sys.exit(f'unknown or no run: {unknown}; see --list')
     for name in args.runs:

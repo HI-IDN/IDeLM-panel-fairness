@@ -10,17 +10,18 @@
 # `files` are local and gitignored. A file that does not exist is left out with a warning.
 #
 # Entry keys:
+#   name         the run's name (its results are <name>_agenda.csv etc.)
 #   model        panel_model (default) or role_model
 #   start        run whose agenda this run starts from (--start <results>/<start>_agenda.csv)
 #   files        keys of `files` below, added to the model run and, where given, to the check
-#   options      extra model options (on top of `defaults.options`)
+#   options      extra model options, one string (on top of `defaults.options`)
 #   time_limit   solver limit in seconds
-#   check        options for models/check_agenda.py (the agenda is checked after the run)
-#   note         what the run was for and how it turned out
+#   check        options for models/check_agenda.py, one string (the agenda is checked after the run)
+# The comment after each name says what the run was for and how it turned out.
 defaults:
   results: ../data/tdf/results
   panel: ../data/tdf/panel.csv
-  options: [--fairness, lexburden, --meetings-slack, 2, --fewest-meetings, R02]
+  options: --fairness lexburden --meetings-slack 2 --fewest-meetings R02
   time_limit: 10800
 
 files:
@@ -30,52 +31,43 @@ files:
   alpha_tiers: {path: ../data/tdf/alpha_tiers.csv, model: --alpha-file}
 
 runs:
-  round:
+  - name: round          # First round, M3 the next meeting, absences and time windows.
     files: [unavailable, windows]
-    options: [--next-meeting, M3]
-    check: [--next-meeting, M3, --max-per-member, 5]
-    note: First round, M3 the next meeting, absences and time windows.
-  round_scratch:
+    options: --next-meeting M3
+    check: --next-meeting M3 --max-per-member 5
+  - name: round_scratch  # The same round planned from the start (nothing fixed).
     files: [unavailable, windows]
-    options: [--from-scratch]
-    check: [--from-scratch, --max-per-member, 5, --first-meeting-rule]
-    note: The same round planned from the start (nothing fixed).
-  round2:
+    options: --from-scratch
+    check: --from-scratch --max-per-member 5 --first-meeting-rule
+  - name: round2         # Repeat of round with the model as it then was.
     files: [unavailable, windows]
-    options: [--next-meeting, M3]
-    check: [--next-meeting, M3, --max-per-member, 5]
-    note: Repeat of round with the model as it then was.
-  round2_scratch:
+    options: --next-meeting M3
+    check: --next-meeting M3 --max-per-member 5
+  - name: round2_scratch # Repeat of round_scratch.
     files: [unavailable, windows]
-    options: [--from-scratch]
-    check: [--from-scratch, --max-per-member, 5, --first-meeting-rule]
-    note: Repeat of round_scratch.
-  round3:
+    options: --from-scratch
+    check: --from-scratch --max-per-member 5 --first-meeting-rule
+  - name: round3         # At most 4 own proposals per meeting; alpha by number of proposals (high levels).
     files: [unavailable, windows, alpha_high]
-    options: [--next-meeting, M3, --max-per-member, 4]
-    check: [--next-meeting, M3, --max-per-member, 4]
-    note: At most 4 own proposals per meeting; alpha by number of proposals (high levels).
-  round4:
+    options: --next-meeting M3 --max-per-member 4
+    check: --next-meeting M3 --max-per-member 4
+  - name: round4         # As round3 with the alpha tiers, warm-started from round3.
     start: round3
     files: [unavailable, windows, alpha_tiers]
-    options: [--next-meeting, M3, --max-per-member, 4]
-    check: [--next-meeting, M3, --max-per-member, 4]
-    note: As round3 with the alpha tiers, warm-started from round3.
-  round5a:
+    options: --next-meeting M3 --max-per-member 4
+    check: --next-meeting M3 --max-per-member 4
+  - name: round5a        # M1-M3 fixed (M3 is the next meeting; its proposals are fixed, order free); M4-M9 optimised. Short run.
     files: [unavailable, windows, alpha_tiers]
-    options: [--fix-meetings, M1, M2, M3, --max-per-member, 4]
+    options: --fix-meetings M1 M2 M3 --max-per-member 4
     time_limit: 600
-    check: [--closed, M3, --max-per-member, 4]
-    note: M1-M3 fixed (M3 is the next meeting; its proposals are fixed, order free); M4-M9 optimised. Short run.
-  round5:
+    check: --closed M3 --max-per-member 4
+  - name: round5         # Long run from round5a.
     start: round5a
     files: [unavailable, windows, alpha_tiers]
-    options: [--fix-meetings, M1, M2, M3, --max-per-member, 4]
-    check: [--closed, M3, --max-per-member, 4]
-    note: Long run from round5a.
-  round6:
+    options: --fix-meetings M1 M2 M3 --max-per-member 4
+    check: --closed M3 --max-per-member 4
+  - name: round6         # Latest round (the agenda for the funder), warm-started from round5.
     start: round5
     files: [unavailable, windows, alpha_tiers]
-    options: [--fix-meetings, M1, M2, M3, --max-per-member, 4]
-    check: [--closed, M3, --max-per-member, 4]
-    note: Latest round (the agenda for the funder), warm-started from round5.
+    options: --fix-meetings M1 M2 M3 --max-per-member 4
+    check: --closed M3 --max-per-member 4
