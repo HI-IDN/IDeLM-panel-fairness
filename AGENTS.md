@@ -26,7 +26,7 @@ fairness for anaesthetists is
   explanation of each term.
 * **Schedule model:** `code/models/panel_model.py` (Gurobi), settings in
   `code/models/panel_model.yml`. Held meetings are fixed through the `position` column of
-  `panel.csv`. All scenarios of the book: `code/run_panel_scenarios.sh`; each agenda is checked with
+  `panel.csv`. All scenarios of the book: `code/scripts/run_panel_scenarios.sh`; each agenda is checked with
   `models/check_agenda.py`. Results go to `data/tdf/results/` (gitignored).
 * **Role model:** `code/models/role_model.py` (editor / reader 1 / reader 2).
 * Python dependencies go in `requirements.txt` at the repo root.

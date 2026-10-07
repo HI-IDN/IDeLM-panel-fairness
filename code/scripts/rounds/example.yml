@@ -1,6 +1,6 @@
-# One round of runs, in order (run with: python run_round.py rounds/example.yml, from code/).
+# One round of runs, in order (run with: python scripts/run_round.py scripts/rounds/example.yml, from code/).
 # Each run writes <results>/<name>_agenda.csv etc. and a log; the next run may start from an earlier one.
-# Copy this file to rounds/<your round>.yml; files holding real data stay under data/tdf/ (gitignored).
+# Copy this file to scripts/rounds/<your round>.yml; files holding real data stay under data/tdf/ (gitignored).
 panel: ../data/tdf/panel.csv
 results: ../data/tdf/results
 common: >-            # options for every run

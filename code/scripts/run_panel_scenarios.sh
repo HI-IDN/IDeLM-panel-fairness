@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run all review-panel scenarios of the book (docs/scenarios.qmd and docs/assign.qmd). Run from code/.
+# Run all review-panel scenarios of the book (docs/scenarios.qmd and docs/assign.qmd). Run from anywhere (it changes to code/ itself).
 # Each scenario writes <name>_agenda.csv, <name>_members.csv, <name>_coi_present.csv,
 # <name>_fairness.csv (fairness measures), <name>_levels.csv (value, bound and gap of each step) and a log to
 # ../data/tdf/results/. Each scenario starts from the solution of the one before (--start).
@@ -10,6 +10,7 @@
 #   ONLY           scenario names to run, e.g. "current free" (default: all)
 #   PANEL          panel file for a run (default ../data/tdf/panel.csv); set per run below
 set -u
+cd "$(dirname "$0")/.." || exit 1   # the paths below are relative to code/
 P=../data/tdf/panel.csv
 R=${RESULTS:-../data/tdf/results}
 mkdir -p "$R"

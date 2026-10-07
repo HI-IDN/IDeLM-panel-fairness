@@ -264,7 +264,7 @@ script_starts <- function(script = run_script) {
 }
 
 # Time limit (minutes) of each run in run_panel_scenarios.sh: "run <name> ... --time-limit <seconds>".
-run_script <- normalizePath("run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
+run_script <- normalizePath("scripts/run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
 script_time_limits <- function(script = run_script) {
   lines <- script_lines(script)
   runs <- regmatches(lines, regexec("^\\s*(?:PANEL=\\S+ )?run (\\w+) .*--time-limit (\\d+)", lines, perl = TRUE))

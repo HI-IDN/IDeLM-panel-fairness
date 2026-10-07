@@ -216,7 +216,7 @@ With `--keep-meetings` it checks that no proposal left its planned meeting, and 
 `--windows` and `--new-editor-from` (alone, the meeting `new_editor_from` in the settings) check unavailable
 meetings and proposals edited by new members coming up too early (held meetings excepted). It also
 prints, without counting them as problems, the conflicted members present and the fairness measures of
-the agenda. `run_panel_scenarios.sh` runs it after every schedule.
+the agenda. `scripts/run_panel_scenarios.sh` runs it after every schedule.
 
 ## Exact order within meetings (`models/order_meetings.py`)
 
@@ -244,18 +244,18 @@ Requires Python 3.10+ with `requirements.txt` and a Gurobi licence (an academic 
 the pip wheel's trial licence is too small). From `code/`:
 
 ```bash
-bash run_panel_scenarios.sh            # all scenarios, results in ../data/tdf/results/
+bash scripts/run_panel_scenarios.sh    # all scenarios, results in ../data/tdf/results/
 python export_docs_data.py             # pseudonymised copies the book reads (../docs/data/)
 python export_plan_xlsx.py --agenda ... --members ...  # Excel plan with real names/titles from the local key files (see its docstring; the xlsx stays under data/tdf/, never committed)
 ```
 
-`run_panel_scenarios.sh` takes environment variables: `RESULTS` (results folder), `MODEL_OPTIONS`
+`scripts/run_panel_scenarios.sh` takes environment variables: `RESULTS` (results folder), `MODEL_OPTIONS`
 (extra options for every schedule run) and `ONLY` (scenario names to run). The final runs of
 1 October 2026 used
 
 ```bash
 RESULTS=../data/tdf/results/final \
-MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_panel_scenarios.sh
+MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash scripts/run_panel_scenarios.sh
 ```
 
 | Scenario | What is free |
@@ -270,16 +270,16 @@ MODEL_OPTIONS="--fairness lexburden --alpha 2 --postpone-penalty 3" bash run_pan
 | `roles`, `roles_presence`, `roles_presence_free` | roles on the staff's meetings or on `free` |
 | `assign`, `assign_schedule` | reviewers chosen from scratch, then meetings and order for them |
 
-### One round, step by step (`run_round.py`)
+### One round, step by step (`scripts/run_round.py`)
 
 For a round that is not the book's scenarios (say the plan for the remaining meetings of the real
 round), list the runs in a YAML file and run them in order from `code/`:
 
 ```bash
-python run_round.py rounds/example.yml            # or: nohup python run_round.py rounds/my_round.yml > round.log &
+python scripts/run_round.py scripts/rounds/example.yml   # or: nohup python scripts/run_round.py scripts/rounds/my_round.yml > round.log &
 ```
 
-`rounds/example.yml` shows the format: shared options (`common`), then each run with its options,
+`scripts/rounds/example.yml` shows the format: shared options (`common`), then each run with its options,
 time limit, the run to warm-start from (`start`) and the options for `check_agenda`. The runs go one
 after the other in the foreground, and each prints start, done and the check's last line with the
 time, so waiting is only leaving the terminal open (or `nohup`). A failed run stops the round.

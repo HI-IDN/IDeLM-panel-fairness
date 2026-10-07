@@ -1,12 +1,13 @@
 """Run the model runs listed in a round file, one after the other, and check each agenda.
 
-    python run_round.py rounds/example.yml [--only NAME ...]
+    python scripts/run_round.py scripts/rounds/example.yml [--only NAME ...]
 
-The runs go in the foreground in the order of the file, so a plain `nohup python run_round.py ... &`
+The runs go in the foreground in the order of the file, so a plain `nohup python scripts/run_round.py ... &`
 or a terminal left open is all the waiting there is: each run prints "start", "done" and the
 check's last line with the time. A failed run stops the round (later runs may start from it).
 """
 import argparse
+import os
 import shlex
 import subprocess
 import sys
@@ -25,7 +26,9 @@ def main():
     ap.add_argument('round_file')
     ap.add_argument('--only', nargs='+', metavar='NAME', help='run only these runs')
     args = ap.parse_args()
-    cfg = yaml.safe_load(Path(args.round_file).read_text(encoding='utf-8'))
+    round_file = Path(args.round_file).resolve()
+    os.chdir(Path(__file__).resolve().parent.parent)  # paths in the round file are relative to code/
+    cfg = yaml.safe_load(round_file.read_text(encoding='utf-8'))
     panel, results = cfg['panel'], Path(cfg['results'])
     results.mkdir(parents=True, exist_ok=True)
     common = shlex.split(cfg.get('common', ''))

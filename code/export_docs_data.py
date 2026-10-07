@@ -13,7 +13,7 @@ solver's progress lines (time, best solution, best bound, gap) for each step.
 Experiments the book refers to (EXPERIMENTS below) go to docs/data/experiments/, with their own
 solver.csv, so their numbers are computed in the book rather than typed in.
 
-Run from code/ after run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
+Run from code/ after scripts/run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
 """
 import argparse
 import csv
