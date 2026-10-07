@@ -71,3 +71,4 @@ runs:
     files: [unavailable, windows, alpha_tiers]
     options: --fix-meetings M1 M2 M3 --max-per-member 4
     check: --closed M3 --max-per-member 4
+    xlsx: fundaaetlun_taeknithrounarsjodur_haust2026.xlsx  # the Excel plan for the funder, made from this run (round6_agenda.csv, round6_members.csv) with export_plan_xlsx.py
