@@ -1,0 +1,56 @@
+# The runs of the 2026 round (TÞS), in the order they were made: M1 and M2 held, M3 next.
+# Everything here is code-only; the real files named below stay under data/tdf/ (gitignored).
+# Run all:  python scripts/run_round.py scripts/rounds/tdf_2026.yml     one: add --only round4
+# `fewest`: R02 is the member who asked for the fewest meetings (first priority of the model).
+# `note` is for people; the runner ignores it.
+panel: ../data/tdf/panel.csv
+results: ../data/tdf/results
+common: >-
+  --unavailable ../data/tdf/unavailable.csv --windows ../data/tdf/windows.csv
+  --fairness lexburden --meetings-slack 2 --fewest-meetings R02
+runs:
+  - name: round                # first plan for the remaining meetings, M3 next
+    note: M3 as advertised; later meetings free; at most 5 own proposals per meeting
+    options: --next-meeting M3
+    time_limit: 10800
+    check: --next-meeting M3 --max-per-member 5
+  - name: round_scratch        # the whole round from the start, nothing fixed
+    options: --from-scratch
+    time_limit: 10800
+    check: --from-scratch --max-per-member 5 --first-meeting-rule
+  - name: round2               # as `round`, rerun; and its from-scratch twin below
+    options: --next-meeting M3
+    time_limit: 10800
+    check: --next-meeting M3 --max-per-member 5
+  - name: round2_scratch
+    options: --from-scratch
+    time_limit: 10800
+    check: --from-scratch --max-per-member 5 --first-meeting-rule
+  - name: round3               # at most 4 own proposals per meeting, higher alpha for members with many proposals
+    options: --next-meeting M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_high.csv
+    time_limit: 10800
+    check: --next-meeting M3 --max-per-member 4
+  - name: round4               # alpha by number of proposals in tiers; warm start from round3
+    start: round3
+    options: --next-meeting M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
+    time_limit: 10800
+    check: --next-meeting M3 --max-per-member 4
+  - name: round5a              # M1-M3 fixed (M3's order free), M4-M9 optimised; short first run
+    options: --fix-meetings M1 M2 M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
+    time_limit: 600
+    check: --closed M3 --max-per-member 4
+  - name: round5               # the same, improved for 3 hours from round5a
+    start: round5a
+    options: --fix-meetings M1 M2 M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
+    time_limit: 10800
+    check: --closed M3 --max-per-member 4
+    note: largest burden 70, Gini 0.143, total waiting 718
+  - name: round6               # the same settings, 3 more hours from round5; the plan sent to the funder
+    start: round5
+    options: --fix-meetings M1 M2 M3 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
+    time_limit: 10800
+    check: --closed M3 --max-per-member 4
+    note: a different plan from round5 (33 of 116 proposals in another meeting); largest burden 66, Gini 0.123, total waiting 726
+# After round6 the book's scenarios were rerun on the same data:
+#   RESULTS=../data/tdf/results/book MODEL_OPTIONS="--fairness lexburden --meetings-slack 2" \
+#   ONLY="current free free_sum free_leximin free_noworse free_max4" bash scripts/run_panel_scenarios.sh

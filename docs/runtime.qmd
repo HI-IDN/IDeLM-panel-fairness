@@ -23,61 +23,22 @@ viðmiðunarplani fá reglurnar 10 % og viðmiðunarplanið 20 %. Hin þrepin sk
 milli sín. Þrep sem klárast fyrr skilar ónotuðum tíma ekki áfram, svo heildartíminn getur orðið
 styttri en tímamörkin.
 
-Flestar sviðsmyndir byrja á lausn annarrar sviðsmyndar og halda áfram þaðan: 2a og 2d byrja á
-lausn 1, 2b, 2c og 3 á lausn 2a og 4 á lausn 3. Samanlagður tími leggur því saman reiknitíma allra
-keyrslna í keðjunni, t.d. 2d = 1 + 2d.
+Sviðsmynd 2a var keyrð í 3 klst. með M1–M3 föstum. Sviðsmyndir 2b–2d og 3 voru keyrðar í 20 mínútur
+hver, og byrjuðu á lausn úr styttri keyrslu, svo þær fengu mun minni tíma og verri upphafslausn en 2a.
+Samanburður þeirra við 2a er því ekki fullkomlega sanngjarn, og þær má keyra aftur frá lausn 2a.
+Sviðsmynd 4 hefur ekki verið keyrð aftur með nýjustu gögnunum.
 
 ```{r}
 #| label: tbl-runtime
-#| tbl-cap: "Tímamörk, notaður reiknitími og bil í síðasta þrepi hverrar sviðsmyndar. Samanlagður tími bætir við reiknitíma keyrslnanna sem sviðsmyndin byrjar á."
+#| tbl-cap: "Tímamörk, notaður reiknitími og bil í síðasta þrepi hverrar sviðsmyndar."
 solver %>%
   arrange(scenario) %>%
   transmute(Sviðsmynd = as.character(scenario),
             `Tímamörk (mín.)` = num(limit_minutes),
             `Reiknitími (mín.)` = num(minutes),
-            `Samanlagður tími (mín.)` = num(total_minutes),
             `Bil (%)` = num(gap)) %>%
-  knitr::kable(align = c("l", "r", "r", "r", "r"))
+  knitr::kable(align = c("l", "r", "r", "r"))
 ```
-
-## Sviðsmynd 2d
-
-Sviðsmynd 2d fékk mestan tíma, því hún er sú sem skilar bestu niðurstöðunni. Hún var keyrð í
-nokkrum áföngum og hver byrjaði á lausn þess fyrri: tillaga starfsmanna (5,0 mín.), fyrsta keyrsla 2d
-(17,3 mín.), keyrsla í 1 klst. (42,7 mín. notaðar), keyrsla með svigrúmi fyrir þrep 1 (`meetings_slack`
-2, 42,1 mín.) og loks lokakeyrsla í 3 klst. með sama svigrúmi (146,1 mín.). Samanlagt eru þetta
-253,2 mín., sem er talan í töflunni. Fleiri keyrslur voru gerðar og hentar (@tbl-runs-2d). Önnur sviðsmynd var ekki keyrð svona lengi, svo samanburðurinn
-er ekki alveg sanngjarn gagnvart þeim. Þróunin sem er sýnd hér að neðan er aðeins lokakeyrslan (146,1 mín.), svo tímarnir á
-myndunum leggjast saman í 146 mín. en ekki í 253 mín. Fyrri keyrslurnar eru ekki sýndar.
-
-```{r}
-#| label: tbl-runs-2d
-#| tbl-cap: "Allar keyrslur sem tengjast sviðsmynd 2d, í þeirri röð sem þær voru gerðar. Tími er sá sem lausnarinn notaði. Keðjan er keyrslurnar sem hver byrjaði á lausn þeirrar á undan og skiluðu lokaplaninu."
-runs_2d <- tribble(
-  ~Keyrsla, ~`Tími (mín.)`, ~Staða,
-  "Tillaga starfsmanna (sviðsmynd 1)", 5.0, "í keðju",
-  "2d, fyrsta tilraun (endurtekin eftir leiðréttingu á líkaninu)", 20.0, "hent",
-  "2d, önnur tilraun", 17.3, "í keðju",
-  "Neðri mörk (21 útreikningur)", 18.0, "ekki áætlun",
-  "2d í 1 klst. keyrslu", 42.7, "í keðju",
-  "leximin án skilyrðisins um að enginn sé verr settur", 60.3, "hent",
-  "leximin fyrir alla fagráðsmenn", 84.2, "hent",
-  "2d með svigrúm 1 fyrir þrep 1", 42.1, "ekki valin",
-  "2d með svigrúm 2 fyrir þrep 1", 42.1, "í keðju",
-  "2d lokakeyrsla, 3 klst., svigrúm 2", 146.1, "í keðju, valin")
-chain_total <- sum(runs_2d$`Tími (mín.)`[startsWith(runs_2d$Staða, "í keðju")])
-all_total <- sum(runs_2d$`Tími (mín.)`)
-runs_2d %>%
-  mutate(`Tími (mín.)` = num(`Tími (mín.)`)) %>%
-  knitr::kable(align = c("l", "r", "l"))
-```
-
-Keðjan er alls `r num(chain_total)` mín. Ef keyrslur sem voru hentar eða ekki valdar eru taldar með, og
-neðri mörkin, fóru alls um `r num(all_total, 0)` mín. í sviðsmynd 2d.
-
-Svigrúmið leyfir þrepi 1 (fundir) að enda allt að 2 yfir besta gildi sínu. Lausnin notaði 1 af því
-(202,5 í stað 201,5), og í staðinn lækkaði mesta byrði úr 60 í 51 í sömu keðju. Fundir samtals eru
-jafn margir og áður.
 
 ## Þróun lausnar yfir tíma
 
@@ -104,11 +65,7 @@ if (nrow(progress) > 0) {
   for (s in levels(droplevels(progress$scenario))) {
     cat("#### ", sub("[.].*", "", s), "\n\n", sep = "")
     info <- solver[as.character(solver$scenario) == s, ]
-    note <- if (nrow(info) && info$total_minutes > info$minutes + 0.05) {
-      sprintf("Aðeins síðasta keyrslan: %s mín. af %s mín. samtals", num(info$minutes), num(info$total_minutes))
-    } else {
-      sprintf("Keyrslan tók %s mín.", num(info$minutes))
-    }
+    note <- sprintf("Keyrslan tók %s mín.", num(info$minutes))
     print(plot_progress(filter(progress, scenario == s)) + labs(title = s, subtitle = note))
     cat("\n\n")
   }

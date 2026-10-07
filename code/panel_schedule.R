@@ -264,7 +264,7 @@ script_starts <- function(script = run_script) {
 }
 
 # Time limit (minutes) of each run in run_panel_scenarios.sh: "run <name> ... --time-limit <seconds>".
-run_script <- normalizePath("run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
+run_script <- normalizePath("scripts/run_panel_scenarios.sh", mustWork = FALSE)  # this file is sourced from code/
 script_time_limits <- function(script = run_script) {
   lines <- script_lines(script)
   runs <- regmatches(lines, regexec("^\\s*(?:PANEL=\\S+ )?run (\\w+) .*--time-limit (\\d+)", lines, perl = TRUE))
@@ -273,7 +273,7 @@ script_time_limits <- function(script = run_script) {
 }
 
 # Step names of the stepwise objective, in the order they are solved.
-step_labels <- c(rules = "Reglur", reference = "Viðmiðunarplan", meetings = "Fundir (þrep 1)",
+step_labels <- c(priority = "Forgangur (þrep 0)", rules = "Reglur", reference = "Viðmiðunarplan", meetings = "Fundir (þrep 1)",
                  worst = "Mesta byrði (þrep 2)", top1 = "leximin 1", top2 = "leximin 2", top3 = "leximin 3",
                  waiting = "Heildarbið (þrep 3)")
 
