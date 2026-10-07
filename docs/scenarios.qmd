@@ -43,7 +43,9 @@ nota þrepamarkfallið úr @sec-model (`lexburden`) nema annað sé tekið fram.
    aðeins röð umsókna innan M3 er frjáls. Seinni fundir (M4–M9) eru óskorðaðir: líkanið má raða
    umsóknum á þá upp á nýtt, þar á meðal umsóknum sem eru ekki enn komnar á fund. Fjögur afbrigði
    eru borin saman, sem eru ólík aðeins í markfallinu:
-   a. **`lexburden`:** þrepamarkfallið, eins og því er lýst í kaflanum um líkanið.
+   a. **`lexburden`:** þrepamarkfallið, eins og því er lýst í kaflanum um líkanið. Þetta er **tillagan sem
+      send var Rannís**: fyrst færri fundir, síðan minnsta mesta byrði og loks minnst heildarbið, með
+      fjarvistum, tímamörkum, hærra $\alpha_r$ fyrir þá sem hafa flestar umsóknir ($\alpha_r = 4$ fyrir 22 umsóknir eða fleiri, 3 fyrir 20–21 umsókn, 2 fyrir aðra) og forgangi þess sem vill fæsta fundi.
    b. **Án sanngirnisþreps** (`lexsum`): fæstir fundir og síðan minnst heildarbið, til samanburðar.
    c. **`leximin`:** í stað þess að verja aðeins þann verst setta eru þrjár stærstu byrðarnar
       lágmarkaðar hver á eftir annarri.
@@ -63,9 +65,9 @@ Ef umsókn er frestað af ástæðum sem líkanið sér ekki, t.d. vegna mannekl
 
 ::: {.callout-note}
 Sviðsmyndir 2a–2d og 3 eru keyrðar á nýjustu gögnum: M1–M3 fastir, fjarvistir og tímagluggar fagráðsmanna,
-hærra $\alpha_r$ hjá þeim sem hafa flestar umsóknir og forgangur þess sem vill fæsta fundi. Sviðsmynd 2a
-fékk 3 klst. reiknitíma en 2b–2d og 3 aðeins 20 mínútur og byrjuðu á lakari upphafslausn, svo samanburðurinn við
-2a er ekki fullkomlega sanngjarn; þær má endurkeyra frá lausn 2a. Sviðsmynd 4 og kaflar 6 og 7 (hlutverk og
+hærra $\alpha_r$ hjá þeim sem hafa flestar umsóknir og forgangur þess sem vill fæsta fundi. Sviðsmynd 2a er tillagan
+og fékk 3 klst. reiknitíma, en 2b–2d og 3 eru til samanburðar og fengu aðeins 20 mínútur og byrjuðu á lakari
+upphafslausn, svo samanburðurinn við 2a er ekki fullkomlega sanngjarn; þær má endurkeyra frá lausn 2a. Sviðsmynd 4 og kaflar 6 og 7 (hlutverk og
 úthlutun) hafa ekki verið endurkeyrð með leiðréttu gögnunum og nýju reglunum, svo tölur þeirra eru eldri.
 :::
 
