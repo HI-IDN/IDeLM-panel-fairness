@@ -169,7 +169,7 @@ fundum þeirra fækkar. Samanborið við sama $\alpha$ fyrir alla fór heildarbi
 mesta bið einhvers úr 55 í 48 og mesta byrði úr 71 í 62, en Gini-stuðullinn var óbreyttur (0,147).
 Mesta byrðin er ekki beinn samanburður, því $\alpha_r$ er hærra hjá þeim sem bera hana. Hærra
 $\alpha_r$ hjá þeim sem hafa flestar umsóknir léttir því á þeim en kostar nokkra viðbótarbið hjá öðrum.
-Í sviðsmyndum 2a–2d og 3 í @sec-scenarios er $\alpha_r$ stillt á þennan hátt.
+Í sviðsmyndum 1–3 í @sec-scenarios er $\alpha_r$ stillt á þennan hátt.
 
 ## Fundir sem fagráðsmaður kemst ekki á
 
