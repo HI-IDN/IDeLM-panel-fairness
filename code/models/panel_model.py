@@ -982,10 +982,14 @@ class PanelScheduleModel:
 
         def callback(model, where):
             if where == GRB.Callback.MIPSOL and time.time() - self._checkpoint_time >= self.checkpoint_minutes * 60:
-                values = model.cbGetSolution(variables)
-                agenda = sorted((m, k, p) for ((p, m, k), _), value in zip(items, values) if value > 0.5)
-                self._save_checkpoint(agenda, model.cbGet(GRB.Callback.MIPSOL_OBJ),
-                                      model.cbGet(GRB.Callback.MIPSOL_OBJBND), model.cbGet(GRB.Callback.RUNTIME))
+                try:
+                    values = model.cbGetSolution(variables)
+                    agenda = sorted((m, k, p) for ((p, m, k), _), value in zip(items, values) if value > 0.5)
+                    self._save_checkpoint(agenda, model.cbGet(GRB.Callback.MIPSOL_OBJ),
+                                          model.cbGet(GRB.Callback.MIPSOL_OBJBND), model.cbGet(GRB.Callback.RUNTIME))
+                except Exception as error:  # a failed save must not stop a long solve; try again later
+                    print(f'checkpoint not saved: {error}')
+                    self._checkpoint_time = time.time()
         self.m.optimize(callback)
 
     def _save_checkpoint(self, agenda, objective, bound, seconds):
@@ -993,15 +997,21 @@ class PanelScheduleModel:
         restart) and a line about the step, objective, bound and time."""
         prefix = self.checkpoint_prefix + '_checkpoint'
         os.makedirs(os.path.dirname(prefix) or '.', exist_ok=True)
-        with open(prefix + '.csv', 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(['meeting', 'position', 'application'])
-            writer.writerows(agenda)
-        with open(prefix + '_info.csv', 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(['level', 'objective', 'bound', 'seconds_in_step', 'saved'])
-            writer.writerow([self._level, f'{objective:g}', f'{bound:g}', f'{seconds:.0f}', time.strftime('%Y-%m-%d %H:%M:%S')])
+        # Write to a temporary file and replace the old one, so an interruption in the middle of a
+        # write leaves the previous checkpoint intact. The agenda first, then the line about it.
+        self._write_replace(prefix + '.csv', [['meeting', 'position', 'application']] + [list(row) for row in agenda])
+        self._write_replace(prefix + '_info.csv',
+                            [['level', 'objective', 'bound', 'seconds_in_step', 'saved'],
+                             [self._level, f'{objective:g}', f'{bound:g}', f'{seconds:.0f}',
+                              time.strftime('%Y-%m-%d %H:%M:%S')]])
         self._checkpoint_time = time.time()
+
+    @staticmethod
+    def _write_replace(path, rows):
+        temporary = path + '.tmp'
+        with open(temporary, 'w', newline='', encoding='utf-8') as f:
+            csv.writer(f).writerows(rows)
+        os.replace(temporary, path)
 
     def _solve_in_steps(self):
         """Hierarchical optimisation: minimise each level in turn, then hold it at the value reached
@@ -1024,8 +1034,11 @@ class PanelScheduleModel:
             value = held.getValue()
             gap = self.m.MIPGap if self.m.IsMIP else 0.0
             if self.checkpoint_prefix:  # a step is done: save the plan it ended with
-                self._save_checkpoint(sorted((m, k, p) for (p, m, k), var in self.x.items() if var.X > 0.5),
-                                      self.m.ObjVal, self.m.ObjBound, self.m.Runtime)
+                try:
+                    self._save_checkpoint(sorted((m, k, p) for (p, m, k), var in self.x.items() if var.X > 0.5),
+                                          self.m.ObjVal, self.m.ObjBound, self.m.Runtime)
+                except OSError as error:
+                    print(f'checkpoint not saved: {error}')
             # value is the held expression; objective, bound and gap are the solver's (the same
             # expression, except the learning reward in the waiting step).
             reached.append({'level': name, 'value': value, 'objective': self.m.ObjVal,
@@ -1161,7 +1174,8 @@ def main():
     parser.add_argument('--time-limit', type=float)
     parser.add_argument('--checkpoint-minutes', type=float, default=None,
                         help='save the best plan so far to <out>_checkpoint.csv (usable as --start after an '
-                             'interruption) at most this often, and when a step finishes; off by default')
+                             'interruption) at most this often, and when a step finishes; 0 saves at every new '
+                             'best plan; off when not given')
     parser.add_argument('--mip-focus', type=int, default=0,
                         help='Gurobi MIPFocus (1: focus on finding good solutions quickly)')
     parser.add_argument('--start', help='agenda CSV to warm-start from (e.g. the order-only solution)')
@@ -1268,7 +1282,7 @@ def main():
     model.m.Params.MIPFocus = args.mip_focus
     if args.start:
         model.set_start(read_agenda(args.start))
-    model.checkpoint_prefix = args.out if args.checkpoint_minutes else None
+    model.checkpoint_prefix = args.out if args.checkpoint_minutes is not None else None
     model.checkpoint_minutes = args.checkpoint_minutes or 0.0
     solution = model.solve()
     model.save(args.out)
