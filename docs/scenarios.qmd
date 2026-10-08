@@ -84,7 +84,7 @@ if (!have_results) {
 
 ```{r}
 #| label: tbl-scenarios
-#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum. *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru 3 klst. fyrir 2a, 20 mín. fyrir 2b–2d og 3 og 5 mín. fyrir 1, skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað. Sviðsmynd 4 er úr eldri keyrslu."
+#| tbl-cap: "Sviðsmyndirnar bornar saman. Byrði er $\\alpha_r$ á hvern fund sem mætt er á auk biðpunkta (@eq-burden). *Fylgni funda og biðar* er Spearman-fylgni yfir fagráðsmenn; jákvæð fylgni þýðir að þeir sem mæta oftast bíða líka mest. Biðpunktar eru umsóknir annarra sem fagráðsmaður situr undir áður en síðasta umsókn hans er tekin fyrir. *Dreifing funda* og *Dreifing biðpunkta* sýna fjölda funda sem hver fagráðsmaður mætir á og biðpunkta hans yfir lotuna sem súlurit, á sama kvarða í öllum línum (aðeins í vefútgáfunni; PDF-útgáfan sleppir þeim). *Vanhæfir viðstaddir* telur skipti sem vanhæfur fagráðsmaður þyrfti að bregða sér af fundi, á fundum sem eru ekki búnir. Reiknitími er sá tími sem lausnarinn notaði; tímamörkin eru 3 klst. fyrir 2a, 20 mín. fyrir 2b–2d og 3 og 5 mín. fyrir 1, skipt á milli þrepa markfallsins, og ef þrep klárast fyrr verður tíminn styttri (sjá [Reiknitíma](runtime.qmd)). Bilið er milli bestu lausnar og neðri marks, svo 0 % þýðir sannað besta lausn. Besta gildi hvers mælikvarða er feitletrað. Sviðsmynd 4 er úr eldri keyrslu."
 #| eval: !expr have_results
 solver <- read_solver_info(results)
 results_table <- summary_table(runs) %>%
@@ -208,7 +208,7 @@ Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðs
 
 ```{r}
 #| label: tbl-new
-#| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum. Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í bestu sviðsmyndinni sem bestar ekki frá grunni."
+#| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum (í PDF-útgáfunni eru sýnd miðgildi í stað súlurita). Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í bestu sviðsmyndinni sem bestar ekki frá grunni."
 #| eval: !expr have_results
 # Best scenario without planning from scratch: the lowest worst-off burden among scenarios 2-3.
 candidates <- runs %>%
