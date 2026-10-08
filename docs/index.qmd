@@ -1,5 +1,10 @@
 # Inngangur {.unnumbered}
 
+::: {.content-visible when-format="html"}
+Greinargerðina er líka hægt að sækja í heild sem [PDF-skjal](sanngjarnari-fagradsfundir.pdf)
+(eða með niðurhalstákninu efst á síðunni).
+:::
+
 ## Hvers vegna þessi greinargerð
 
 Ég hef setið í fagráði Tækniþróunarsjóðs (TÞS) í nokkur ár og haft bæði gagn og gaman af
