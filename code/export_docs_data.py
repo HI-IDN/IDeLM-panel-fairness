@@ -13,7 +13,11 @@ solver's progress lines (time, best solution, best bound, gap) for each step.
 Experiments the book refers to (EXPERIMENTS below) go to docs/data/experiments/, with their own
 solver.csv, so their numbers are computed in the book rather than typed in.
 
-Run from code/ after scripts/run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>]
+The runs of the October 2026 round on the 110 proposals that are discussed (ROUNDS below) are copied as
+scenarios s1, s2, s3, with their logs taken from ../data/tdf/logs/. With --rounds-only, only these are
+copied and their rows replaced in solver.csv and progress.csv, leaving every other file as it is.
+
+Run from code/ after scripts/run_panel_scenarios.sh:  python export_docs_data.py [--results <folder>] [--rounds-only]
 """
 import argparse
 import csv
@@ -47,6 +51,11 @@ EXPERIMENTS = {
     'rotation_skip': 'rotation/free_skip',
     'rotation_wait2': 'rotation/free_wait2',
 }
+# The October 2026 round on the 110 proposals that are discussed: scenario -> run in results (its log has the
+# same name in LOGS). s1: the staff's plan with the meetings fixed and the order optimised; s2: M1-M4 fixed and
+# M5-M9 free; s3: from scratch. A run is copied only once it has finished (its _members.csv exists).
+LOGS = '../data/tdf/logs'
+ROUNDS = {'s1': 'rounds_2026-10/scen110_1', 's2': 'rounds_2026-10/scen110_2', 's3': 'rounds_2026-10/scen110_3'}
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
 CODE = re.compile(r'^([RAM]\d+|-?\d+(\.\d+)?([eE][-+]?\d+)?|TRUE|FALSE|True|False|yes|no|)$', re.I)  # codes, numbers, flags
@@ -147,7 +156,36 @@ def main():
         if os.path.exists(src + '.log'):
             solver.append({'scenario': name, **solver_info(src + '.log')})
     write_solver(os.path.join(experiments, 'solver.csv'), solver)
+    export_rounds()
     print(f'{len(os.listdir(OUT))} files in {OUT}, {len(os.listdir(experiments))} in {experiments}')
+
+
+def export_rounds():
+    """Copy the finished runs of ROUNDS as their scenario names, and replace their rows in solver.csv and
+    progress.csv (other rows are kept)."""
+    solver, progress = [], []
+    for s, run in ROUNDS.items():
+        src, log = os.path.join(RESULTS, run), os.path.join(LOGS, run + '.log')
+        if not os.path.exists(src + '_members.csv'):
+            continue
+        print(f'{s}: {run}')
+        for suffix, columns in COLUMNS.items():
+            if os.path.exists(src + suffix):
+                copy(src + suffix, os.path.join(OUT, s + suffix), columns)
+        if os.path.exists(log):
+            solver.append({'scenario': s, **solver_info(log)})
+            progress += [{'scenario': s, **row} for row in solver_progress(log)]
+    done = {row['scenario'] for row in solver}
+    write_solver(os.path.join(OUT, 'solver.csv'), keep_rows(os.path.join(OUT, 'solver.csv'), done) + solver)
+    write_progress(os.path.join(OUT, 'progress.csv'), keep_rows(os.path.join(OUT, 'progress.csv'), done) + progress)
+
+
+def keep_rows(path, scenarios):
+    """The rows of an exported csv whose scenario is not among scenarios."""
+    if not os.path.exists(path):
+        return []
+    with open(path, newline='', encoding='utf-8') as f:
+        return [row for row in csv.DictReader(f) if row['scenario'] not in scenarios]
 
 
 def best_run(scenario):
@@ -198,5 +236,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[1])
     parser.add_argument('--results', default=RESULTS,
                         help='folder of the model results (default: %(default)s), e.g. a copy where long runs were made')
-    RESULTS = parser.parse_args().results
-    main()
+    parser.add_argument('--rounds-only', action='store_true',
+                        help='copy only the runs of ROUNDS, leaving the other exported files as they are')
+    args = parser.parse_args()
+    RESULTS = args.results
+    if args.rounds_only:
+        export_rounds()
+    else:
+        main()
