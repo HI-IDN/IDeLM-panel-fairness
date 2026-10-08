@@ -99,28 +99,41 @@ meeting_breaks <- seq(min(runs$meetings) - 0.5, max(runs$meetings) + 0.5, by = 1
 meetings_split <- split(runs$meetings, droplevels(runs$scenario))
 meetings_hist <- kableExtra::spec_hist(meetings_split, breaks = rep(list(meeting_breaks), length(meetings_split)),
                                        col = role_colours[["Reader"]], border = "white", same_lim = TRUE)
-# Show only the scenario number; the full name is a tooltip.
+# Show only the scenario number; the full name is a tooltip (HTML only). The PDF has no histograms.
+html_out <- knitr::is_html_output()
 display_table <- results_table %>%
-  mutate(Svið = sprintf('<span title="%s">%s</span>', Sviðsmynd, sub("[.].*", "", Sviðsmynd)),
+  mutate(Svið = if (html_out) sprintf('<span title="%s">%s</span>', Sviðsmynd, sub("[.].*", "", Sviðsmynd))
+                else sub("[.].*", "", Sviðsmynd),
          .before = 1) %>%
-  select(-Sviðsmynd) %>%
-  mutate(`Dreifing funda` = "", .after = `Fundir sem mætt er á (bil)`) %>%
-  mutate(`Dreifing biðpunkta` = "", .after = `Biðpunktar samtals`)
+  select(-Sviðsmynd)
+if (html_out) {
+  display_table <- display_table %>%
+    mutate(`Dreifing funda` = "", .after = `Fundir sem mætt er á (bil)`) %>%
+    mutate(`Dreifing biðpunkta` = "", .after = `Biðpunktar samtals`)
+}
 # Bold the best (lowest) value in each column where lower is better.
 bold_best <- function(x) {
   text <- format(round(x, 2), decimal.mark = ",", trim = TRUE)
   best <- !is.na(x) & round(x, 2) == min(round(x, 2), na.rm = TRUE)
-  ifelse(best, paste0("<b>", text, "</b>"), text)
+  ifelse(best, if (html_out) paste0("<b>", text, "</b>") else paste0("\\textbf{", text, "}"), text)
 }
 best_columns <- c("Mesta byrði", "Fundir samtals", "Biðpunktar samtals", "Fylgni funda og biðar",
                   "Vanhæfir viðstaddir")
 display_table <- display_table %>% mutate(across(all_of(best_columns), bold_best))
 right_aligned <- names(display_table) %in% best_columns | sapply(display_table, is.numeric)
-display_table %>%
-  knitr::kable(format = "html", digits = 2, format.args = list(decimal.mark = ","), escape = FALSE,
-               align = ifelse(right_aligned, "r", "l")) %>%
-  kableExtra::column_spec(which(names(display_table) == "Dreifing funda"), image = meetings_hist) %>%
-  kableExtra::column_spec(which(names(display_table) == "Dreifing biðpunkta"), image = waiting_hist)
+if (html_out) {
+  display_table %>%
+    knitr::kable(format = "html", digits = 2, format.args = list(decimal.mark = ","), escape = FALSE,
+                 align = ifelse(right_aligned, "r", "l")) %>%
+    kableExtra::column_spec(which(names(display_table) == "Dreifing funda"), image = meetings_hist) %>%
+    kableExtra::column_spec(which(names(display_table) == "Dreifing biðpunkta"), image = waiting_hist)
+} else {
+  display_table %>%
+    rename(`Bil (\\%)` = `Bil (%)`) %>%
+    knitr::kable(format = "latex", booktabs = TRUE, digits = 2, format.args = list(decimal.mark = ","),
+                 escape = FALSE, align = ifelse(right_aligned, "r", "l"), na = "") %>%
+    kableExtra::kable_styling(latex_options = "scale_down")
+}
 ```
 
 ```{r}
@@ -221,16 +234,23 @@ measures <- c("Ritstjóri" = "Editor", "Lesari" = "Reader", "Samtals" = "Total",
               "best" = "best_wait")
 names(measures)[names(measures) == "best"] <- paste0("Biðpunktar, svið ", best_number)
 hist_table <- per_member %>% count(Hópur, name = "Fjöldi")
-for (m in names(measures)) hist_table[[m]] <- ""
-hist_kable <- knitr::kable(hist_table, format = "html", escape = FALSE)
-for (m in names(measures)) {
-  values <- split(per_member[[measures[[m]]]], per_member$Hópur)
-  hist_kable <- kableExtra::column_spec(
-    hist_kable, which(names(hist_table) == m),
-    image = kableExtra::spec_hist(values, breaks = 6, col = role_colours[["Editor"]], border = "white",
-                                  same_lim = TRUE))
+if (knitr::is_html_output()) {
+  for (m in names(measures)) hist_table[[m]] <- ""
+  hist_kable <- knitr::kable(hist_table, format = "html", escape = FALSE)
+  for (m in names(measures)) {
+    values <- split(per_member[[measures[[m]]]], per_member$Hópur)
+    hist_kable <- kableExtra::column_spec(
+      hist_kable, which(names(hist_table) == m),
+      image = kableExtra::spec_hist(values, breaks = 6, col = role_colours[["Editor"]], border = "white",
+                                    same_lim = TRUE))
+  }
+  hist_kable
+} else {
+  # The PDF shows the group medians instead of histograms.
+  knitr::kable(new_table, format = "latex", booktabs = TRUE, digits = 1,
+               format.args = list(decimal.mark = ",")) %>%
+    kableExtra::kable_styling(latex_options = "scale_down")
 }
-hist_kable
 # For the text: median waiting of a group in the best scenario (col 7).
 wait_of <- function(group, col) new_table[[col]][new_table$Hópur == group]
 ```
