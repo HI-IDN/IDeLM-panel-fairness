@@ -61,11 +61,6 @@ if (!file.exists(file.path(results, "s3_members.csv"))) {
 }
 ```
 
-::: {.callout-note}
-Kaflar 6 og 7 (hlutverk og úthlutun) hafa ekki verið endurkeyrðir með nýjustu gögnunum og reglunum, svo tölur
-þeirra eru eldri.
-:::
-
 ```{r}
 #| label: no-results
 #| results: asis

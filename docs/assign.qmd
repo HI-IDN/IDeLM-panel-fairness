@@ -1,11 +1,5 @@
 # Hvað ef: jöfn úthlutun frá grunni {#sec-assign}
 
-::: {.callout-note}
-Þessi kafli hefur ekki verið keyrður aftur með leiðréttu gögnunum (ritstjóri og vanhæfi einnar umsóknar
-voru leiðrétt) og nýju reglunum (M1–M3 fastir, fjarvistir og tímagluggar). Tölur og myndir hér eru úr
-eldri keyrslum og verða uppfærðar.
-:::
-
 ```{r}
 #| label: setup-assign
 source("_setup.R")
@@ -126,9 +120,22 @@ if (!have_schedule) {
 #| label: tbl-assign-schedule
 #| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við bestað plan sviðsmyndar 2 (endurröðun leyfð, pörun föst)."
 #| eval: !expr have_schedule
-summary_table(compare) %>%
+cmp <- summary_table(compare)
+cmp %>%
   rename(Skipulag = Sviðsmynd) %>%
   knitr::kable(digits = 2, format.args = list(decimal.mark = ","))
+```
+
+```{r}
+#| label: assign-note
+#| results: asis
+#| eval: !expr have_schedule
+base <- cmp[1, ]; equal <- cmp[2, ]
+cat("Jöfn úthlutun jafnar greiðslur á umsókn, en fundaskipanin er ekki betri en í sviðsmynd 2: mesta byrði er ",
+    equal[["Mesta byrði"]], " á móti ", base[["Mesta byrði"]], " og biðpunktar samtals ", equal[["Biðpunktar samtals"]],
+    " á móti ", base[["Biðpunktar samtals"]], ", en fundarsetur eru ", equal[["Fundir samtals"]], " á móti ",
+    base[["Fundir samtals"]], ". Lausnin er ekki sönnuð best, svo hluti ",
+    "munarins getur stafað af leitinni.\n", sep = "")
 ```
 
 ::: {.panel-tabset}
