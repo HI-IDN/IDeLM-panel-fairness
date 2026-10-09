@@ -187,8 +187,8 @@ sanngirninni.
 
 **Afbrigði**
 
-Fjórar viðbætur taka á fyrirvörunum hér að neðan. Tvær aðrar, tímagluggar og forgangur, eru kröfur
-lotunnar sjálfrar og er lýst í lokin.
+Fjórar viðbætur taka á fyrirvörunum hér að neðan. Tvær aðrar, tímagluggar og forgangur, lúta að
+óskum og aðstæðum fagráðsmanna í lotunni og er þeim lýst síðast.
 
 `leximin` kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; `leximin` ver líka þann næstverst setta, þann
 þar á eftir o.s.frv. Þetta er sama leximin-röð og lýst var í kaflanum um sanngirni: fyrst er
@@ -230,23 +230,24 @@ lotu nú. $C_r$ má vera neikvætt.
 
 *Tímagluggar innan fundar* (`windows`). Fagráðsmaður getur verið á fundi aðeins hluta hans: hann kemur
 seint, eða þarf að fara fyrir tiltekinn tíma, eða er aðeins seinni helminginn. Hver fundur byrjar
-klukkan `r config$meeting_start` og hver umsókn tekur `r num(config$slot_minutes)` mínútur (ein „rauf“).
-Glugginn er skráður sem tími frá og til fyrir fagráðsmann og fund og er breytt í raufar. Eigin umsóknir
-fagráðsmannsins fara þá aðeins í raufar innan gluggans. Af hverjum lokatíma eru dregnar `r num(config$leave_margin_minutes)`
-mínútur, svo enginn sé skipulagður alveg fram á síðustu stundu sem hann má vera. Raufar áður en
-fagráðsmaður kemur teljast frjálsar, ekki bið, því hann sat ekki undir þeim. Án glugga er ekkert
-af þessu í gildi.
+klukkan `r config$meeting_start` og hver umsókn tekur `r num(config$slot_minutes)` mínútur (einn dagskrárlið).
+Glugginn er skráður sem tími frá og til fyrir hvern fagráðsmann og fund, og honum er breytt í
+dagskrárliði. Eigin umsóknir fagráðsmannsins fara þá aðeins í dagskrárliði innan gluggans. Lokatíminn er
+færður fram um `r num(config$leave_margin_minutes)` mínútur, svo enginn sé skipulagður alveg fram á síðustu
+stundu sem hann má vera. Dagskrárliðir áður en fagráðsmaður kemur teljast frjálsir, ekki bið, því hann
+sat ekki undir þeim. Án glugga er ekkert af þessu í gildi.
 
-*Forgangur: fæstir fundir fyrir tiltekinn fagráðsmann* (`--fewest-meetings`). Ef fagráðsmaður óskar eftir
-að mæta á sem fæsta fundi má gefa honum forgang. Þá er sett inn þrep á undan öllum hinum þrepunum, þar
-sem fjöldi funda þeirra sem eru á listanum er gerður sem minnstur,
+*Forgangur: fæstir fundir fyrir tiltekna fagráðsmenn* (`--fewest-meetings`). Ef fagráðsmenn óska eftir að
+mæta á sem fæsta fundi má gefa þeim forgang. Þá er bætt við þrepi á undan öllum hinum, þar sem
+fjöldi funda þeirra fagráðsmanna sem eru á listanum, $R^{\text{fæstir}} \subseteq R$, er gerður sem minnstur,
 
 $$
-\min \;\; \underbrace{\sum_{r \in R^{\text{fæstir}}} \sum_{m} a_{rm}}_{\text{fundir sem þeir mæta á}} ,
+\min \;\; \underbrace{\sum_{r \in R^{\text{fæstir}}} \sum_{m \in M} a_{rm}}_{\text{fundir sem þeir mæta á}} ,
 $$
 
 og gildið er fest. Önnur þrep, þ.m.t. regluþrepið og sanngirnisþrepin, mega því ekki fjölga fundum
-þeirra. Þetta þarf að vera sanngirnisþrep í þrepum (`lexburden`, `leximin` eða `lexsum`).
+þeirra. Þetta virkar aðeins með markfalli sem er leyst í þrepum (t.d. `lexburden`, `leximin` eða
+`lexsum`).
 
 Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
 námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er skráð með niðurstöðunum.
