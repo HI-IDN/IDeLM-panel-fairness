@@ -77,7 +77,7 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 | Ein umsókn í hverjum dagskrárlið | $\sum_{p \in P} x_{pmk} \le 1 \quad \forall m, k$ |
 | Engin göt í dagskránni | $\sum_{p} x_{pm,k+1} \le \sum_{p} x_{pmk} \quad \forall m,\ k < \bar K$ |
 | Fundir sem eru búnir haldast eins og þeir voru | $x_{p m_p k_p} = 1 \quad \forall p \in F$ |
-| Engri umsókn er bætt á næsta fund; auglýstum umsóknum má fresta á seinni fund (í sviðsmyndum 2a–2d og 3 er það ekki leyft: M3 hefur nákvæmlega auglýstu umsóknirnar) | $x_{p m^* k} = 0 \quad \forall p \notin N,\ k$ |
+| Engri umsókn er bætt á næsta fund; auglýstum umsóknum má fresta á seinni fund (í sviðsmynd 2 er það ekki leyft: M4 hefur nákvæmlega auglýstu umsóknirnar) | $x_{p m^* k} = 0 \quad \forall p \notin N,\ k$ |
 | Á fyrsta fundi mæta allir, með nákvæmlega eina umsókn hver | $\sum_{p \in P_r} \sum_{k} x_{p m_1 k} = 1 \quad \forall r$ |
 | Á seinni fundum hefur hver fagráðsmaður mest $\bar k$ umsóknir | $\sum_{p \in P_r} \sum_{k} x_{pmk} \le \bar k \quad \forall r,\ m \ne m_1$ |
 | Fagráðsmaður er ekki settur á fund sem hann kemst ekki á | $a_{rm} = 0 \quad \forall r,\ m \in U_r$ |
@@ -329,7 +329,7 @@ sem er færð framar hefði annars engan mögulegan ritstjóra. Markmiðið er j
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
 má greiða fyrir byrði dagskrárinnar (`--pay-per burden`): fagráðsmenn sem bera meiri byrði
 (@eq-burden, með sama $\alpha_r$ og dagskráin) en meðaltal reyndra fá fleiri ritstjórahlutverk.
-Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
+Hlutverk á fundum sem eru haldnir eða hafa verið auglýstir haldast óbreytt.
 
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á
