@@ -146,7 +146,7 @@ res(2, "Biðpunktar samtals"), " á móti ", res(1, "Biðpunktar samtals"), " og
 res(2, "Fundir samtals"), " á móti ", res(1, "Fundir samtals"), ". Enginn fagráðsmaður ber meiri byrði en í sviðsmynd 1 ",
 "og enginn vanhæfur er viðstaddur (í sviðsmynd 1 eru ", res(1, "Vanhæfir viðstaddir"), " skipti).
 ",
-"* **Að sleppa auglýstri samsetningu fundar 4 gefur enn meira.** Í sviðsmynd 3 er mesta byrði ",
+"* **Að sleppa auglýstri samsetningu fundar 4 minnkar byrði og bið enn frekar, en kostar fundarsetur.** Í sviðsmynd 3 er mesta byrði ",
 res(3, "Mesta byrði"), " og heildarbið ", res(3, "Biðpunktar samtals"), ", á móti ", res(2, "Mesta byrði"), " og ",
 res(2, "Biðpunktar samtals"), " í sviðsmynd 2, en fundarsetur eru ", res(3, "Fundir samtals"), " á móti ",
 res(2, "Fundir samtals"), ". Fagráðsmenn þurfa því að mæta oftar í sviðsmynd 3, en bíða skemur. Enginn vanhæfur er viðstaddur á þeim fundum sem eru ekki búnir (",

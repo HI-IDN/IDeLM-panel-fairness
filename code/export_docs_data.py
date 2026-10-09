@@ -82,7 +82,7 @@ def solver_info(log_file):
     text = open(log_file, encoding='utf-8', errors='replace').read()
     version = re.search(r'Gurobi Optimizer version ([0-9.]+)', text)
     seconds = step_seconds(log_file)
-    gap =(re.findall(r'(?m)^objective .*gap ([0-9.]+)%', text)
+    gap = (re.findall(r'(?m)^objective .*gap ([0-9.]+)%', text)
            or re.findall(r'Best objective .*gap ([0-9.]+)%', text))
     # The first time limit set is the whole run's; a stepwise solve then sets a share for each step.
     limit = re.search(r'Set parameter TimeLimit to value ([0-9.e+]+)', text)

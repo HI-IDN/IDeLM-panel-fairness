@@ -308,7 +308,7 @@ sem er færð framar hefði annars engan mögulegan ritstjóra. Markmiðið er j
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
 má greiða fyrir byrði dagskrárinnar (`--pay-per burden`): fagráðsmenn sem bera meiri byrði
 (@eq-burden, með sama $\alpha_r$ og dagskráin) en meðaltal reyndra fá fleiri ritstjórahlutverk.
-Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
+Hlutverk á fundum sem eru haldnir eða hafa verið auglýstir haldast óbreytt.
 
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á
