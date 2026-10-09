@@ -40,13 +40,13 @@ fæsta fundi (nema annað sé tekið fram).
    hvers og eins miðað við sviðsmynd 1 gerð sem minnst, svo fjöldi funda, síðan þrjár stærstu byrðarnar
    hver á eftir annarri (`leximin`) og loks heildarbið. Tímamörk eru 12 klst. og lausnin byrjar á plani
    sviðsmyndar 1.
-3. **Hvað ef: allt skipulagt frá upphafi lotunnar:** ekkert er fest, hvorki fundir sem eru haldnir né
-   auglýstir. Allar 110 umsóknirnar eru skipulagðar sanngjarnt frá byrjun fagráðsins, eins og ef líkanið hefði
-   verið notað áður en fyrsti fundur var haldinn. Þetta sýnir hver fræðilega besta lausnin gæti hafa verið,
-   og hvað hefur tapast með því að skipuleggja ekki lotuna svona frá upphafi. Ekki er tekið tillit til þess að
-   fundir 1–3 eru þegar haldnir, svo þetta er ekki raunhæfur kostur fyrir þá fundi sem eftir eru heldur viðmið.
-   Markfallið er það sama og í sviðsmynd 2 og tímamörk eru 12 klst. Þessi sviðsmynd er í keyrslu og niðurstöður
-   hennar bætast við þegar henni lýkur.
+3. **Hvað ef: allt skipulagt frá upphafi lotunnar:** ekkert er bundið, hvorki fundir 1–3 sem eru haldnir
+   né fundur 4 sem er auglýstur. Allar 110 umsóknirnar eru skipulagðar sanngjarnt frá byrjun fagráðsins, eins og ef
+   líkanið hefði verið notað áður en fyrsti fundur var haldinn. Sviðsmyndin svarar spurningunni: *hve miklu
+   munar um að fyrstu fundirnir voru ekki skipulagðir sem best?* Munurinn á henni og sviðsmynd 2 sýnir hvað
+   fyrstu fundirnir, sem eru óbestaðir og nú fastir, hafa kostað í byrði og bið. Hún er því viðmið, ekki
+   raunhæfur kostur fyrir þá fundi sem eftir eru. Markfallið er það sama og í sviðsmynd 2 og tímamörk eru
+   12 klst. Þessi sviðsmynd er í keyrslu og niðurstöður hennar bætast við þegar henni lýkur.
 
 Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
