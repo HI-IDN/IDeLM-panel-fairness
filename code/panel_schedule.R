@@ -469,6 +469,8 @@ plot_exit_sankey <- function(schedule) {
 # peel-off points so far (without changing which member is lit).
 plot_exit_sankey_interactive <- function(schedule) {
   static <- plot_exit_sankey(schedule)
+  # The PDF has no interactivity: fall back to the static alluvial plot.
+  if (!knitr::is_html_output()) return(static)
   flow <- exit_flow(schedule) %>% mutate(x = as.integer(meeting))
   lodes <- layer_data(static, 1) %>%
     transmute(member = as.character(alluvium), x, ymin, ymax) %>%

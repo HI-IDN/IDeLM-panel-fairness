@@ -8,6 +8,9 @@ book:
   subtitle: "Frumgerð byggð á APAP-sanngirnislíkaninu"
   author: "Dr. Helga Ingimundardóttir"
   date: today
+  # Download icon in the navbar and a link on the front page; the PDF is built from the same chapters.
+  downloads: [pdf]
+  output-file: sanngjarnari-fagradsfundir
   favicon: img/hi/favicon.svg
   navbar:
     pinned: true
@@ -68,6 +71,17 @@ format:
     # Browser tab: "book | chapter" (Quarto's default is "chapter – book").
     template-partials:
       - _partials/metadata.html
+
+  pdf:
+    documentclass: scrbook
+    papersize: a4
+    pdf-engine: xelatex
+    toc: true
+    number-sections: true
+    colorlinks: true
+    fig-format: png
+    fig-dpi: 150
+    keep-tex: false
 
 execute:
   echo: false

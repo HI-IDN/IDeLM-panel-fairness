@@ -44,6 +44,7 @@ Usage (from code/):
 import argparse
 import csv
 import os
+import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 
@@ -365,6 +366,10 @@ class PanelScheduleModel:
         self.m = Model('PanelSchedule')
         self.m.Params.TimeLimit = time_limit
         self.solution = None
+        self.checkpoint_prefix = None   # save the best plan so far to <prefix>_checkpoint*.csv
+        self.checkpoint_minutes = 60.0  # at most this often, and whenever a step finishes
+        self._checkpoint_time = None
+        self._level = ''
 
         self.fixed_meeting = dict(data.fixed_meeting)
         if keep_meetings:
@@ -965,6 +970,49 @@ class PanelScheduleModel:
             agenda = {p: (relabel.get(m, m), k) for p, (m, k) in agenda.items()}
         return agenda
 
+    def _optimize(self):
+        """Run the solver, saving the best plan found so far now and then (see _save_checkpoint)."""
+        if not self.checkpoint_prefix:
+            self.m.optimize()
+            return
+        if self._checkpoint_time is None:
+            self._checkpoint_time = time.time()
+        items = list(self.x.items())
+        variables = [var for _, var in items]
+
+        def callback(model, where):
+            if where == GRB.Callback.MIPSOL and time.time() - self._checkpoint_time >= self.checkpoint_minutes * 60:
+                try:
+                    values = model.cbGetSolution(variables)
+                    agenda = sorted((m, k, p) for ((p, m, k), _), value in zip(items, values) if value > 0.5)
+                    self._save_checkpoint(agenda, model.cbGet(GRB.Callback.MIPSOL_OBJ),
+                                          model.cbGet(GRB.Callback.MIPSOL_OBJBND), model.cbGet(GRB.Callback.RUNTIME))
+                except Exception as error:  # a failed save must not stop a long solve; try again later
+                    print(f'checkpoint not saved: {error}')
+                    self._checkpoint_time = time.time()
+        self.m.optimize(callback)
+
+    def _save_checkpoint(self, agenda, objective, bound, seconds):
+        """Write the agenda (same columns as an agenda file, so it can be used as --start after a
+        restart) and a line about the step, objective, bound and time."""
+        prefix = self.checkpoint_prefix + '_checkpoint'
+        os.makedirs(os.path.dirname(prefix) or '.', exist_ok=True)
+        # Write to a temporary file and replace the old one, so an interruption in the middle of a
+        # write leaves the previous checkpoint intact. The agenda first, then the line about it.
+        self._write_replace(prefix + '.csv', [['meeting', 'position', 'application']] + [list(row) for row in agenda])
+        self._write_replace(prefix + '_info.csv',
+                            [['level', 'objective', 'bound', 'seconds_in_step', 'saved'],
+                             [self._level, f'{objective:g}', f'{bound:g}', f'{seconds:.0f}',
+                              time.strftime('%Y-%m-%d %H:%M:%S')]])
+        self._checkpoint_time = time.time()
+
+    @staticmethod
+    def _write_replace(path, rows):
+        temporary = path + '.tmp'
+        with open(temporary, 'w', newline='', encoding='utf-8') as f:
+            csv.writer(f).writerows(rows)
+        os.replace(temporary, path)
+
     def _solve_in_steps(self):
         """Hierarchical optimisation: minimise each level in turn, then hold it at the value reached
         while the next level is optimised. The time limit is split between the levels. Returns the
@@ -979,11 +1027,18 @@ class PanelScheduleModel:
         for (name, objective, held), share in zip(self.levels, shares):
             self.m.setObjective(objective, GRB.MINIMIZE)
             self.m.Params.TimeLimit = share * time_limit
-            self.m.optimize()
+            self._level = name
+            self._optimize()
             if self.m.SolCount == 0:
                 raise RuntimeError(f'No solution found at level {name} (status {self.m.Status}).')
             value = held.getValue()
             gap = self.m.MIPGap if self.m.IsMIP else 0.0
+            if self.checkpoint_prefix:  # a step is done: save the plan it ended with
+                try:
+                    self._save_checkpoint(sorted((m, k, p) for (p, m, k), var in self.x.items() if var.X > 0.5),
+                                          self.m.ObjVal, self.m.ObjBound, self.m.Runtime)
+                except OSError as error:
+                    print(f'checkpoint not saved: {error}')
             # value is the held expression; objective, bound and gap are the solver's (the same
             # expression, except the learning reward in the waiting step).
             reached.append({'level': name, 'value': value, 'objective': self.m.ObjVal,
@@ -1003,7 +1058,7 @@ class PanelScheduleModel:
         if self.levels:
             levels = self._solve_in_steps()
         else:
-            self.m.optimize()
+            self._optimize()
         if self.m.SolCount == 0:
             raise RuntimeError(f'No solution found (status {self.m.Status}).')
         agenda = sorted((m, k, p) for (p, m, k), var in self.x.items() if var.X > 0.5)
@@ -1117,6 +1172,10 @@ def main():
     parser.add_argument('--target', action='store_true',
                         help='use the target number of proposals per meeting (experienced / new)')
     parser.add_argument('--time-limit', type=float)
+    parser.add_argument('--checkpoint-minutes', type=float, default=None,
+                        help='save the best plan so far to <out>_checkpoint.csv (usable as --start after an '
+                             'interruption) at most this often, and when a step finishes; 0 saves at every new '
+                             'best plan; off when not given')
     parser.add_argument('--mip-focus', type=int, default=0,
                         help='Gurobi MIPFocus (1: focus on finding good solutions quickly)')
     parser.add_argument('--start', help='agenda CSV to warm-start from (e.g. the order-only solution)')
@@ -1223,6 +1282,8 @@ def main():
     model.m.Params.MIPFocus = args.mip_focus
     if args.start:
         model.set_start(read_agenda(args.start))
+    model.checkpoint_prefix = args.out if args.checkpoint_minutes is not None else None
+    model.checkpoint_minutes = args.checkpoint_minutes or 0.0
     solution = model.solve()
     model.save(args.out)
     if solution['waiting_target'] is not None:
