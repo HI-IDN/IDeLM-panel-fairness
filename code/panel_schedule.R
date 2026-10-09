@@ -9,7 +9,7 @@ source("panel_palette.R")  # colours of all figures
 # Scenarios: result file prefix -> label, in the order they are compared.
 scenarios <- c(s1 = "1. Áætlun starfsmanna, röð bestuð",
                s2 = "2. M1–M4 fastir, restin bestuð",
-               s3 = "3. Frá fundi 4 frjálst")
+               s3 = "3. Hvað ef: allt skipulagt frá upphafi")
 # Earlier runs on older data, kept only for the chapters that have not been rerun (assign.qmd).
 legacy_scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
                       free = "2a. Næsti fundur festur, restin bestuð",

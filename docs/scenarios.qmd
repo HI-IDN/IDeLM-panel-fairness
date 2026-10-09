@@ -40,15 +40,26 @@ fæsta fundi (nema annað sé tekið fram).
    hvers og eins miðað við sviðsmynd 1 gerð sem minnst, svo fjöldi funda, síðan þrjár stærstu byrðarnar
    hver á eftir annarri (`leximin`) og loks heildarbið. Tímamörk eru 12 klst. og lausnin byrjar á plani
    sviðsmyndar 1.
-3. **Allt frá fundi 4 skipulagt frá grunni:** fundir 1–3 eru eins og þeir voru haldnir, en frá og með
-   fundi 4 er allt frjálst, líka hvaða umsóknir eru á fundi 4. Munurinn á sviðsmynd 2 er því sá að
-   auglýsta samsetning fundar 4 er ekki fest. Líkanið notar sama markfall og í sviðsmynd 2, með
-   skilyrðinu að enginn sé verr settur en í sviðsmynd 1. Tímamörk eru 12 klst. Þetta sýnir hvað hefði
-   unnist ef allt sem eftir er hefði verið skipulagt upp á nýtt.
+3. **Hvað ef: allt skipulagt frá upphafi lotunnar:** ekkert er fest, hvorki fundir sem eru haldnir né
+   auglýstir. Allar 110 umsóknirnar eru skipulagðar sanngjarnt frá byrjun fagráðsins, eins og ef líkanið hefði
+   verið notað áður en fyrsti fundur var haldinn. Þetta sýnir hver fræðilega besta lausnin gæti hafa verið,
+   og hvað hefur tapast með því að skipuleggja ekki lotuna svona frá upphafi. Ekki er tekið tillit til þess að
+   fundir 1–3 eru þegar haldnir, svo þetta er ekki raunhæfur kostur fyrir þá fundi sem eftir eru heldur viðmið.
+   Markfallið er það sama og í sviðsmynd 2 og tímamörk eru 12 klst. Þessi sviðsmynd er í keyrslu og niðurstöður
+   hennar bætast við þegar henni lýkur.
 
 Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
 Ef umsókn er frestað af ástæðum sem líkanið sér ekki, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
+
+```{r}
+#| label: pending-note
+#| results: asis
+if (!file.exists(file.path(results, "s3_members.csv"))) {
+  cat("::: {.callout-note}\nNiðurstöður sviðsmyndar 3 eru væntanlegar (12 klst. keyrsla) og eru ekki með í töflum og",
+      "myndum hér fyrir neðan.\n:::\n")
+}
+```
 
 ::: {.callout-note}
 Kaflar 6 og 7 (hlutverk og úthlutun) hafa ekki verið endurkeyrðir með nýjustu gögnunum og reglunum, svo tölur
@@ -145,12 +156,6 @@ res(2, "Mesta byrði"), " á móti ", res(1, "Mesta byrði"), " í sviðsmynd 1,
 res(2, "Biðpunktar samtals"), " á móti ", res(1, "Biðpunktar samtals"), " og fundarsetur ",
 res(2, "Fundir samtals"), " á móti ", res(1, "Fundir samtals"), ". Enginn fagráðsmaður ber meiri byrði en í sviðsmynd 1 ",
 "og enginn vanhæfur er viðstaddur (í sviðsmynd 1 eru ", res(1, "Vanhæfir viðstaddir"), " skipti).
-",
-"* **Að sleppa auglýstri samsetningu fundar 4 minnkar byrði og bið enn frekar, en kostar fundarsetur.** Í sviðsmynd 3 er mesta byrði ",
-res(3, "Mesta byrði"), " og heildarbið ", res(3, "Biðpunktar samtals"), ", á móti ", res(2, "Mesta byrði"), " og ",
-res(2, "Biðpunktar samtals"), " í sviðsmynd 2, en fundarsetur eru ", res(3, "Fundir samtals"), " á móti ",
-res(2, "Fundir samtals"), ". Fagráðsmenn þurfa því að mæta oftar í sviðsmynd 3, en bíða skemur. Enginn vanhæfur er viðstaddur á þeim fundum sem eru ekki búnir (",
-res(3, "Vanhæfir viðstaddir"), " skipti).
 ",
 "* **Þeir sem mæta oftast bíða enn mest.** Fylgni funda og biðar er ", res(2, "Fylgni funda og biðar"),
 " í sviðsmynd 2 og ", res(1, "Fylgni funda og biðar"), " í sviðsmynd 1. Fylgnin er því ekki lægri í sviðsmynd 2, ",
@@ -275,7 +280,7 @@ plot_meetings(schedules[["s1"]])
 plot_meetings(schedules[["s2"]])
 ```
 
-#### 3. Frá fundi 4 frjálst
+#### 3. Hvað ef: frá upphafi
 
 ```{r}
 #| label: fig-meetings-s3
@@ -311,7 +316,7 @@ plot_attendance(schedules[["s1"]])
 plot_attendance(schedules[["s2"]])
 ```
 
-#### 3. Frá fundi 4 frjálst
+#### 3. Hvað ef: frá upphafi
 
 ```{r}
 #| label: fig-attendance-s3
@@ -386,7 +391,7 @@ plot_exit_heatmap(schedules[["s2"]])
 plot_exit_sankey_interactive(schedules[["s2"]])
 ```
 
-#### 3. Frá fundi 4 frjálst
+#### 3. Hvað ef: frá upphafi
 
 ```{r}
 #| label: fig-exit-heat-s3

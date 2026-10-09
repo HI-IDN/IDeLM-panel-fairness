@@ -25,7 +25,7 @@ styttri en tímamörkin.
 
 Sviðsmynd 1 hafði 1 klst. í tímamörk og sviðsmyndir 2 og 3 12 klst. hvor. Sviðsmynd 2 byrjar á lausn
 sviðsmyndar 1. Þrep sem klárast fyrr skila ónotuðum tíma ekki áfram, svo sviðsmynd 2 notaði 7,8 klst. af 12.
-Sviðsmynd 3 hafði einnig 12 klst. í tímamörk. Vélin svaf hluta keyrslunnar, svo reiknitíminn í töflunni er sá tími sem lausnarinn vann í raun, ekki klukkutíminn frá upphafi til enda.
+Sviðsmynd 3 hefur einnig 12 klst. í tímamörk og er enn í keyrslu.
 
 ```{r}
 #| label: tbl-runtime
