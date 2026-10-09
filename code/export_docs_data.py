@@ -81,8 +81,8 @@ def solver_info(log_file):
     own summary line when there is one, as a stepwise solve has one Gurobi run per step)."""
     text = open(log_file, encoding='utf-8', errors='replace').read()
     version = re.search(r'Gurobi Optimizer version ([0-9.]+)', text)
-    seconds = [float(s) for s in re.findall(r'Explored .* in ([0-9.]+) seconds', text)]
-    gap = (re.findall(r'(?m)^objective .*gap ([0-9.]+)%', text)
+    seconds = step_seconds(log_file)
+    gap =(re.findall(r'(?m)^objective .*gap ([0-9.]+)%', text)
            or re.findall(r'Best objective .*gap ([0-9.]+)%', text))
     # The first time limit set is the whole run's; a stepwise solve then sets a share for each step.
     limit = re.search(r'Set parameter TimeLimit to value ([0-9.e+]+)', text)
@@ -97,17 +97,37 @@ PROGRESS = re.compile(r'(-?[0-9.]+(?:e[-+]?\d+)?)\s+(-?[0-9.]+(?:e[-+]?\d+)?)\s+
 DONE = re.compile(r'Explored .* in ([0-9.]+) seconds')
 FINAL = re.compile(r'Best objective (\S+), best bound (\S+), gap ([0-9.]+)%')
 STEP = re.compile(r'^level (\w+):')
+LIMIT = re.compile(r'Set parameter TimeLimit to value ([0-9.e+]+)')
+
+
+def step_seconds(log_file):
+    """The solve time of each Gurobi run in a log. Gurobi counts wall-clock time, so a run during which
+    the machine slept reports far more than its time limit: when the reported time exceeds the time of
+    the run's last progress line by more than the run's time limit, that last progress time is used."""
+    seconds, limit, last = [], None, None
+    for line in open(log_file, encoding='utf-8', errors='replace'):
+        if m := LIMIT.search(line):
+            limit = float(m.group(1))
+        elif m := PROGRESS.search(line):
+            last = float(m.group(4))
+        elif m := DONE.search(line):
+            reported = float(m.group(1))
+            asleep = last is not None and limit is not None and reported - last > limit
+            seconds.append(last if asleep else reported)
+            last = None
+    return seconds
 
 
 def solver_progress(log_file):
     """The solver's progress over time for each step of a run: one row per progress line, plus the
     final value of each step. Times are from the start of the run, over all steps."""
     rows, pending, offset, step = [], [], 0.0, 0
+    solve_times = iter(step_seconds(log_file))
     for line in open(log_file, encoding='utf-8', errors='replace'):
         if m := PROGRESS.search(line):
             pending.append([offset + float(m.group(4)), m.group(1), m.group(2), m.group(3)])
-        elif m := DONE.search(line):
-            seconds = float(m.group(1))
+        elif DONE.search(line):
+            seconds = next(solve_times)
         elif m := FINAL.search(line):
             pending.append([offset + seconds, m.group(1), m.group(2), m.group(3)])
             offset += seconds
