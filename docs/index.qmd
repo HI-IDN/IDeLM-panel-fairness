@@ -1,9 +1,4 @@
-# Inngangur {.unnumbered}
-
-::: {.content-visible when-format="html"}
-Greinargerðina er líka hægt að sækja í heild sem [PDF-skjal](sanngjarnari-fagradsfundir.pdf)
-(eða með niðurhalstákninu efst á síðunni).
-:::
+# Formáli {.unnumbered}
 
 ## Hvers vegna þessi greinargerð
 

@@ -8,7 +8,7 @@ book:
   subtitle: "Frumgerð byggð á APAP-sanngirnislíkaninu"
   author: "Dr. Helga Ingimundardóttir"
   date: today
-  # Download icon in the navbar and a link on the front page; the PDF is built from the same chapters.
+  # Download icon in the navbar; the PDF is built from the same chapters.
   downloads: [pdf]
   output-file: sanngjarnari-fagradsfundir
   favicon: img/hi/favicon.svg
