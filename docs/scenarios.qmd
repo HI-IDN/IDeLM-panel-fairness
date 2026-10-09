@@ -194,7 +194,7 @@ Með mælikvörðunum úr @sec-fairness má bera saman nýja og reynda fagráðs
 #| label: tbl-new
 #| tbl-cap: "Nýir og reyndir fagráðsmenn bornir saman: dreifing hvers mælikvarða innan hvors hóps, á sama kvarða í báðum línum (í PDF-útgáfunni eru sýnd miðgildi í stað súlurita). Biðpunktar eru umsóknir annarra sem setið er undir yfir alla lotuna, í sviðsmynd 2."
 #| eval: !expr have_results
-# Scenario 2 is the one reported here (the best of the scenarios that are not planned from scratch).
+# Scenario 2 is the one reported here.
 best <- levels(droplevels(runs$scenario))[startsWith(levels(droplevels(runs$scenario)), "2.")]
 best_number <- sub("[.].*", "", best)
 waiting_in <- function(label) filter(runs, scenario == label) %>% select(member, waiting)
