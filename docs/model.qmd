@@ -77,7 +77,7 @@ lausnara sem krefst ekki leyfis, t.d. SCIP [@scip]; það væri hluti af NSN-ver
 | Ein umsókn í hverjum dagskrárlið | $\sum_{p \in P} x_{pmk} \le 1 \quad \forall m, k$ |
 | Engin göt í dagskránni | $\sum_{p} x_{pm,k+1} \le \sum_{p} x_{pmk} \quad \forall m,\ k < \bar K$ |
 | Fundir sem eru búnir haldast eins og þeir voru | $x_{p m_p k_p} = 1 \quad \forall p \in F$ |
-| Engri umsókn er bætt á næsta fund; auglýstum umsóknum má fresta á seinni fund (í sviðsmyndum 2a–2d og 3 er það ekki leyft: M3 hefur nákvæmlega auglýstu umsóknirnar) | $x_{p m^* k} = 0 \quad \forall p \notin N,\ k$ |
+| Engri umsókn er bætt á næsta fund; auglýstum umsóknum má fresta á seinni fund (í sviðsmynd 2 er það ekki leyft: M4 hefur nákvæmlega auglýstu umsóknirnar) | $x_{p m^* k} = 0 \quad \forall p \notin N,\ k$ |
 | Á fyrsta fundi mæta allir, með nákvæmlega eina umsókn hver | $\sum_{p \in P_r} \sum_{k} x_{p m_1 k} = 1 \quad \forall r$ |
 | Á seinni fundum hefur hver fagráðsmaður mest $\bar k$ umsóknir | $\sum_{p \in P_r} \sum_{k} x_{pmk} \le \bar k \quad \forall r,\ m \ne m_1$ |
 | Fagráðsmaður er ekki settur á fund sem hann kemst ekki á | $a_{rm} = 0 \quad \forall r,\ m \in U_r$ |
@@ -187,8 +187,8 @@ sanngirninni.
 
 **Afbrigði**
 
-Fjórar viðbætur taka á fyrirvörunum hér að neðan. Engin þeirra hefur enn verið keyrð á öllum
-sviðsmyndunum.
+Fjórar viðbætur taka á fyrirvörunum hér að neðan. Tvær aðrar, tímagluggar og forgangur, lúta að
+óskum og aðstæðum fagráðsmanna í lotunni og er þeim lýst síðast.
 
 `leximin` kemur í stað þreps 2. Þrep 2 ver aðeins þann verst setta; `leximin` ver líka þann næstverst setta, þann
 þar á eftir o.s.frv. Þetta er sama leximin-röð og lýst var í kaflanum um sanngirni: fyrst er
@@ -227,6 +227,27 @@ að vega fundi á móti bið. Sjálfgefið svigrúm er `r num(config$meetings_sl
 *Byrði úr fyrri lotum* (`--carry`). Byrði sem fagráðsmaður ber með sér úr fyrri lotum, $C_r$, er
 bætt við $B_r$ í sanngirnisþrepunum (þrepi 2 eða `leximin`), svo sá sem bar þungt í fyrra fær léttari
 lotu nú. $C_r$ má vera neikvætt.
+
+*Tímagluggar innan fundar* (`windows`). Fagráðsmaður getur verið á fundi aðeins hluta hans: hann kemur
+seint, eða þarf að fara fyrir tiltekinn tíma, eða er aðeins seinni helminginn. Hver fundur byrjar
+klukkan `r config$meeting_start` og hver umsókn tekur `r num(config$slot_minutes)` mínútur (einn dagskrárlið).
+Glugginn er skráður sem tími frá og til fyrir hvern fagráðsmann og fund, og honum er breytt í
+dagskrárliði. Eigin umsóknir fagráðsmannsins fara þá aðeins í dagskrárliði innan gluggans. Lokatíminn er
+færður fram um `r num(config$leave_margin_minutes)` mínútur, svo enginn sé skipulagður alveg fram á síðustu
+stundu sem hann má vera. Dagskrárliðir áður en fagráðsmaður kemur teljast frjálsir, ekki bið, því hann
+sat ekki undir þeim. Án glugga er ekkert af þessu í gildi.
+
+*Forgangur: fæstir fundir fyrir tiltekna fagráðsmenn* (`--fewest-meetings`). Ef fagráðsmenn óska eftir að
+mæta á sem fæsta fundi má gefa þeim forgang. Þá er bætt við þrepi á undan öllum hinum, þar sem
+fjöldi funda þeirra fagráðsmanna sem eru á listanum, $R^{\text{fæstir}} \subseteq R$, er gerður sem minnstur,
+
+$$
+\min \;\; \underbrace{\sum_{r \in R^{\text{fæstir}}} \sum_{m \in M} a_{rm}}_{\text{fundir sem þeir mæta á}} ,
+$$
+
+og gildið er fest. Önnur þrep, þ.m.t. regluþrepið og sanngirnisþrepin, mega því ekki fjölga fundum
+þeirra. Þetta virkar aðeins með markfalli sem er leyst í þrepum (t.d. `lexburden`, `leximin` eða
+`lexsum`).
 
 Hvert þrep er fest með hlutfallslegu vikmarki $10^{-4}$, rýmra en heiltöluvikmörk lausnarans, svo
 námundun í einu þrepi geri næsta þrep ekki ógerlegt. Bil hvers þreps er skráð með niðurstöðunum.
@@ -308,7 +329,7 @@ sem er færð framar hefði annars engan mögulegan ritstjóra. Markmiðið er j
 reyndra fagráðsmanna: líkanið lágmarkar muninn á hæstu og lægstu greiðslu á umsókn hjá þeim. Það byggir á þeirri forsendu að hver umsókn taki jafnlangan tíma, líka biðin á fundum. Í stað þess
 má greiða fyrir byrði dagskrárinnar (`--pay-per burden`): fagráðsmenn sem bera meiri byrði
 (@eq-burden, með sama $\alpha_r$ og dagskráin) en meðaltal reyndra fá fleiri ritstjórahlutverk.
-Hlutverk á fundum sem búið er að auglýsa (M3) haldast óbreytt.
+Hlutverk á fundum sem eru haldnir eða hafa verið auglýstir haldast óbreytt.
 
 **Jöfn úthlutun frá grunni** (@sec-assign): gert er ráð fyrir að allir séu jafnhæfir til að fjalla um
 allar umsóknir, og ekkert er fest. Líkanið velur alla þrjá og ritstjórann, og lágmarkar muninn á

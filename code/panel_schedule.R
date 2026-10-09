@@ -7,14 +7,18 @@ library(tidyverse)
 source("panel_palette.R")  # colours of all figures
 
 # Scenarios: result file prefix -> label, in the order they are compared.
-scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
-               free = "2a. Næsti fundur festur, restin bestuð",
-               free_sum = "2b. Eins og 2a, án sanngirnisþreps",
-               free_leximin = "2c. Eins og 2a, leximin",
-               free_noworse = "2d. Eins og 2c, enginn verr settur en í 1",
-               free_max4 = "3. Eins og 2a, mest 4 á fund",
-               scratch = "4. Bestað frá byrjun")
-scenario_colours <- setNames(scenario_palette, scenarios)
+scenarios <- c(s1 = "1. Áætlun starfsmanna, röð bestuð",
+               s2 = "2. M1–M4 fastir, restin bestuð",
+               s3 = "3. Frá fundi 4 frjálst")
+# Earlier runs on older data, kept only for the chapters that have not been rerun (assign.qmd).
+legacy_scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
+                      free = "2a. Næsti fundur festur, restin bestuð",
+                      free_sum = "2b. Eins og 2a, án sanngirnisþreps",
+                      free_leximin = "2c. Eins og 2a, leximin",
+                      free_noworse = "2d. Eins og 2c, enginn verr settur en í 1",
+                      free_max4 = "3. Eins og 2a, mest 4 á fund",
+                      scratch = "4. Bestað frá byrjun")
+scenario_colours <- setNames(scenario_palette[seq_along(scenarios)], scenarios)
 # Agenda slots where a member has a conflict of interest: red if they have to step out, pink if
 # they are not in the meeting then (already left, or not attending).
 conflict_colour <- "#d7263d"
@@ -148,10 +152,10 @@ read_members <- function(prefix, scenario) {
 }
 
 # Read every scenario that has results, as one data frame with a scenario column.
-read_scenarios <- function(results) {
-  available <- names(scenarios)[file.exists(file.path(results, paste0(names(scenarios), "_members.csv")))]
-  bind_rows(lapply(available, function(s) read_members(file.path(results, s), scenarios[[s]]))) %>%
-    mutate(scenario = factor(scenario, levels = scenarios))
+read_scenarios <- function(results, which = scenarios) {
+  available <- names(which)[file.exists(file.path(results, paste0(names(which), "_members.csv")))]
+  bind_rows(lapply(available, function(s) read_members(file.path(results, s), which[[s]]))) %>%
+    mutate(scenario = factor(scenario, levels = which))
 }
 
 # Times a conflicted member is present when that proposal is discussed, per scenario.
@@ -465,6 +469,8 @@ plot_exit_sankey <- function(schedule) {
 # peel-off points so far (without changing which member is lit).
 plot_exit_sankey_interactive <- function(schedule) {
   static <- plot_exit_sankey(schedule)
+  # The PDF has no interactivity: fall back to the static alluvial plot.
+  if (!knitr::is_html_output()) return(static)
   flow <- exit_flow(schedule) %>% mutate(x = as.integer(meeting))
   lodes <- layer_data(static, 1) %>%
     transmute(member = as.character(alluvium), x, ymin, ymax) %>%
