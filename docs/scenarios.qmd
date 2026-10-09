@@ -57,7 +57,7 @@ Ef umsókn er frestað af ástæðum sem líkanið sér ekki, t.d. vegna mannekl
 #| results: asis
 if (!file.exists(file.path(results, "s3_members.csv"))) {
   cat("::: {.callout-note}\nNiðurstöður sviðsmyndar 3 eru væntanlegar (12 klst. keyrsla) og eru ekki með í töflum og",
-      "myndum hér fyrir neðan.\n:::\n")
+      "myndum hér fyrir neðan. Unnið er að þeim í dröginu að breytingu #54 á GitHub.\n:::\n")
 }
 ```
 
