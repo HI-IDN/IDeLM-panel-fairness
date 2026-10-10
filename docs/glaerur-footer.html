@@ -36,7 +36,7 @@
 .reveal table.results th:first-child, .reveal table.results td:first-child { width: 34%; }
 .reveal table.results th { font-size: 20px !important; text-align: center !important; padding: 10px 12px !important; line-height: 1.2; }
 .reveal table.results tbody tr:nth-child(even) td { background: var(--panel-2); }
-.reveal .pct { color: var(--blue); font-weight: 800; font-size: 0.8em; white-space: nowrap; }
+.reveal .pct { background: var(--yellow); color: var(--blue); font-weight: 800; font-size: 0.8em; white-space: nowrap; padding: 2px 8px; }
 .reveal .table-note { font-size: 18px !important; color: var(--muted); margin-top: 14px; }
 .reveal .bar { display: block; height: 10px; background: var(--panel); margin: 6px auto 0; width: 80%; }
 .reveal .bar i { display: block; height: 100%; background: var(--blue); }
@@ -44,7 +44,8 @@
 .reveal table.results tr.hours td { font-size: 19px; color: var(--muted); }
 .reveal .questions { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 24px; }
 .reveal .questions-photo, .reveal .questions img { width: 100%; max-height: 420px; object-fit: cover; margin: 0; }
-.reveal .questions-contact { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+.reveal .questions-contact { display: flex; flex-direction: column; gap: 30px; align-items: flex-start; }
+.reveal .questions-contact .contact-card { margin-bottom: 22px; }
 .reveal .questions-contact p { margin: 0; }
-.reveal .questions-contact a { background: var(--white); color: var(--blue) !important; padding: 10px 18px; font-weight: 700; text-decoration: none; display: inline-block; }
+.reveal .questions-contact p:not(:has(.contact-card)) a { color: var(--blue) !important; background: var(--white); border: 3px solid var(--blue); box-shadow: 8px 8px 0 var(--yellow); padding: 10px 20px; font-weight: 700; text-decoration: none; display: inline-block; }
 </style>
