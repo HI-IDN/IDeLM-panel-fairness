@@ -131,11 +131,7 @@ Hugmynd að skiptingu: þrír nemendur vinna samhliða, hver í um þrjá mánu�
 * [hi-yellow] handshake | Afstaða | Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
 :::
 
-## Spurningar?
-
-::: {.big-claim}
-Greinargerðin og kóðinn eru opin: sjá vefsíðuna og GitHub.
-:::
+## Spurningar? {.focus-slide background-color="#2DD2C0"}
 
 ::: {.muted}
 Greinargerð: hi-idn.github.io/IDeLM-panel-fairness · Kóði: github.com/HI-IDN/IDeLM-panel-fairness
