@@ -131,7 +131,7 @@ cmp %>%
 #| results: asis
 #| eval: !expr have_schedule
 base <- cmp[1, ]; equal <- cmp[2, ]
-cat("Jöfn úthlutun jafnar greiðslur á umsókn, en fundaskipanin er ekki betri en í sviðsmynd 2: mesta byrði er ",
+cat("Jöfn úthlutun jafnar greiðslur á umsókn, en fundaskipanin er ekki betri á byrði og bið en í sviðsmynd 2: mesta byrði er ",
     equal[["Mesta byrði"]], " á móti ", base[["Mesta byrði"]], " og biðpunktar samtals ", equal[["Biðpunktar samtals"]],
     " á móti ", base[["Biðpunktar samtals"]], ", en fundarsetur eru ", equal[["Fundir samtals"]], " á móti ",
     base[["Fundir samtals"]], ". Lausnin er ekki sönnuð best, svo hluti ",

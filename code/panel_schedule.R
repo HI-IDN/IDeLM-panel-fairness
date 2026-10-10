@@ -10,14 +10,6 @@ source("panel_palette.R")  # colours of all figures
 scenarios <- c(s1 = "1. Áætlun starfsmanna, röð bestuð",
                s2 = "2. M1–M4 fastir, restin bestuð",
                s3 = "3. Hvað ef: allt skipulagt frá upphafi")
-# Earlier runs on older data, kept only for the chapters that have not been rerun (assign.qmd).
-legacy_scenarios <- c(current = "1. Tillaga starfsmanna, sanngjörn röð",
-                      free = "2a. Næsti fundur festur, restin bestuð",
-                      free_sum = "2b. Eins og 2a, án sanngirnisþreps",
-                      free_leximin = "2c. Eins og 2a, leximin",
-                      free_noworse = "2d. Eins og 2c, enginn verr settur en í 1",
-                      free_max4 = "3. Eins og 2a, mest 4 á fund",
-                      scratch = "4. Bestað frá byrjun")
 scenario_colours <- setNames(scenario_palette[seq_along(scenarios)], scenarios)
 # Agenda slots where a member has a conflict of interest: red if they have to step out, pink if
 # they are not in the meeting then (already left, or not attending).

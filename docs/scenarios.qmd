@@ -143,10 +143,10 @@ res(2, "Biðpunktar samtals"), " á móti ", res(1, "Biðpunktar samtals"), " og
 res(2, "Fundir samtals"), " á móti ", res(1, "Fundir samtals"), ". Enginn fagráðsmaður ber meiri byrði en í sviðsmynd 1 ",
 "og enginn vanhæfur er viðstaddur (í sviðsmynd 1 eru ", res(1, "Vanhæfir viðstaddir"), " skipti).
 ",
-"* **Fyrstu fundirnir kostuðu mikið.** Ef allt hefði verið skipulagt frá upphafi (sviðsmynd 3) væri mesta byrði ",
+"* **Fyrstu fundirnir kostuðu líklega talsvert.** Ef allt hefði verið skipulagt frá upphafi (sviðsmynd 3) væri mesta byrði ",
 res(3, "Mesta byrði"), " í stað ", res(2, "Mesta byrði"), ", heildarbið ", res(3, "Biðpunktar samtals"), " í stað ",
 res(2, "Biðpunktar samtals"), " og fundarsetur ", res(3, "Fundir samtals"), " í stað ", res(2, "Fundir samtals"),
-". Munurinn á sviðsmynd 3 og 2 er það sem óbestuðu fyrstu fundirnir hafa kostað. Sviðsmynd 3 er viðmið en ekki ",
+". Munurinn á sviðsmynd 3 og 2 er mat á því hvað óbestuðu fyrstu fundirnir hafa kostað; vegna bilsins er raunverulegur kostnaður óviss. Sviðsmynd 3 er viðmið en ekki ",
 "raunhæfur kostur, og lausnin er ekki sönnuð best (bil ", res(3, "Bil (%)"), " %).
 ",
 "* **Þeir sem mæta oftast bíða enn mest.** Fylgni funda og biðar er ", res(2, "Fylgni funda og biðar"),
