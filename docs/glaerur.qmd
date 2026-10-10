@@ -90,6 +90,14 @@ Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. 
 Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill fæsta fundi, og er því ekki fullkomlega sambærileg. Í sviðsmynd 3 finnur lausnarinn góða lausn en getur ekki sannað að hún sé sú besta.
 :::
 
+## Hver fær hvað?
+
+![](img/sankey_s2.svg){fig-alt="Sankey-mynd: hvenær hver fagráðsmaður fer af hverjum fundi í sviðsmynd 2"}
+
+::: {.blue-note}
+Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
+:::
+
 ## Greiðslur: ritstjóri eða lesari?
 
 ::: {.lead}
