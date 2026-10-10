@@ -79,6 +79,7 @@ def main():
     ap.add_argument('--postponed', nargs='*', default=[], help='codes of proposals taken off a meeting that has been held')
     ap.add_argument('--postponed-note', default='frestað af M3: aðeins tveir af þremur höfðu lesið umsóknina',
                     help='comment on those proposals')
+    ap.add_argument('--scenario', help='what the plan is, shown in the overview (e.g. "Sviðsmynd 2, 110 umsóknir")')
     ap.add_argument('--author', default=os.environ.get('PLAN_AUTHOR', ''),
                     help='author name and contact, written to the workbook properties and the Yfirlit sheet')
     ap.add_argument('--out', default='../data/tdf/results/fundaaetlun_taeknithrounarsjodur_haust2026.xlsx')
@@ -136,11 +137,13 @@ def main():
     waiting = [float(m['waiting']) for m in members]
     burden = [float(m['burden']) for m in members]
     rows = [
+        ('Mest fundir hjá einum fulltrúa', max(int(m['meetings']) for m in members)),
+        ('Fundarsetur samtals', sum(int(m['meetings']) for m in members)),
         ('Samtals bið (raufar)', int(sum(waiting))),
         ('Mesta bið eins fulltrúa (raufar)', int(max(waiting))),
         ('Mesta byrði eins fulltrúa (alfa × fundir + bið)', int(max(burden))),
         ('Lengd rauf (mín.)', SLOT_MINUTES),
-        ('Keyrsla líkansins', os.path.basename(args.agenda).replace('_agenda.csv', '')),
+        ('Áætlun', args.scenario or os.path.basename(args.agenda).replace('_agenda.csv', '')),
         ('Skjal útbúið', dt.date.today().isoformat()),
     ]
     if args.author:
