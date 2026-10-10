@@ -26,19 +26,10 @@ event-date: today
 Fagráðsmaður getur setið heilan fund og beðið eftir að röðin komi að umsóknum hans.
 :::
 
-::: {.three-col}
-::: {.soft .blue}
-<h3>Margir fundir</h3>
-Umsóknum fjölgar, fundir eru tíðari og lengri.
-:::
-::: {.soft .yellow}
-<h3>Löng bið</h3>
-Fundum er ekki lokið fyrr en allar umsóknir eru afgreiddar og margir sitja lengi fyrir sínar.
-:::
-::: {.soft .red}
-<h3>Ójafnt álag</h3>
-Sumir mæta oftar og bíða meira en aðrir.
-:::
+::: {.fa-card}
+* [hi-teal] calendar-days | Margir fundir | Umsóknum fjölgar, fundir eru tíðari og lengri.
+* [hi-yellow] hourglass-half | Löng bið | Fundum er ekki lokið fyrr en allar umsóknir eru afgreiddar og margir sitja lengi fyrir sínar.
+* [hi-red] scale-unbalanced | Ójafnt álag | Sumir mæta oftar og bíða meira en aðrir.
 :::
 
 ## Hugmyndin
@@ -54,38 +45,19 @@ Ef álaginu er dreift gagnsætt og sanngjarnt, fer tími fagráðsmanna betur.
 
 ## Tvö hugtök
 
-::: {.two-col}
-::: {.soft .blue}
-<h3>Biðpunktur</h3>
-Ein umsókn annars fagráðsmanns sem þú situr undir áður en þín síðasta umsókn er tekin fyrir.
-:::
-::: {.soft .yellow}
-<h3>Byrði</h3>
-Fundir sem þú mætir á (hver telur 2–4) og biðpunktar. Lægri byrði er betri.
-:::
-:::
-
-::: {.blue-note}
-Þeir sem hafa flestar umsóknir fá hærra mat á kostnaði við að mæta.
+::: {.fa-card cols=2}
+* [hi-teal] hourglass-half | Biðpunktur | Ein umsókn annars fagráðsmanns sem þú situr undir áður en þín síðasta umsókn er tekin fyrir.
+* [hi-yellow] weight-hanging | Byrði | Fundir sem þú mætir á (hver telur 2–4) og biðpunktar. Lægri byrði er betri.
 :::
 
 ## Þrjár sviðsmyndir
 
 Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. Fundir 1–3 eru haldnir og fundur 4 er auglýstur.
 
-::: {.three-col}
-::: {.scenario-card}
-<h3>Sviðsmynd 1: áætlun starfsmanna</h3>
-Umsóknir á fundum eru óbreyttar. Aðeins röðin innan funda er löguð. Þetta er viðmiðið.
-:::
-::: {.scenario-card .best}
-<h3>Sviðsmynd 2: fundir 1–4 festir</h3>
-Umsóknum á fundum 5–9 er raðað upp á nýtt. Enginn fagráðsmaður ber meiri byrði en í áætlun starfsmanna.
-:::
-::: {.scenario-card}
-<h3>Sviðsmynd 3: hvað ef?</h3>
-Allt skipulagt frá upphafi lotunnar. Fræðilegur samanburður, ekki raunhæfur kostur.
-:::
+::: {.fa-card}
+* [hi-blue] clipboard-list | Sviðsmynd 1: áætlun starfsmanna | Umsóknir á fundum eru óbreyttar. Aðeins röðin innan funda er löguð. Þetta er viðmiðið.
+* [hi-teal] calendar-check | Sviðsmynd 2: fundir 1–4 festir | Umsóknum á fundum 5–9 er raðað upp á nýtt. Enginn fagráðsmaður ber meiri byrði en í áætlun starfsmanna.
+* [hi-yellow] wand-magic-sparkles | Sviðsmynd 3: hvað ef? | Allt skipulagt frá upphafi lotunnar. Fræðilegur samanburður, ekki raunhæfur kostur.
 :::
 
 ## Niðurstöður
@@ -125,15 +97,9 @@ Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill
 Líkanið gerir ráð fyrir að hver umsókn taki sama tíma og að skipulag haldist. Raunveruleg gögn úr kerfum Rannís geta bætt það.
 :::
 
-::: {.two-col}
-::: {.soft .blue}
-<h3>Breytingaskrár</h3>
-Hver færist milli funda, hvenær og hvers vegna? Þá sést hve oft áætlanir breytast og hverju má spá fyrir.
-:::
-::: {.soft .yellow}
-<h3>Tímastimplar funda</h3>
-Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mínútum í stað umsókna.
-:::
+::: {.fa-card cols=2}
+* [hi-teal] clock-rotate-left | Breytingaskrár | Hvaða umsóknir færast milli funda, hvenær og hvers vegna? Þá sést hve oft áætlanir breytast og hverju má spá fyrir.
+* [hi-yellow] stopwatch | Tímastimplar funda | Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mínútum í stað umsókna.
 :::
 
 ## Hvað fæst með þeim?
@@ -147,19 +113,10 @@ Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mí
 
 Sumarverkefni nemenda með styrk úr Nýsköpunarsjóði námsmanna, með aðstoð upplýsingatæknideildar.
 
-::: {.three-col}
-::: {.scenario-card}
-<h3>Líkanið</h3>
-Betri pörun fagráðsmanna og umsókna, líkar umsóknir á sama fundi, öll fagráð saman.
-:::
-::: {.scenario-card}
-<h3>Áreiðanleiki</h3>
-Bið í tíma, fjarvistir og seinkomur, hraðari lausn.
-:::
-::: {.scenario-card}
-<h3>Innleiðing</h3>
-Opinn lausnari, tenging við kerfi sjóðsins, gögnin sem að ofan var lýst.
-:::
+::: {.fa-card}
+* [hi-blue] diagram-project | Líkanið | Betri pörun fagráðsmanna og umsókna, líkar umsóknir á sama fundi, öll fagráð saman.
+* [hi-teal] shield-halved | Áreiðanleiki | Bið í tíma, fjarvistir og seinkomur, hraðari lausn.
+* [hi-yellow] plug | Innleiðing | Opinn lausnari, tenging við kerfi sjóðsins, gögnin sem að ofan var lýst.
 :::
 
 ::: {.blue-note}
@@ -168,19 +125,10 @@ Hugmynd að skiptingu: þrír nemendur vinna samhliða, hver í um þrjá mánu�
 
 ## Hvað þarf frá Rannís?
 
-::: {.three-col}
-::: {.goal}
-[1]{.num}
-Aðgang að sögulegum gögnum: breytingaskrám og tímastimplum funda.
-:::
-::: {.goal}
-[2]{.num}
-Samtal við upplýsingatæknideild um tengingu við kerfi sjóðsins.
-:::
-::: {.goal}
-[3]{.num}
-Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
-:::
+::: {.fa-card}
+* [hi-blue] database | Gögn | Aðgang að sögulegum gögnum: breytingaskrám og tímastimplum funda.
+* [hi-teal] comments | Samtal | Samtal við upplýsingatæknideild um tengingu við kerfi sjóðsins.
+* [hi-yellow] handshake | Afstaða | Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
 :::
 
 ## Spurningar?
