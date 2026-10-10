@@ -5,7 +5,6 @@ format:
   haskoli-islands-revealjs:
     footer: "Sanngjarnari fagráðsfundir · frumgerð fyrir Tækniþróunarsjóð"
     favicon: img/hi/favicon.svg
-    watermark: img/hi/hi_logo.svg
     include-in-header: glaerur-footer.html
     include-after-body: glaerur-after.html
     embed-resources: false
