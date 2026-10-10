@@ -68,14 +68,14 @@ Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. 
 <tr><th></th><th>Sviðsmynd 1: áætlun starfsmanna</th><th>Sviðsmynd 2: fundir 1–4 festir</th><th>Sviðsmynd 3: hvað ef?</th></tr>
 </thead>
 <tbody>
-<tr><td>Biðpunktar samtals</td><td>810</td><td>680 <span class="pct">−16 %</span></td><td><strong>556</strong> <span class="pct">−31 %</span></td></tr>
-<tr><td>Bið samtals, ca 15 mín. á biðpunkt</td><td>um 203 klst.</td><td>um 170 klst.</td><td><strong>um 139 klst.</strong></td></tr>
-<tr><td>Mesta byrði eins fagráðsmanns</td><td>67</td><td>63 <span class="pct">−6 %</span></td><td><strong>60</strong> <span class="pct">−10 %</span></td></tr>
-<tr><td>Fundarsetur samtals</td><td>144</td><td>124 <span class="pct">−14 %</span></td><td><strong>111</strong> <span class="pct">−23 %</span></td></tr>
+<tr><td>Biðpunktar samtals</td><td>810<span class="bar"><i style="width:100%"></i></span></td><td>680 <span class="pct">−16 %</span><span class="bar"><i style="width:84%"></i></span></td><td><strong>556</strong> <span class="pct">−31 %</span><span class="bar"><i style="width:69%"></i></span></td></tr>
+<tr class="hours"><td>Áætluð bið, ca 15 mín. á biðpunkt</td><td>um 203 klst.</td><td>um 170 klst.</td><td><strong>um 139 klst.</strong></td></tr>
+<tr><td>Mesta byrði eins fagráðsmanns</td><td>67<span class="bar"><i style="width:100%"></i></span></td><td>63 <span class="pct">−6 %</span><span class="bar"><i style="width:94%"></i></span></td><td><strong>60</strong> <span class="pct">−10 %</span><span class="bar"><i style="width:90%"></i></span></td></tr>
+<tr><td>Fundarsetur samtals</td><td>144<span class="bar"><i style="width:100%"></i></span></td><td>124 <span class="pct">−14 %</span><span class="bar"><i style="width:86%"></i></span></td><td><strong>111</strong> <span class="pct">−23 %</span><span class="bar"><i style="width:77%"></i></span></td></tr>
 </tbody>
 </table>
 
-<p class="table-note">Prósentur eru miðað við sviðsmynd 1. Biðtíminn er áætlaður: hver biðpunktur er um 15 mínútur. Í sviðsmynd 2 ber enginn fagráðsmaður meiri byrði en í áætlun starfsmanna.</p>
+<p class="table-note">Súlur og prósentur eru miðað við sviðsmynd 1 (100 %). Biðtíminn er áætlaður: hver biðpunktur er um 15 mínútur. Í sviðsmynd 2 ber enginn fagráðsmaður meiri byrði en í áætlun starfsmanna.</p>
 
 ## Hvað segja tölurnar?
 
