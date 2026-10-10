@@ -2,7 +2,7 @@ project:
   type: book
   output-dir: _output
   # The slides are not a chapter; this builds them into _output/ after the book.
-  post-render: build_slides.sh
+  post-render: bash build_slides.sh
 
 # The HÍ logos are not part of the theme extension; img/hi/ is copied from HI-IDN/quarto-hi.
 book:
