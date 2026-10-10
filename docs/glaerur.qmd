@@ -125,7 +125,9 @@ Greiðsla fer eftir hlutverki á hverri umsókn. Því skiptir máli hve oft hve
 <p class="table-note">Bilið er frá lægsta til hæsta hlutfalls meðal 21 fagráðsmanns.</p>
 
 ::: {.blue-note}
-Greiðslan fylgir hlutverkinu. Til umræðu er hverjir fá ritstjórahlutverkið, svo heildargreiðsla á umsókn verði jafnari milli fagráðsmanna: þeir sem bíða óþarflega mikið fá þá oftar ritstjórahlutverkið, sem er betur greitt.
+Greiðslan fylgir hlutverkinu: ritstjóri fær meira en lesari.
+
+**Til umræðu:** hverjir fá ritstjórahlutverkið, þannig að heildargreiðsla á umsókn verði jafnari milli fagráðsmanna. Þeir sem bíða mikið gætu t.d. verið oftar ritstjórar.
 :::
 
 ## Næstu skref: söguleg gögn
