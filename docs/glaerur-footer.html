@@ -1,0 +1,30 @@
+<style>
+/* Rannís and HÍ logos side by side in the footer band (white on blue).
+   The class `corner-logo` is hidden on title slides by the HÍ theme. */
+.corner-logo {
+  position: fixed;
+  right: 110px;
+  bottom: 0;
+  height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  z-index: 100;
+}
+.corner-logo img { height: 32px; width: auto; display: block; }
+.corner-logo .rannis-logo { filter: brightness(0) invert(1); }
+.corner-logo .divider { width: 1px; height: 28px; background: rgba(255, 255, 255, .55); }
+.reveal .footer { padding: 0 380px 0 90px !important; }
+.reveal li, .reveal .slides section > p { font-size: 28px; }
+.reveal .lead { font-size: 32px !important; }
+.reveal .slides h3 { font-size: 28px; }
+.reveal .soft p, .reveal .scenario-card p, .reveal .card p, .reveal .goal { font-size: 24px !important; }
+.reveal .blue-note p, .reveal .callout p, .reveal .lead, .reveal .goal p, .reveal .big-claim { font-size: 26px !important; }
+.reveal .blue-note, .reveal .callout { font-size: 24px !important; max-width: 1060px; }
+.reveal .card .stat { font-size: 38px !important; white-space: nowrap; font-weight: 900; }
+.reveal .card .stat-label { font-size: 22px !important; }
+.stat { line-height: 1; color: var(--blue); margin: 0 0 10px; }
+.stat-label { color: var(--muted); }
+.reveal .scenario-card { background: var(--white); border-top: 9px solid var(--blue); padding: 18px 22px; }
+.reveal .scenario-card.best { border-top-color: var(--teal); }
+</style>

@@ -1,0 +1,15 @@
+<script>
+// Quarto's book navbar has no option for extra tool buttons, so add the slides
+// button (built by build_slides.sh) right after the PDF download button.
+document.addEventListener("DOMContentLoaded", function () {
+  var pdf = document.querySelector('.quarto-navbar-tools a[href$=".pdf"]');
+  if (!pdf) return;
+  var a = document.createElement("a");
+  a.href = "./glaerur.html";
+  a.title = "Glærur";
+  a.className = "quarto-navigation-tool px-1";
+  a.setAttribute("aria-label", "Glærur");
+  a.innerHTML = '<i class="bi bi-easel"></i>';
+  pdf.insertAdjacentElement("afterend", a);
+});
+</script>

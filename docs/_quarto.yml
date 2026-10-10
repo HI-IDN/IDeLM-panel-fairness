@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: _output
+  # The slides are not a chapter; this builds them into _output/ after the book.
+  post-render: build_slides.sh
 
 # The HÍ logos are not part of the theme extension; img/hi/ is copied from HI-IDN/quarto-hi.
 book:
@@ -68,6 +70,8 @@ format:
     code-fold: true
     code-summary: "Sýna kóða"
     theme: styles.scss
+    # Adds the slides button next to the PDF download (see the partial).
+    include-after-body: _partials/slides-button.html
     # Browser tab: "book | chapter" (Quarto's default is "chapter – book").
     template-partials:
       - _partials/metadata.html
