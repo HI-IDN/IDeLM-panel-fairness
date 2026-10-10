@@ -14,6 +14,9 @@ title-theme: "Frumgerð"
 subtitle-highlight: "Sanngjarnari fagráðsfundir"
 presenters:
   - name: "Dr. Helga Ingimundardóttir"
+    hi-username: helgaingim
+    office: "VR-II"
+    github: tungufoss
 event-meta: "Kynning fyrir Rannís"
 event-date: today
 ---
@@ -128,6 +131,14 @@ Hugmynd að skiptingu: þrír nemendur vinna samhliða, hver í um þrjá mánu�
 
 ## Spurningar? {.focus-slide background-color="#2DD2C0"}
 
-::: {.muted}
-Greinargerð: hi-idn.github.io/IDeLM-panel-fairness · Kóði: github.com/HI-IDN/IDeLM-panel-fairness
+::: {.questions}
+![](img/vr2.jpg){.questions-photo fig-alt="VR-II, hús Háskóla Íslands"}
+
+::: {.questions-contact}
+{{< contact-card >}}
+
+[<i class="fa-solid fa-globe"></i> Greinargerð og vinnudagbók](https://hi-idn.github.io/IDeLM-panel-fairness/)
+
+[<i class="fa-solid fa-code-branch"></i> Kóðinn á GitHub](https://github.com/HI-IDN/IDeLM-panel-fairness)
+:::
 :::
