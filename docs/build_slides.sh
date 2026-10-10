@@ -6,7 +6,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 # Quarto sets these for the book render; the slides are rendered as a stand-alone file.
 unset QUARTO_PROJECT_RENDER_ALL QUARTO_PROJECT_OUTPUT_FILES QUARTO_PROJECT_INPUT_FILES
-quarto render glaerur.qmd
+# A failed slides build must not stop the book from being published.
+if ! quarto render glaerur.qmd; then
+  echo "WARNING: the slides could not be rendered; the book is unaffected." >&2
+  exit 0
+fi
 mkdir -p _output
 cp glaerur.html _output/
 rm -rf _output/glaerur_files
