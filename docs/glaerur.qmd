@@ -19,7 +19,7 @@ presenters:
     office: "VR-II"
     github: tungufoss
 event-meta: "Kynning fyrir Rannís"
-event-date: today
+event-date: "20. október 2026"
 ---
 
 {{< hi-title >}}
