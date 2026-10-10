@@ -1,11 +1,5 @@
 # Hvað ef: jöfn úthlutun frá grunni {#sec-assign}
 
-::: {.callout-note}
-Þessi kafli hefur ekki verið keyrður aftur með leiðréttu gögnunum (ritstjóri og vanhæfi einnar umsóknar
-voru leiðrétt) og nýju reglunum (M1–M3 fastir, fjarvistir og tímagluggar). Tölur og myndir hér eru úr
-eldri keyrslum og verða uppfærðar.
-:::
-
 ```{r}
 #| label: setup-assign
 source("_setup.R")
@@ -20,9 +14,9 @@ if (have_assign) {
 }
 if (have_schedule) {
   scheduled <- panel_from_agenda(assigned, file.path(results, "assign_schedule_agenda.csv"))
-  runs <- read_scenarios(results, legacy_scenarios)
+  runs <- read_scenarios(results)
   compare <- bind_rows(
-    filter(runs, startsWith(as.character(scenario), "4.")),
+    filter(runs, startsWith(as.character(scenario), "2.")),
     read_members(file.path(results, "assign_schedule"), "Jöfn úthlutun frá grunni")
   ) %>% mutate(scenario = factor(scenario, levels = unique(scenario)))
 }
@@ -32,6 +26,12 @@ Hvað ef allir fagráðsmenn væru jafnhæfir til að fjalla um allar umsóknir,
 frá grunni? Þá mætti skipta álaginu jafnt, svo enginn beri áberandi meira en aðrir. Þetta er
 einföldun: í raun skipta hæfni, fyrri yfirferð og óskir fagráðsmanna máli. Samanburðurinn sýnir
 hversu jafnt álagið *gæti* verið.
+
+**Viðmið samanburðarins.** Jöfn úthlutun er borin saman við *bestað plan sviðsmyndar 2* (@sec-scenarios):
+þar má raða umsóknum upp á nýtt á fundi 5–9, en pörunin, þ.e. hver fagráðsmaður er á hverri umsókn og í
+hvaða hlutverki, er sú sem starfsmenn lögðu til. Það sýnir hvað jöfn úthlutun bætir við þegar skipulag fundanna
+er þegar bestað. Samanburðurinn er *ekki* við sviðsmynd 1, þar sem aðeins röð umsókna er bestuð innan þeirrar
+fundaskipunar sem fagráð lagði upphaflega til.
 
 Bestað er lagskipt, í tveimur skrefum (@sec-model):
 
@@ -118,11 +118,24 @@ if (!have_schedule) {
 
 ```{r}
 #| label: tbl-assign-schedule
-#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við bestun frá byrjun með núverandi úthlutun (sviðsmynd 4)."
+#| tbl-cap: "Fundaskipan með jafnri úthlutun frá grunni, borin saman við bestað plan sviðsmyndar 2 (endurröðun leyfð, pörun föst)."
 #| eval: !expr have_schedule
-summary_table(compare) %>%
+cmp <- summary_table(compare)
+cmp %>%
   rename(Skipulag = Sviðsmynd) %>%
   knitr::kable(digits = 2, format.args = list(decimal.mark = ","))
+```
+
+```{r}
+#| label: assign-note
+#| results: asis
+#| eval: !expr have_schedule
+base <- cmp[1, ]; equal <- cmp[2, ]
+cat("Jöfn úthlutun jafnar greiðslur á umsókn, en fundaskipanin er ekki betri á byrði og bið en í sviðsmynd 2: mesta byrði er ",
+    equal[["Mesta byrði"]], " á móti ", base[["Mesta byrði"]], " og biðpunktar samtals ", equal[["Biðpunktar samtals"]],
+    " á móti ", base[["Biðpunktar samtals"]], ", en fundarsetur eru ", equal[["Fundir samtals"]], " á móti ",
+    base[["Fundir samtals"]], ". Lausnin er ekki sönnuð best, svo hluti ",
+    "munarins getur stafað af leitinni.\n", sep = "")
 ```
 
 ::: {.panel-tabset}

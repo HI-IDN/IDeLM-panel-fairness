@@ -1,11 +1,5 @@
 # Endurúthlutun hlutverka {#sec-roles}
 
-::: {.callout-note}
-Þessi kafli hefur ekki verið keyrður aftur með leiðréttu gögnunum (ritstjóri og vanhæfi einnar umsóknar
-voru leiðrétt) og nýju reglunum (M1–M3 fastir, fjarvistir og tímagluggar). Tölur og myndir hér eru úr
-eldri keyrslum og verða uppfærðar.
-:::
-
 ```{r}
 #| label: setup-roles
 source("_setup.R")
@@ -18,7 +12,7 @@ if (have_roles) {
 }
 ```
 
-Hér eru sömu fagráðsmenn á hverri umsókn og í tillögu starfsmanna, og fundir sem eru búnir eru
+Hér eru sömu fagráðsmenn á hverri umsókn og í tillögu starfsmanna, og fundir 1–4, sem eru haldnir eða auglýstir, eru
 óbreyttir. Líkanið (@sec-model) má hins vegar breyta því hver þeirra þriggja er ritstjóri. Nýir
 fagráðsmenn eru ritstjórar á mest
 `r scales::percent(yaml::read_yaml("../code/models/panel_model.yml")$new_editor_share)` umsókna sinna.
@@ -79,10 +73,10 @@ nefndir þegar kemur að 2. lesara.
 ## Rými í umræðunni {#sec-voice}
 
 @tbl-voice sýnir hve stórt hlutfall af umsóknum hvers fagráðsmanns er í hverju hlutverki, sem bil frá
-þeim lægsta til þess hæsta. Eftir endurúthlutun dregst bilið saman í öllum hlutverkum, mest hjá
-1. lesara og 2. lesara: enginn er lengur alltaf síðastur að tala, og allir fá að tala næstir á eftir
-ritstjóranum á um það bil helmingi lesaraumsókna sinna. Ritstjórahlutfallið jafnast líka, en síður,
-því nýir fagráðsmenn eru sjaldnar ritstjórar og því er dreift þannig að greiðsla á umsókn verði jöfn.
+þeim lægsta til þess hæsta. Eftir endurúthlutun dregst bilið saman hjá ritstjóra og mest hjá 2. lesara: enginn er lengur
+síðastur að tala á nær allar umsóknir sínar, og enginn er lengur án hlutverks 1. lesara. Bilið hjá 1. lesara er
+þó svipað og áður, aðeins fært til. Ritstjórahlutfallið jafnast minna en hjá 2. lesara, því nýir
+fagráðsmenn eru sjaldnar ritstjórar og því er dreift þannig að greiðsla á umsókn verði jöfn.
 
 ```{r}
 #| label: tbl-voice

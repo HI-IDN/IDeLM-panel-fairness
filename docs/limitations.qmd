@@ -33,7 +33,7 @@ skref.
   fagráðsmann sem fjallar um hana, og styttri ef umsóknin hefur komið áður. Líkanið myndi þá
   mæla bið í tíma frekar en í fjölda umsókna.
 * **Bil í lausn.** Bestaðar dagskrár eru þær bestu sem fundust innan tímamarka, ekki sannaðar
-  bestu lausnir. Í sviðsmyndum þar sem umsóknir eru færðar á milli funda er bilið 40–52 % (sviðsmyndir 2 og 3), og í
+  bestu lausnir. Í sviðsmyndum þar sem umsóknir eru færðar á milli funda er bilið 40–70 % (sviðsmyndir 2 og 3), og í
   þrepamarkfallinu er hvert þrep fest við það sem fannst, svo seinni þrep byggja á ónákvæmu gildi.
   Munur á sviðsmyndum getur því að hluta stafað af leitinni. Fundir eftir næsta fund eru innbyrðis
   skiptanlegir, sem gerir erfitt að loka bilinu. Röðunin innan funda er þó ekki orsökin. Með fundina

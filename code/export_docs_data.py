@@ -55,7 +55,7 @@ EXPERIMENTS = {
 # same name in LOGS). s1: the staff's plan with the meetings fixed and the order optimised; s2: M1-M4 fixed and
 # M5-M9 free; s3: from scratch. A run is copied only once it has finished (its _members.csv exists).
 LOGS = '../data/tdf/logs'
-ROUNDS = {'s1': 'rounds_2026-10/scen110_1', 's2': 'rounds_2026-10/scen110_2', 's3': 'rounds_2026-10/scen110_3'}
+ROUNDS = {'s1': 'rounds_2026-10/scen110_1', 's2': 'rounds_2026-10/scen110_2', 's3': 'rounds_2026-10/scen110_3_whatif'}
 ROLE_FILES = {'roles_panel.csv': ['application', 'editor', 'reader1', 'reader2'],
               'assign_panel.csv': ['application', 'editor', 'reader1', 'reader2']}
 CODE = re.compile(r'^([RAM]\d+|-?\d+(\.\d+)?([eE][-+]?\d+)?|TRUE|FALSE|True|False|yes|no|)$', re.I)  # codes, numbers, flags
