@@ -46,20 +46,11 @@ fæsta fundi (nema annað sé tekið fram).
    munar um að fyrstu fundirnir voru ekki skipulagðir sem best?* Munurinn á henni og sviðsmynd 2 sýnir hvað
    fyrstu fundirnir, sem eru óbestaðir og nú fastir, hafa kostað í byrði og bið. Hún er því viðmið, ekki
    raunhæfur kostur fyrir þá fundi sem eftir eru. Markfallið er það sama og í sviðsmynd 2 og tímamörk eru
-   12 klst. Þessi sviðsmynd er í keyrslu og niðurstöður hennar bætast við þegar henni lýkur.
+   12 klst.
 
 Fleiri og styttri fundir eru ræddir sem framtíðarverkefni í @sec-limitations.
 
 Ef umsókn er frestað af ástæðum sem líkanið sér ekki, t.d. vegna manneklu, er hún færð og líkanið keyrt aftur.
-
-```{r}
-#| label: pending-note
-#| results: asis
-if (!file.exists(file.path(results, "s3_members.csv"))) {
-  cat("::: {.callout-note}\nNiðurstöður sviðsmyndar 3 eru væntanlegar (12 klst. keyrsla) og eru ekki með í töflum og",
-      "myndum hér fyrir neðan. Unnið er að þeim í dröginu að breytingu #54 á GitHub.\n:::\n")
-}
-```
 
 ```{r}
 #| label: no-results
@@ -152,8 +143,14 @@ res(2, "Biðpunktar samtals"), " á móti ", res(1, "Biðpunktar samtals"), " og
 res(2, "Fundir samtals"), " á móti ", res(1, "Fundir samtals"), ". Enginn fagráðsmaður ber meiri byrði en í sviðsmynd 1 ",
 "og enginn vanhæfur er viðstaddur (í sviðsmynd 1 eru ", res(1, "Vanhæfir viðstaddir"), " skipti).
 ",
+"* **Fyrstu fundirnir kostuðu mikið.** Ef allt hefði verið skipulagt frá upphafi (sviðsmynd 3) væri mesta byrði ",
+res(3, "Mesta byrði"), " í stað ", res(2, "Mesta byrði"), ", heildarbið ", res(3, "Biðpunktar samtals"), " í stað ",
+res(2, "Biðpunktar samtals"), " og fundarsetur ", res(3, "Fundir samtals"), " í stað ", res(2, "Fundir samtals"),
+". Munurinn á sviðsmynd 3 og 2 er það sem óbestuðu fyrstu fundirnir hafa kostað. Sviðsmynd 3 er viðmið en ekki ",
+"raunhæfur kostur, og lausnin er ekki sönnuð best (bil ", res(3, "Bil (%)"), " %).
+",
 "* **Þeir sem mæta oftast bíða enn mest.** Fylgni funda og biðar er ", res(2, "Fylgni funda og biðar"),
-" í sviðsmynd 2 og ", res(1, "Fylgni funda og biðar"), " í sviðsmynd 1. Fylgnin er því ekki lægri í sviðsmynd 2, ",
+" í sviðsmynd 2, ", res(3, "Fylgni funda og biðar"), " í sviðsmynd 3 og ", res(1, "Fylgni funda og biðar"), " í sviðsmynd 1. Fylgnin er því ekki lægri í sviðsmyndum 2 og 3, ",
 "þótt hún minnki byrðina: markfallið jafnar ekki biðina á móti fjölda funda.
 ",
 "* **Lausnin er ekki sönnuð best.** Bilið að neðri marki er ", res(2, "Bil (%)"), " % í sviðsmynd 2 og ",
