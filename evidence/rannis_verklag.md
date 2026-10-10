@@ -6,18 +6,18 @@
 
 * **Núverandi aðferð er einfalt gervigreindarprompt** (spjallmenni), notað af starfsmanni fyrir fagráðsfundi í Sprota. Röðun innan fundar er ekki bestuð með reiknilíkani.
 * **Tímaforsendur:** um 10 mín. á umsókn í Sprota, nær 15 mín. í Vexti. Starfsmaður hefur notað „aðeins frábrugðna skipan" fyrir fundi í Vexti.
-* **Fjöldaskorður:** enginn fagráðsmaður má vera með fleiri en 4 umsóknir á fundi. Eitt tilvik með 6 umsóknir kom upp þegar fagráðsmaður boðaði forföll með stuttum fyrirvara á fyrri fundi og fékk fyrstu fjórar umsóknirnar fluttar; það var leyst með handvirkum tilfærslum og viðkomandi samþykkti. Starfsmaður er sammála því að fleiri en fjórar umsóknir á mann sé óásættanlegt.
+* **Fjöldaskorður:** enginn fagráðsmaður má vera með fleiri en 4 umsóknir á fundi. Eitt tilvik með 6 umsóknum kom upp þegar annar fagráðsmaður boðaði forföll með stuttum fyrirvara á síðasta fundi og átti að vera með fjórar fyrstu umsóknirnar; þær voru fluttar með einfaldri handvirkri hrókeringu milli funda og viðkomandi var meðvitaður um það og samþykkti. Starfsmaður er sammála því að fleiri en fjórar umsóknir á mann séu óásættanlegar.
 * **Séróskir fagráðsmanna** (utan prompts, send sem „aukaskilyrði"): geta ekki mætt á alla fundi, vilja vera framarlega í röðinni, vilja vera búnir fyrir tiltekinn tíma, mæta seint.
-* **Dagskráin er flöktandi.** Oft með stuttum fyrirvara kemur fram að lesari getur ekki mætt, hefur takmarkaðan tíma á fundi, í ljós kemur vanhæfi og skipta þarf um lesara o.fl.
-* **Keðjuáhrif:** þegar umsókn er flutt á annan fund eða skilyrðum eins lesara er breytt hefur það áhrif á tvo aðra lesara á umsókninni, og skilyrði þeirra geta stangast á. Að finna nýjan fundartíma fyrir umsókn er sjálfstætt vandamál, því athuga þarf samræmi við skilyrði á hinum fundinum. Starfsmaður nefnir þetta sem úrlausnarefni fyrir framtíðarlausn sem gerir ráð fyrir flökti og „lifandi" dagskrá.
-* **Birt dagskrá er erfitt að breyta.** Lesarar hafa gert ráðstafanir út frá auglýstri viðveru, og því þykir starfsfólki erfitt að breyta röðun haustfunda eftir útgáfu. Nýtt verklag á frekar að taka gildi síðar og vera innleitt markvisst, t.d. með námsmannaverkefni.
+* **Dagskráin er flöktandi.** Oft kemur fram með stuttum fyrirvara að lesari geti ekki mætt eða hafi takmarkaðan tíma á fundi, að í ljós komi vanhæfi og skipta þurfi um lesara, og fleira af því tagi.
+* **Keðjuáhrif:** þegar umsókn er flutt á annan fund eða skilyrðum eins lesara er breytt, hefur það áhrif á tvo aðra lesara á umsókninni, og skilyrði þeirra geta stangast á. Að finna nýjan fundartíma fyrir umsókn er sjálfstætt vandamál, því athuga þarf samræmi við skilyrði á hinum fundinum. Starfsmaður nefnir þetta sem úrlausnarefni fyrir framtíðarlausn sem gerir ráð fyrir flökti og „lifandi" dagskrá.
+* **Birt dagskrá er erfitt að breyta.** Lesarar hafa gert ráðstafanir út frá auglýstri viðveru, og því þykir starfsfólki erfitt að breyta röðun haustfunda eftir útgáfu. Nýtt verklag á fremur að taka gildi síðar og vera innleitt markvisst, t.d. með námsmannaverkefni.
 * **Áhugi á samanburði nálgana:** starfsfólk vill bera saman aðferðir (þar á meðal aðferð sem annar rannsakandi hefur þróað fyrir sjóðinn) og skoða á akademískum nótum.
 * **Hugmynd að sviðsmynd 2 frá starfsmanni:** næsti fundur haldist óbreyttur, en gerður sé nákvæmari samanburður á núverandi áætlun og nýjum tillögum til að sjá hvað breytingin þýðir fyrir einstaka lesara.
-* **Sviðsmynd 1:** í póstunum heyrist að Rannís vilji fara leið þar sem besta lausn er fundin miðað við þegar auglýsta áætlun.
+* **Sviðsmynd 1:** að mati Helgu vill Rannís fara leið þar sem besta lausn er fundin miðað við þegar auglýsta áætlun.
 
 ## 2. Prompt starfsmanns (orðrétt, með staðgenglum)
 
-Staðgenglar: umsóknir A1–A4; fagráðsmenn R1–R9. Textinn er að öðru leyti óbreyttur, að meðtalinni ritvillu í frumtextanum („F12").
+Staðgenglar: umsóknir A1–A4; fagráðsmenn R1–R9. Textinn er að öðru leyti óbreyttur.
 
 ```text
 You are to create a meeting schedule.
@@ -70,16 +70,16 @@ If any constraint cannot be met, mark it with ⚠️ and clearly state the confl
 
 * Markmið promptsins er að lágmarka **bið** (óvirkar umsóknir milli fyrstu og síðustu umsóknar hvers lesara) innan eins fundar; það nær hvorki til **vals á fundi** fyrir umsókn né til **hlutverkaskiptingar** (ritstjóri, 1. og 2. lesari).
 * Það hefur ekki skilgreint sanngirni milli fagráðsmanna á heilu fundaröðinni (fjöldi funda, samanlögð bið).
-* Prompt biður gervigreind sjálfa að „sannreyna" hagkvæmni; slík sannreyning er óáreiðanleg án reiknilíkans.
+* Promptið biður gervigreindina sjálfa að „sannreyna" hagkvæmni; slík sannreyning er óáreiðanleg án reiknilíkans.
 * Skorður í prompt (komutími, brottfarartími, „sem fyrst") samsvara að hluta tímagluggum og forgangi í líkaninu. Þær eru handskráðar fyrir hvern fund.
 
 ## 4. Tímalína samskipta (án nafna)
 
 | Dags. | Atvik |
 |---|---|
-| 1. okt. 2026 | Starfsmaður tilkynnir Helgu um breytingu á lesara vegna vanhæfis; hún er sett á eina umsókn til viðbótar á fundi þar sem hún er þegar með tvær. Helga samþykkir og nefnir sambærilegt bestunarverkefni og sanngirni í fundasókn (þrír fagráðsmenn sitja alla 9 fundina en flestir 6). |
+| 1. okt. 2026 | Starfsmaður tilkynnir Helgu um breytingu á lesara vegna vanhæfis; Helga er sett í staðinn á eina umsókn til viðbótar á fundi þar sem hún er þegar með tvær. Helga samþykkir og nefnir sambærilegt bestunarverkefni og sanngirni í fundasókn (þrír fagráðsmenn sitja alla 9 fundina en flestir 6). |
 | 1. okt. 2026 | Starfsmaður lýsir áhuga; röðun var gerð með „einföldu prompti"; auka skilyrði um séróskir eru til. Nefnir að annar rannsakandi hafi boðið fram bestunaraðstoð. |
-| 1. okt. 2026 | Helga bendir á að LLM sé ekki vel til þess fallið, spyr um hvort tekið sé tillit til endurinnsendra umsókna, og biður um söguleg gögn (breytingasaga í grunni, tímastimplar samþykktar umsókna) til að meta lausnir. |
+| 1. okt. 2026 | Helga bendir á að gervigreindarlíkan (LLM) sé ekki vel til þess fallið, spyr um hvort tekið sé tillit til endurinnsendra umsókna, og biður um söguleg gögn (breytingasaga í grunni, tímastimplar samþykktar umsókna) til að meta lausnir. |
 | 2. okt. 2026 | Starfsmaður sendir yfirlit aukaskilyrða. |
 | 5. okt. 2026 | Helga sendir fundaáætlun fyrir haustið (M1–M9) og óskar eftir fundi. |
 | 9. okt. 2026 | Starfsmenn eru spenntir fyrir samstarfinu; vilja funda innbyrðis fyrst og bjóða hinum rannsakandanum með. Starfsmaður nefnir flökt í dagskrá og sviðsmynd 2 (sjá lið 1). |
