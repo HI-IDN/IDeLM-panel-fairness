@@ -54,6 +54,14 @@ Ef álaginu er dreift gagnsætt og sanngjarnt, fer tími fagráðsmanna betur.
 * [hi-yellow] weight-hanging | Byrði | Fundir sem þú mætir á (hver telur 2–4) og biðpunktar. Lægri byrði er betri.
 :::
 
+## Fundir 1–3: fundur fyrir fund
+
+![](img/held.png){.held-fig fig-alt="Hvenær fagráðsmenn gátu farið af fundum 1–3"}
+
+<p class="held-key"><span class="k blue"></span> eigin umsókn · <span class="k grey"></span> tími á fundinum · <span class="k red"></span> vanhæfur og víkur af fundi · <span class="k pink"></span> vanhæfur en farinn eða ekki mættur · reitir hægra megin: uppsafnaðir biðpunktar</p>
+
+<div class="held-notes"><p>R09 fer 18:30 · R05 fer 17:45</p><p>R21 kemur 16:30 · R09 fer 18:30 · R05 fer 17:45 · R04 kemur 17:15</p><p>R17 kemst ekki · R09 fer 18:30 · R05 fer 17:45</p></div>
+
 ## Þrjár sviðsmyndir
 
 Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. Fundir 1–3 eru haldnir og fundur 4 er auglýstur.
