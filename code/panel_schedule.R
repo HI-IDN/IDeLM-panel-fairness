@@ -42,7 +42,7 @@ held_conflicts <- function(panel) {
     mutate(in_meeting = !is.na(leave) & leave >= position)
 }
 
-plot_held <- function(panel) {
+plot_held <- function(panel, with_title = TRUE) {
   held <- held_meetings(panel)
   meetings <- sort(unique(as.character(held$meeting)))
   members <- sort(unique(held$member))
@@ -121,6 +121,10 @@ plot_held <- function(panel) {
                         x = 0.01, hjust = 0, y = 0.33, size = 11)
   body <- cowplot::plot_grid(plotlist = panels, nrow = 1, rel_widths = widths, align = "h", axis = "tb")
   axis <- cowplot::ggdraw() + cowplot::draw_label("Dagskrárliður (umsóknir teknar fyrir)", size = 11)
+  if (!with_title) {
+    # For slides: the explanation is written on the slide, not in the figure.
+    return(cowplot::plot_grid(body, axis, legend, ncol = 1, rel_heights = c(1, 0.05, 0.12)))
+  }
   cowplot::plot_grid(title, body, axis, legend, ncol = 1, rel_heights = c(0.2, 1, 0.05, 0.12))
 }
 
