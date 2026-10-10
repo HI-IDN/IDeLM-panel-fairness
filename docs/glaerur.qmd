@@ -127,7 +127,7 @@ Greiðsla fer eftir hlutverki á hverri umsókn. Því skiptir máli hve oft hve
 ::: {.blue-note}
 Greiðslan fylgir hlutverkinu: ritstjóri fær meira en lesari.
 
-**Til umræðu:** hverjir fá ritstjórahlutverkið, þannig að heildargreiðsla á umsókn verði jafnari milli fagráðsmanna. Þeir sem bíða mikið gætu t.d. verið oftar ritstjórar.
+Til umræðu: hverjir fá ritstjórahlutverkið, þannig að heildargreiðsla á umsókn verði jafnari milli fagráðsmanna. Þeir sem bíða mikið gætu t.d. verið oftar ritstjórar.
 :::
 
 ## Næstu skref: söguleg gögn
