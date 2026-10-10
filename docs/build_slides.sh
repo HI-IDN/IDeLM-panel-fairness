@@ -15,3 +15,6 @@ mkdir -p _output
 cp glaerur.html _output/
 rm -rf _output/glaerur_files
 cp -r glaerur_files _output/
+# The pictures of the slides (img/) are not used by the book, so Quarto does not copy them.
+mkdir -p _output/img
+cp -r img/. _output/img/
