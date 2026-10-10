@@ -90,6 +90,28 @@ Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. 
 Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill fæsta fundi, og er því ekki fullkomlega sambærileg. Í sviðsmynd 3 finnur lausnarinn góða lausn en getur ekki sannað að hún sé sú besta.
 :::
 
+## Greiðslur: ritstjóri eða lesari?
+
+::: {.lead}
+Greiðsla fer eftir hlutverki á hverri umsókn. Því skiptir máli hve oft hver er ritstjóri og hve oft lesari.
+:::
+
+<table class="table results roles">
+<thead>
+<tr><th>Hlutfall umsókna hvers fagráðsmanns</th><th>Ritstjóri</th><th>1&#46; lesari</th><th>2&#46; lesari</th></tr>
+</thead>
+<tbody>
+<tr><td>Í tillögu starfsmanna</td><td>5–73 % <span class="mid">(miðgildi 31 %)</span></td><td>0–70 % <span class="mid">(28 %)</span></td><td>0–85 % <span class="mid">(33 %)</span></td></tr>
+<tr><td>Eftir endurúthlutun hlutverka</td><td>11–67 % <span class="mid">(33 %)</span></td><td>7–78 % <span class="mid">(32 %)</span></td><td>11–45 % <span class="mid">(33 %)</span></td></tr>
+</tbody>
+</table>
+
+<p class="table-note">Bilið er frá lægsta til hæsta hlutfalls meðal 21 fagráðsmanns. Endurúthlutun er bráðabirgðaniðurstaða úr eldri keyrslu.</p>
+
+::: {.blue-note}
+Til umræðu: á greiðslan að fylgja hlutverkinu, eða líka fundarsetunni, sem hægt væri að mæla með tímastimplum?
+:::
+
 ## Næstu skref: söguleg gögn
 
 ::: {.lead}
