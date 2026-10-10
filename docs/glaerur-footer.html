@@ -20,11 +20,35 @@
 .reveal .slides h3 { font-size: 28px; }
 .reveal .soft p, .reveal .scenario-card p, .reveal .card p, .reveal .goal { font-size: 24px !important; }
 .reveal .blue-note p, .reveal .callout p, .reveal .lead, .reveal .goal p, .reveal .big-claim { font-size: 26px !important; }
-.reveal .blue-note, .reveal .callout { font-size: 24px !important; max-width: 1060px; }
+.reveal .blue-note, .reveal .callout { font-size: 24px !important; max-width: 1060px; margin-top: 34px; }
+.reveal .fa-card-body p { font-size: 22px !important; }
+.reveal .fa-card-body h3 { font-size: 26px !important; }
 .reveal .card .stat { font-size: 38px !important; white-space: nowrap; font-weight: 900; }
 .reveal .card .stat-label { font-size: 22px !important; }
 .stat { line-height: 1; color: var(--blue); margin: 0 0 10px; }
 .stat-label { color: var(--muted); }
 .reveal .scenario-card { background: var(--white); border-top: 9px solid var(--blue); padding: 18px 22px; }
 .reveal .scenario-card.best { border-top-color: var(--teal); }
+.reveal table.results { width: 100%; margin-top: 18px; }
+.reveal table.results th, .reveal table.results td { font-size: 22px; padding: 12px 16px; text-align: center; }
+.reveal table.results th:first-child, .reveal table.results td:first-child { text-align: left; font-weight: 700; }
+.reveal table.results { table-layout: fixed; }
+.reveal table.results th:first-child, .reveal table.results td:first-child { width: 34%; }
+.reveal table.results th { font-size: 20px !important; text-align: center !important; padding: 10px 12px !important; line-height: 1.2; }
+.reveal table.results tbody tr:nth-child(even) td { background: var(--panel-2); }
+.reveal .pct { background: var(--yellow); color: var(--blue); font-weight: 800; font-size: 0.8em; white-space: nowrap; padding: 2px 8px; }
+.reveal .table-note { font-size: 18px !important; color: var(--muted); margin-top: 14px; }
+.reveal .bar { display: block; height: 10px; background: var(--panel); margin: 6px auto 0; width: 80%; }
+.reveal .bar i { display: block; height: 100%; background: var(--blue); }
+.reveal table.results td:nth-child(4) .bar i { background: var(--teal); }
+.reveal table.results tr.hours td { font-size: 19px; color: var(--muted); }
+.reveal .questions { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 24px; }
+.reveal .questions-photo, .reveal .questions img { width: 100%; max-height: 420px; object-fit: cover; margin: 0; }
+.reveal .questions-contact { display: flex; flex-direction: column; gap: 30px; align-items: flex-start; }
+.reveal .questions-contact .contact-card { margin-bottom: 22px; }
+.reveal .questions-contact p { margin: 0; }
+.reveal .questions-contact p:not(:has(.contact-card)) a { color: var(--blue) !important; background: var(--white); border: 3px solid var(--blue); box-shadow: 8px 8px 0 var(--yellow); padding: 10px 20px; font-weight: 700; text-decoration: none; display: inline-block; }
+.reveal .mid { color: var(--muted); font-size: 0.8em; white-space: nowrap; }
+.reveal table.roles td:first-child { width: 34%; }
+.reveal img[src$="sankey_s2.svg"] { max-height: 430px; width: auto; max-width: 100%; display: block; margin: 8px auto 0; }
 </style>

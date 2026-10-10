@@ -5,6 +5,7 @@ format:
   haskoli-islands-revealjs:
     footer: "Sanngjarnari fagráðsfundir · frumgerð fyrir Tækniþróunarsjóð"
     favicon: img/hi/favicon.svg
+    watermark: img/hi/hi_logo.svg
     include-in-header: glaerur-footer.html
     include-after-body: glaerur-after.html
     embed-resources: false
@@ -14,8 +15,11 @@ title-theme: "Frumgerð"
 subtitle-highlight: "Sanngjarnari fagráðsfundir"
 presenters:
   - name: "Dr. Helga Ingimundardóttir"
+    hi-username: helgaingim
+    office: "VR-II"
+    github: tungufoss
 event-meta: "Kynning fyrir Rannís"
-event-date: today
+event-date: "20. október 2026"
 ---
 
 {{< hi-title >}}
@@ -26,19 +30,10 @@ event-date: today
 Fagráðsmaður getur setið heilan fund og beðið eftir að röðin komi að umsóknum hans.
 :::
 
-::: {.three-col}
-::: {.soft .blue}
-<h3>Margir fundir</h3>
-Umsóknum fjölgar, fundir eru tíðari og lengri.
-:::
-::: {.soft .yellow}
-<h3>Löng bið</h3>
-Fundum er ekki lokið fyrr en allar umsóknir eru afgreiddar og margir sitja lengi fyrir sínar.
-:::
-::: {.soft .red}
-<h3>Ójafnt álag</h3>
-Sumir mæta oftar og bíða meira en aðrir.
-:::
+::: {.fa-card}
+* [hi-teal] calendar-days | Margir fundir | Umsóknum fjölgar, fundir eru tíðari og lengri.
+* [hi-yellow] hourglass-half | Löng bið | Fundum er ekki lokið fyrr en allar umsóknir eru afgreiddar og margir sitja lengi fyrir sínar.
+* [hi-red] scale-unbalanced | Ójafnt álag | Sumir mæta oftar og bíða meira en aðrir.
 :::
 
 ## Hugmyndin
@@ -54,60 +49,36 @@ Ef álaginu er dreift gagnsætt og sanngjarnt, fer tími fagráðsmanna betur.
 
 ## Tvö hugtök
 
-::: {.two-col}
-::: {.soft .blue}
-<h3>Biðpunktur</h3>
-Ein umsókn annars fagráðsmanns sem þú situr undir áður en þín síðasta umsókn er tekin fyrir.
-:::
-::: {.soft .yellow}
-<h3>Byrði</h3>
-Fundir sem þú mætir á (hver telur 2–4) og biðpunktar. Lægri byrði er betri.
-:::
-:::
-
-::: {.blue-note}
-Þeir sem hafa flestar umsóknir fá hærra mat á kostnaði við að mæta.
+::: {.fa-card cols=2}
+* [hi-teal] hourglass-half | Biðpunktur | Ein umsókn annars fagráðsmanns sem þú situr undir áður en þín síðasta umsókn er tekin fyrir.
+* [hi-yellow] weight-hanging | Byrði | Fundir sem þú mætir á (hver telur 2–4) og biðpunktar. Lægri byrði er betri.
 :::
 
 ## Þrjár sviðsmyndir
 
 Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. Fundir 1–3 eru haldnir og fundur 4 er auglýstur.
 
-::: {.three-col}
-::: {.scenario-card}
-<h3>Sviðsmynd 1: áætlun starfsmanna</h3>
-Umsóknir á fundum eru óbreyttar. Aðeins röðin innan funda er löguð. Þetta er viðmiðið.
-:::
-::: {.scenario-card .best}
-<h3>Sviðsmynd 2: fundir 1–4 festir</h3>
-Umsóknum á fundum 5–9 er raðað upp á nýtt. Enginn fagráðsmaður ber meiri byrði en í áætlun starfsmanna.
-:::
-::: {.scenario-card}
-<h3>Sviðsmynd 3: hvað ef?</h3>
-Allt skipulagt frá upphafi lotunnar. Fræðilegur samanburður, ekki raunhæfur kostur.
-:::
+::: {.fa-card}
+* [hi-blue] clipboard-list | Sviðsmynd 1: áætlun starfsmanna | Umsóknir á fundum eru óbreyttar. Aðeins röðin innan funda er löguð. Þetta er viðmiðið.
+* [hi-teal] calendar-check | Sviðsmynd 2: fundir 1–4 festir | Umsóknum á fundum 5–9 er raðað upp á nýtt. Enginn fagráðsmaður ber meiri byrði en í áætlun starfsmanna.
+* [hi-yellow] wand-magic-sparkles | Sviðsmynd 3: hvað ef? | Allt skipulagt frá upphafi lotunnar. Fræðilegur samanburður, ekki raunhæfur kostur.
 :::
 
 ## Niðurstöður
 
-::: {.three-col}
-::: {.card}
-<p class="stat">810 → 680 → 556</p>
-<p class="stat-label">**Biðpunktar** samtals (sviðsmynd 1, 2, 3)</p>
-:::
-::: {.card}
-<p class="stat">67 → 63 → 60</p>
-<p class="stat-label">**Mesta byrði** eins fagráðsmanns</p>
-:::
-::: {.card}
-<p class="stat">144 → 124 → 111</p>
-<p class="stat-label">**Fundarsetur** samtals (hver mæting eins fagráðsmanns)</p>
-:::
-:::
+<table class="table results">
+<thead>
+<tr><th></th><th>Sviðsmynd 1: áætlun starfsmanna</th><th>Sviðsmynd 2: fundir 1–4 festir</th><th>Sviðsmynd 3: hvað ef?</th></tr>
+</thead>
+<tbody>
+<tr><td>Biðpunktar samtals</td><td>810<span class="bar"><i style="width:100%"></i></span></td><td>680 <span class="pct">−16 %</span><span class="bar"><i style="width:84%"></i></span></td><td><strong>556</strong> <span class="pct">−31 %</span><span class="bar"><i style="width:69%"></i></span></td></tr>
+<tr class="hours"><td>Áætluð bið, ca 15 mín. á biðpunkt</td><td>um 203 klst.</td><td>um 170 klst.</td><td><strong>um 139 klst.</strong></td></tr>
+<tr><td>Mesta byrði eins fagráðsmanns</td><td>67<span class="bar"><i style="width:100%"></i></span></td><td>63 <span class="pct">−6 %</span><span class="bar"><i style="width:94%"></i></span></td><td><strong>60</strong> <span class="pct">−10 %</span><span class="bar"><i style="width:90%"></i></span></td></tr>
+<tr><td>Fundarsetur samtals</td><td>144<span class="bar"><i style="width:100%"></i></span></td><td>124 <span class="pct">−14 %</span><span class="bar"><i style="width:86%"></i></span></td><td><strong>111</strong> <span class="pct">−23 %</span><span class="bar"><i style="width:77%"></i></span></td></tr>
+</tbody>
+</table>
 
-::: {.callout}
-Sviðsmynd 2 sparar um 16 % af biðinni og færri fundarsetur, án þess að nokkur beri meira en áður.
-:::
+<p class="table-note">Súlur og prósentur eru miðað við sviðsmynd 1 (100 %). Biðtíminn er áætlaður: hver biðpunktur er um 15 mínútur. Í sviðsmynd 2 ber enginn fagráðsmaður meiri byrði en í áætlun starfsmanna.</p>
 
 ## Hvað segja tölurnar?
 
@@ -119,21 +90,45 @@ Sviðsmynd 2 sparar um 16 % af biðinni og færri fundarsetur, án þess að nok
 Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill fæsta fundi, og er því ekki fullkomlega sambærileg. Í sviðsmynd 3 finnur lausnarinn góða lausn en getur ekki sannað að hún sé sú besta.
 :::
 
+## Hver fær hvað?
+
+![](img/sankey_s2.svg){fig-alt="Sankey-mynd: hvenær hver fagráðsmaður fer af hverjum fundi í sviðsmynd 2"}
+
+::: {.blue-note}
+Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
+:::
+
+## Greiðslur: ritstjóri eða lesari?
+
+::: {.lead}
+Greiðsla fer eftir hlutverki á hverri umsókn. Því skiptir máli hve oft hver er ritstjóri og hve oft lesari.
+:::
+
+<table class="table results roles">
+<thead>
+<tr><th>Hlutfall umsókna hvers fagráðsmanns</th><th>Ritstjóri</th><th>1&#46; lesari</th><th>2&#46; lesari</th></tr>
+</thead>
+<tbody>
+<tr><td>Í tillögu starfsmanna</td><td>5–73 % <span class="mid">(miðgildi 31 %)</span></td><td>0–70 % <span class="mid">(28 %)</span></td><td>0–85 % <span class="mid">(33 %)</span></td></tr>
+<tr><td>Eftir endurúthlutun hlutverka</td><td>11–67 % <span class="mid">(33 %)</span></td><td>7–78 % <span class="mid">(32 %)</span></td><td>11–45 % <span class="mid">(33 %)</span></td></tr>
+</tbody>
+</table>
+
+<p class="table-note">Bilið er frá lægsta til hæsta hlutfalls meðal 21 fagráðsmanns.</p>
+
+::: {.blue-note}
+Til umræðu: á greiðslan að fylgja hlutverkinu, eða líka fundarsetunni, sem hægt væri að mæla með tímastimplum?
+:::
+
 ## Næstu skref: söguleg gögn
 
 ::: {.lead}
 Líkanið gerir ráð fyrir að hver umsókn taki sama tíma og að skipulag haldist. Raunveruleg gögn úr kerfum Rannís geta bætt það.
 :::
 
-::: {.two-col}
-::: {.soft .blue}
-<h3>Breytingaskrár</h3>
-Hver færist milli funda, hvenær og hvers vegna? Þá sést hve oft áætlanir breytast og hverju má spá fyrir.
-:::
-::: {.soft .yellow}
-<h3>Tímastimplar funda</h3>
-Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mínútum í stað umsókna.
-:::
+::: {.fa-card cols=2}
+* [hi-teal] clock-rotate-left | Breytingaskrár | Hvaða umsóknir færast milli funda, hvenær og hvers vegna? Þá sést hve oft áætlanir breytast og hverju má spá fyrir.
+* [hi-yellow] stopwatch | Tímastimplar funda | Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mínútum í stað umsókna.
 :::
 
 ## Hvað fæst með þeim?
@@ -147,19 +142,10 @@ Hve lengi stendur hver umsókn og hver fundur í raun? Þá má meta bið í mí
 
 Sumarverkefni nemenda með styrk úr Nýsköpunarsjóði námsmanna, með aðstoð upplýsingatæknideildar.
 
-::: {.three-col}
-::: {.scenario-card}
-<h3>Líkanið</h3>
-Betri pörun fagráðsmanna og umsókna, líkar umsóknir á sama fundi, öll fagráð saman.
-:::
-::: {.scenario-card}
-<h3>Áreiðanleiki</h3>
-Bið í tíma, fjarvistir og seinkomur, hraðari lausn.
-:::
-::: {.scenario-card}
-<h3>Innleiðing</h3>
-Opinn lausnari, tenging við kerfi sjóðsins, gögnin sem að ofan var lýst.
-:::
+::: {.fa-card}
+* [hi-blue] diagram-project | Líkanið | Betri pörun fagráðsmanna og umsókna, líkar umsóknir á sama fundi, öll fagráð saman.
+* [hi-teal] shield-halved | Áreiðanleiki | Bið í tíma, fjarvistir og seinkomur, hraðari lausn.
+* [hi-yellow] plug | Innleiðing | Opinn lausnari, tenging við kerfi sjóðsins, gögnin sem að ofan var lýst.
 :::
 
 ::: {.blue-note}
@@ -168,27 +154,22 @@ Hugmynd að skiptingu: þrír nemendur vinna samhliða, hver í um þrjá mánu�
 
 ## Hvað þarf frá Rannís?
 
-::: {.three-col}
-::: {.goal}
-[1]{.num}
-Aðgang að sögulegum gögnum: breytingaskrám og tímastimplum funda.
-:::
-::: {.goal}
-[2]{.num}
-Samtal við upplýsingatæknideild um tengingu við kerfi sjóðsins.
-:::
-::: {.goal}
-[3]{.num}
-Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
-:::
+::: {.fa-card}
+* [hi-blue] database | Gögn | Aðgang að sögulegum gögnum: breytingaskrám og tímastimplum funda.
+* [hi-teal] comments | Samtal | Samtal við upplýsingatæknideild um tengingu við kerfi sjóðsins.
+* [hi-yellow] handshake | Afstaða | Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
 :::
 
-## Spurningar?
+## Spurningar? {.focus-slide background-color="#2DD2C0"}
 
-::: {.big-claim}
-Greinargerðin og kóðinn eru opin: sjá vefsíðuna og GitHub.
+::: {.questions}
+![](img/vr2.jpg){.questions-photo fig-alt="VR-II, hús Háskóla Íslands"}
+
+::: {.questions-contact}
+{{< contact-card >}}
+
+[<i class="fa-solid fa-globe"></i> Greinargerð og vinnudagbók](https://hi-idn.github.io/IDeLM-panel-fairness/)
+
+[<i class="fa-solid fa-code-branch"></i> Kóðinn á GitHub](https://github.com/HI-IDN/IDeLM-panel-fairness)
 :::
-
-::: {.muted}
-Greinargerð: hi-idn.github.io/IDeLM-panel-fairness · Kóði: github.com/HI-IDN/IDeLM-panel-fairness
 :::
