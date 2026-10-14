@@ -2,7 +2,8 @@
 
     python scripts/run_round.py scripts/rounds/example.yml [--only NAME ...]
 
-The runs go in the foreground in the order of the file, so a plain `nohup python scripts/run_round.py ... &`
+A run may name its own `panel:` file, and `{free}` in its options or check stands for the codes in the
+file named by the top-level `free:` (see make_current_plan.py). The runs go in the foreground in the order of the file, so a plain `nohup python scripts/run_round.py ... &`
 or a terminal left open is all the waiting there is: each run prints "start", "done" and the
 check's last line with the time. A failed run stops the round (later runs may start from it).
 """
@@ -32,11 +33,16 @@ def main():
     panel, results = cfg['panel'], Path(cfg['results'])
     results.mkdir(parents=True, exist_ok=True)
     common = shlex.split(cfg.get('common', ''))
+    free = Path(cfg['free']).read_text(encoding='utf-8').strip() if cfg.get('free') and Path(cfg['free']).exists() else ''
     for run in cfg['runs']:
         name = run['name']
         if args.only and name not in args.only:
             continue
-        cmd = [sys.executable, '-m', 'models.panel_model', panel, *common, *shlex.split(run.get('options', ''))]
+        run_panel = run.get('panel', panel)  # a run may have its own panel file
+        if '{free}' in run.get('options', '') + run.get('check', '') and not free:
+            sys.exit(f"{name}: needs the file named by `free:` (the codes for --free-proposals)")
+        options = run.get('options', '').replace('{free}', free)
+        cmd = [sys.executable, '-m', 'models.panel_model', run_panel, *common, *shlex.split(options)]
         if 'start' in run:
             cmd += ['--start', str(results / f"{run['start']}_agenda.csv")]
         if 'time_limit' in run:
@@ -48,8 +54,8 @@ def main():
                 sys.exit(f'{stamp()} {name}: FAILED (see {results / name}.log)')
         print(f'{stamp()} {name}: done', flush=True)
         if 'check' in run:
-            chk = [sys.executable, '-m', 'models.check_agenda', panel, str(results / f'{name}_agenda.csv'),
-                   *common_check(common), *shlex.split(run['check'])]
+            chk = [sys.executable, '-m', 'models.check_agenda', run_panel, str(results / f'{name}_agenda.csv'),
+                   *common_check(common), *shlex.split(run['check'].replace('{free}', free))]
             out = subprocess.run(chk, capture_output=True, text=True, check=False).stdout.strip().splitlines()
             print(f'{stamp()} {name} check: {out[-1] if out else "no output"}', flush=True)
 

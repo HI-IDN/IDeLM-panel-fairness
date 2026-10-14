@@ -81,6 +81,9 @@ def main():
                     help='comment on those proposals')
     ap.add_argument('--author', default=os.environ.get('PLAN_AUTHOR', ''),
                     help='author name and contact, written to the workbook properties and the Yfirlit sheet')
+    ap.add_argument('--compare', help='agenda CSV of the plan to compare with (e.g. the implemented plan with '
+                    'the new proposals last): changes are marked in the meeting sheets and listed on Yfirlit')
+    ap.add_argument('--new', nargs='*', default=[], help='codes of proposals that came after that plan')
     ap.add_argument('--out', default='../data/tdf/results/fundaaetlun_taeknithrounarsjodur_haust2026.xlsx')
     args = ap.parse_args()
 
@@ -116,6 +119,17 @@ def main():
     unscheduled = sorted(a for a in panel if a not in scheduled)
     moved = sorted(set(moved) | set(args.postponed))
     moved_to = {r['application']: r['meeting'] for r in agenda if r['application'] in moved}
+
+    before = {r['application']: (r['meeting'], int(r['position'])) for r in read(args.compare)} if args.compare else {}
+    changed = {}  # code -> note, for proposals that differ from the plan compared with
+    for r in agenda:
+        a, m, k = r['application'], r['meeting'], int(r['position'])
+        if a in args.new:
+            changed[a] = f'ný umsókn, sett á {m}' + (f' (var síðust á {before[a][0]})' if a in before else '')
+        elif a in before and before[a][0] != m:
+            changed[a] = f'færð af {before[a][0]} á {m} vegna nýju umsóknanna'
+        elif a in before and before[a][1] != k:
+            changed[a] = f'röð breytt: var nr. {before[a][1]}, nú nr. {k}'
 
     own_positions = {}  # (meeting, member) -> positions of the member's own proposals
     for r in agenda:
@@ -167,6 +181,13 @@ def main():
     ws.append([f'Umsóknir færðar af {args.first_open}', 'Nýr fundur'])
     for a in moved:
         ws.append([appl(a), f"{moved_to[a]} ({date_text(date_of[moved_to[a]])})" if moved_to[a] in date_of else moved_to[a]])
+    if before:
+        ws.append([])
+        ws.append(['Breytingar vegna nýju umsóknanna', 'Hvað breyttist'])
+        order = {r['application']: i for i, r in enumerate(agenda)}
+        for a in sorted(changed, key=order.get):
+            ws.append([appl(a), changed[a]])
+        ws.append(['Alls umsóknir sem breyttust', len(changed)])
     ws.append([])
     ws.append(['Umsóknir sem eiga eftir að fá úthlutun', 'Staða'])
     for a in unscheduled:
@@ -181,7 +202,7 @@ def main():
             if cell.value is not None:
                 cell.font = Font(bold=True)
     for row in ws.iter_rows():
-        if row[0].value and str(row[0].value).startswith(('Umsóknir færðar', 'Umsóknir sem eiga')):
+        if row[0].value and str(row[0].value).startswith(('Umsóknir færðar', 'Umsóknir sem eiga', 'Breytingar vegna')):
             for cell in row:
                 if cell.value is not None:
                     cell.font = Font(bold=True)
@@ -196,6 +217,8 @@ def main():
             notes = []
             if a in moved:
                 notes.append(args.postponed_note if a in args.postponed else f'færð af {args.first_open}')
+            if a in changed:
+                notes.append(changed[a])
             for c in [c for c in p['coi'].split(';') if c]:
                 own = own_positions.get((m, c), [])
                 later = [q for q in own if q > pos]
@@ -206,6 +229,11 @@ def main():
             sheet.append([f'{m} (haldinn)' if m in held else m, date_text(date_of[m]) if m in date_of else '', pos, slot_time(pos), appl(a),
                           who(p['editor']), who(p['reader1']), who(p['reader2']), '; '.join(notes)])
         style_sheet(sheet, [14, 13, 6, 8, 60, 14, 14, 14, 48], head_row)
+        mark = PatternFill('solid', fgColor='FFF2CC')
+        for (mm, pos), a in sorted((k, v) for k, v in placed.items() if k[0] == m):
+            if a in changed:
+                for cell in sheet[pos + 1]:
+                    cell.fill = mark
     sheet_counts = {m: wb[m].max_row - 1 for m in meetings}
     for m in meetings:
         assert sheet_counts[m] == count.get(m, 0), f'{m}: sheet rows differ from the agenda'

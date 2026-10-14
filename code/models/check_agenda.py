@@ -37,7 +37,7 @@ from models.panel_model import (fairness_metrics, member_measures, read_alpha, r
 
 def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_meeting=None,
           max_two_meetings=None, min_per_member=None, keep_meetings=False, first_meeting_rule=False,
-          not_before=None):
+          not_before=None, free_proposals=(), free_meetings=()):
     """Return a list of problems (empty if the agenda follows the rules). Unavailable meetings are
     taken from data.unavailable; not_before is {proposal: first meeting it may go to}."""
     problems = []
@@ -57,7 +57,10 @@ def check(data, agenda, closed=(), max_per_member=None, meeting_size=None, next_
             problems.append(f'{p} is in {m}, before {first}')
     if keep_meetings:
         for p, m, _ in agenda:
-            if data.current.get(p) and data.current[p] != m:
+            if p in free_proposals:
+                if free_meetings and m not in free_meetings:
+                    problems.append(f'{p} is in {m}, not in one of {" ".join(free_meetings)}')
+            elif data.current.get(p) and data.current[p] != m:
                 problems.append(f'{p} moved from {data.current[p]} to {m}')
     placed = Counter(p for p, _, _ in agenda)
     for p in data.reviewers:
@@ -146,6 +149,8 @@ def main():
     parser.add_argument('--max-two-meetings', type=int)
     parser.add_argument('--min-per-member', type=int, help='least own proposals in a meeting a member attends')
     parser.add_argument('--keep-meetings', action='store_true', help='every proposal stays in its planned meeting')
+    parser.add_argument('--free-proposals', nargs='+', default=[], help='with --keep-meetings: these may move')
+    parser.add_argument('--free-meetings', nargs='+', default=[], help='the meetings the --free-proposals may go to')
     parser.add_argument('--first-meeting-rule', action='store_true',
                         help='everyone has exactly one proposal in the first meeting')
     parser.add_argument('--alpha', type=float, default=2.0, help='cost of a meeting in the fairness measures')
@@ -184,7 +189,7 @@ def main():
         agenda = [(row['application'], row['meeting'], int(row['position'])) for row in csv.DictReader(f)]
     problems = check(data, agenda, args.closed, args.max_per_member, args.meeting_size, args.next_meeting,
                      args.max_two_meetings, args.min_per_member, args.keep_meetings, args.first_meeting_rule,
-                     not_before)
+                     not_before, args.free_proposals, args.free_meetings)
     meetings = Counter(m for _, m, _ in agenda)
     print(f'{len(agenda)} proposals in {len(meetings)} meetings: '
           + ', '.join(f'{m}={n}' for m, n in sorted(meetings.items(), key=lambda kv: int(kv[0][1:]))))

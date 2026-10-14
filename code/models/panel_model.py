@@ -279,7 +279,7 @@ class PanelScheduleModel:
                  new_members=(), learning_weight=0.001, learning_until=None, soft_max_per_member=None,
                  soft_max_weight=0.0,
                  rotate_wait=None, meetings_slack=0.0, leximin_levels=3, reference_burden=None,
-                 carry=None, fewest_meetings=()):
+                 carry=None, fewest_meetings=(), free_proposals=(), free_meetings=None, fixed_slot=None):
         """
         alpha:              cost of attending a meeting, in slots; a number or {member: value}
         fewest_meetings:    members whose number of meetings is minimised first of all (step modes):
@@ -287,6 +287,10 @@ class PanelScheduleModel:
         max_per_meeting:    most proposals one meeting can handle
         total_weight:       weight of the total burden next to the worst-off member's burden
         keep_meetings:      keep every proposal in its current meeting and only choose the order
+        free_proposals:     with keep_meetings: these proposals are not kept; they may go to any open
+                            meeting (or to free_meetings), all others stay where they are
+        free_meetings:      the meetings the free proposals may go to (None: every open meeting)
+        fixed_slot:         {proposal: slot} order kept for these proposals in meetings not yet held
         coi_penalty:        objective penalty for each time a conflicted member is present
         closed_meetings:    meetings whose proposals are settled (e.g. the next meeting): no other
                             proposals may be moved there. Held meetings are always closed.
@@ -374,6 +378,16 @@ class PanelScheduleModel:
         self.fixed_meeting = dict(data.fixed_meeting)
         if keep_meetings:
             self.fixed_meeting.update({p: m for p, m in data.current.items() if m})
+        unknown = [p for p in free_proposals if p not in data.reviewers]
+        if unknown:
+            raise ValueError(f'free_proposals: not proposals of the panel: {unknown}')
+        for p in free_proposals:
+            if p in data.fixed_position:
+                raise ValueError(f'free_proposals: {p} is in a meeting that has been held')
+            self.fixed_meeting.pop(p, None)
+        self.free_proposals = set(free_proposals)
+        self.free_meetings = set(free_meetings) if free_meetings else None
+        self.fixed_slot = dict(fixed_slot or {})
         held = {data.fixed_meeting[p] for p in data.fixed_position}
         self.held = held
         self.closed = set(closed_meetings) | held
@@ -441,6 +455,8 @@ class PanelScheduleModel:
             return [m]
         open_meetings = [m for m in self.data.meetings
                          if m not in self.closed and m != self.next_meeting and m not in away]
+        if p in self.free_proposals and self.free_meetings:
+            open_meetings = [m for m in open_meetings if m in self.free_meetings]
         if p in self.not_before:
             first = self.data.meetings.index(self.not_before[p])
             open_meetings = [m for m in open_meetings if self.data.meetings.index(m) >= first]
@@ -463,7 +479,9 @@ class PanelScheduleModel:
         self.candidates = candidates
 
         def slots_of(p, m):  # a proposal of a held meeting has only its known slot
-            return [data.fixed_position[p]] if p in data.fixed_position else self.slots[m]
+            if p in data.fixed_position:
+                return [data.fixed_position[p]]
+            return [self.fixed_slot[p]] if p in self.fixed_slot else self.slots[m]
         self.x = {(p, m, k): self.m.addVar(vtype=GRB.BINARY, name=f'x[{p},{m},{k}]')
                   for p in data.reviewers for m in self.allowed[p] for k in slots_of(p, m)}
         # Meetings each member may have to attend: those some proposal of theirs may go to.
@@ -1112,6 +1130,14 @@ def main():
                         help='also keep the proposals of these meetings in them (order still free)')
     parser.add_argument('--keep-meetings', action='store_true',
                         help='keep all proposals in their current meeting; only choose the order')
+    parser.add_argument('--free-proposals', nargs='+', metavar='CODE', default=[],
+                        help='with --keep-meetings: these proposals may move, all others stay in their meeting')
+    parser.add_argument('--free-meetings', nargs='+', metavar='MEETING', default=[],
+                        help='the meetings the --free-proposals may go to (default: every open meeting)')
+    parser.add_argument('--fix-order-from', metavar='AGENDA',
+                        help='agenda CSV: keep the order of the proposals in --fix-order-meetings as in it')
+    parser.add_argument('--fix-order-meetings', nargs='+', metavar='MEETING', default=[],
+                        help='meetings whose order is kept as in --fix-order-from (the meetings stay fixed too)')
     parser.add_argument('--alpha', type=float, help='cost of attending a meeting, in slots')
     parser.add_argument('--max-per-meeting', type=int)
     parser.add_argument('--max-per-member', type=int, help='most proposals per member in one meeting')
@@ -1240,6 +1266,17 @@ def main():
     if max_meetings:
         print(f'meeting limit per member: {min(max_meetings.values())}-{max(max_meetings.values())}')
 
+    fixed_slot = {}
+    if args.free_proposals and not args.keep_meetings:
+        parser.error('--free-proposals needs --keep-meetings')
+    if args.fix_order_meetings:
+        if not args.fix_order_from:
+            parser.error('--fix-order-meetings needs --fix-order-from')
+        agenda = read_agenda(args.fix_order_from)
+        fixed_slot = {p: k for p, (m, k) in agenda.items()
+                      if m in args.fix_order_meetings and p in data.reviewers and p not in data.fixed_position}
+        data.fixed_meeting.update({p: agenda[p][0] for p in fixed_slot})
+        print(f'order kept for {len(fixed_slot)} proposals in {" ".join(args.fix_order_meetings)}')
     alpha = read_alpha(config.get('alpha_file'), config['alpha'], data.members)
     if len(set(alpha.values())) > 1:
         print(f'alpha per member: {min(alpha.values()):g}-{max(alpha.values()):g}')
@@ -1278,7 +1315,9 @@ def main():
                                rotate_wait=args.rotate_wait,
                                meetings_slack=float(config.get('meetings_slack') or 0.0),
                                leximin_levels=config.get('leximin_levels', 3),
-                               reference_burden=reference, carry=carry, fewest_meetings=fewest)
+                               reference_burden=reference, carry=carry, fewest_meetings=fewest,
+                               free_proposals=args.free_proposals, free_meetings=args.free_meetings,
+                               fixed_slot=fixed_slot)
     model.m.Params.MIPFocus = args.mip_focus
     if args.start:
         model.set_start(read_agenda(args.start))
