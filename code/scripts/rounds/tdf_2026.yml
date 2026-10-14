@@ -6,6 +6,7 @@
 # `note` is for people; the runner ignores it.
 panel: ../data/tdf/panel.csv
 results: ../data/tdf/results
+free: ../data/tdf/results/rannis_free.txt   # codes of the proposals that came after the plan (make_current_plan.py)
 common: >-
   --unavailable ../data/tdf/unavailable.csv --windows ../data/tdf/windows.csv
   --fairness lexburden --meetings-slack 2 --fewest-meetings R02
@@ -57,6 +58,28 @@ runs:
     options: --fix-meetings M1 M2 M3 M4 --max-per-member 4 --alpha-file ../data/tdf/alpha_tiers.csv
     time_limit: 10800
     check: --closed M4 --max-per-member 4
+  # Four proposals came after the implemented plan (scenario 2) and were put on the last meeting (M9) unordered.
+  # First: python scripts/make_current_plan.py ../data/tdf/panel.csv <scenario 2 agenda> <the four, pseudonymised> \
+  #          --out ../data/tdf/results/rannis
+  # Everything else keeps its meeting of that plan; the four may go to M5-M9; the order is free everywhere.
+  # No-one is worse off than in the plan with the four on M9 (rannis_agenda.csv, the four last in M9).
+  - name: round8               # the four may go to M5-M9
+    panel: ../data/tdf/results/rannis_panel.csv
+    start: rannis
+    options: >-
+      --fix-meetings M1 M2 M3 M4 --keep-meetings --free-proposals {free} --free-meetings M5 M6 M7 M8 M9
+      --fairness leximin --no-worse-than ../data/tdf/results/rannis_agenda.csv --max-per-member 5
+    time_limit: 3600
+    check: --closed M3 M4 --keep-meetings --free-proposals {free} --free-meetings M5 M6 M7 M8 M9 --max-per-member 5
+  - name: round8_m9            # the four stay on M9, which is reordered; M5-M8 keep their order
+    panel: ../data/tdf/results/rannis_panel.csv
+    start: rannis
+    options: >-
+      --fix-meetings M1 M2 M3 M4 --keep-meetings --free-proposals {free} --free-meetings M9
+      --fix-order-from ../data/tdf/results/rannis_agenda.csv --fix-order-meetings M5 M6 M7 M8
+      --fairness leximin --no-worse-than ../data/tdf/results/rannis_agenda.csv --max-per-member 5
+    time_limit: 1800
+    check: --closed M3 M4 --keep-meetings --free-proposals {free} --free-meetings M9 --max-per-member 5
 # After round6 the book's scenarios were rerun on the same data:
 #   RESULTS=../data/tdf/results/book MODEL_OPTIONS="--fairness lexburden --meetings-slack 2" \
 #   ONLY="current free free_sum free_leximin free_noworse free_max4" bash scripts/run_panel_scenarios.sh
