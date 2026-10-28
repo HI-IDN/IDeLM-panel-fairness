@@ -111,7 +111,7 @@ plot_exit_sankey_interactive(schedule_s2, colour_by = "member")
 ```
 
 ::: {.blue-note}
-Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki. Smelltu á kóða til að fylgja einum fagráðsmanni.
+Hvert band er einn fagráðsmaður (kóði; smelltu á hann til að fylgja honum) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
 :::
 
 ## Greiðslur: ritstjóri eða lesari?

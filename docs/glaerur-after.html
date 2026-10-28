@@ -9,7 +9,9 @@
 (function () {
   function fit() {
     var el = document.querySelector('#sankey .js-plotly-plot');
-    if (el && window.Plotly) window.Plotly.Plots.resize(el);
+    // Reveal scales the slide with a CSS transform, so measure the unscaled box (clientWidth), not the
+    // scaled one Plotly would read.
+    if (el && window.Plotly) window.Plotly.relayout(el, {autosize: false, width: el.clientWidth, height: el.clientHeight});
   }
   function start() {
     if (!window.Reveal) return setTimeout(start, 200);
