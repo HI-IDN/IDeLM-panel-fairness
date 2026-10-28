@@ -3,3 +3,22 @@
   <span class="divider"></span>
   <img src="img/hi/hi_named_logo-is.svg" alt="Háskóli Íslands">
 </div>
+<script>
+// The interactive Sankey is drawn while its slide is hidden, so Plotly sees a tiny container: resize it
+// when the slide is shown.
+(function () {
+  function fit() {
+    var el = document.querySelector('#sankey .js-plotly-plot');
+    // Reveal scales the slide with a CSS transform, so measure the unscaled box (clientWidth), not the
+    // scaled one Plotly would read.
+    if (el && window.Plotly) window.Plotly.relayout(el, {autosize: false, width: el.clientWidth, height: el.clientHeight});
+  }
+  function start() {
+    if (!window.Reveal) return setTimeout(start, 200);
+    Reveal.on('slidechanged', function (e) { if (e.currentSlide && e.currentSlide.id === 'sankey') setTimeout(fit, 50); });
+    Reveal.on('resize', fit);
+    Reveal.on('ready', fit);
+  }
+  start();
+})();
+</script>

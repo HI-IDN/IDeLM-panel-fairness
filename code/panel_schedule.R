@@ -462,8 +462,11 @@ plot_exit_sankey <- function(schedule) {
 # the round goes on. Clicking a member's band at the first or last meeting, or their code at the left
 # or right edge, keeps that member's path in colour and greys out the others; clicking again clears
 # it. Hovering a band at a meeting shows the member, the slot after which they leave and their
-# peel-off points so far (without changing which member is lit).
-plot_exit_sankey_interactive <- function(schedule) {
+# peel-off points so far (without changing which member is lit). With colour_by = "member" every
+# member keeps their own colour (as in the static figure, used by the slides) and the colour bar is
+# left out.
+plot_exit_sankey_interactive <- function(schedule, colour_by = c("waiting", "member")) {
+  colour_by <- match.arg(colour_by)
   static <- plot_exit_sankey(schedule)
   # The PDF has no interactivity: fall back to the static alluvial plot.
   if (!knitr::is_html_output()) return(static)
@@ -487,6 +490,8 @@ plot_exit_sankey_interactive <- function(schedule) {
   top_value <- max(lodes$cumulative)
   scale_colours <- hi_sequential(256)
   colour_of <- function(value) scale_colours[pmin(256, 1 + floor(255 * value / max(top_value, 1)))]
+  member_fill <- member_colours(sort(unique(lodes$member)))
+  band_colour <- function(member, value) if (colour_by == "member") member_fill[[member]] else colour_of(value)
 
   # Each band is drawn as small polygons: the box of the first meeting, then for every later meeting the
   # S-curve leading into it, cut into a few slices that fade from the colour of the meeting before to the
@@ -518,13 +523,13 @@ plot_exit_sankey_interactive <- function(schedule) {
   }
   for (member in members) {  # the first traces: member * per_member + 1 ... are one member's polygons
     lode <- lodes[lodes$member == member, ]
-    figure <- add_polygon(figure, box_polygon(lode, 1), colour_of(lode$cumulative[1]))
+    figure <- add_polygon(figure, box_polygon(lode, 1), band_colour(member, lode$cumulative[1]))
     for (i in seq_len(nrow(lode))[-1]) {
       for (k in seq_len(slices)) {
         value <- lode$cumulative[i - 1] + (lode$cumulative[i] - lode$cumulative[i - 1]) * (k - 0.5) / slices
-        figure <- add_polygon(figure, slice_polygon(lode, i, k), colour_of(value))
+        figure <- add_polygon(figure, slice_polygon(lode, i, k), band_colour(member, value))
       }
-      figure <- add_polygon(figure, box_polygon(lode, i), colour_of(lode$cumulative[i]))
+      figure <- add_polygon(figure, box_polygon(lode, i), band_colour(member, lode$cumulative[i]))
     }
   }
   for (member in members) {  # the next traces: invisible points carrying the tooltips
@@ -541,7 +546,7 @@ plot_exit_sankey_interactive <- function(schedule) {
                                 showlegend = FALSE)
   }
   # The colour bar: an invisible trace that carries the scale.
-  figure <- plotly::add_trace(figure, type = "scatter", mode = "markers", x = c(1, 1), y = c(0, 0),
+  if (colour_by == "waiting") figure <- plotly::add_trace(figure, type = "scatter", mode = "markers", x = c(1, 1), y = c(0, 0),
                               marker = list(size = 0.1, opacity = 0, color = c(0, top_value),
                                             colorscale = lapply(seq(0, 1, length.out = 8),
                                                                 function(v) list(v, colour_of(v * top_value))),
@@ -551,14 +556,16 @@ plot_exit_sankey_interactive <- function(schedule) {
                               hoverinfo = "skip", showlegend = FALSE)
   # Meeting columns: one box per leaving slot with its number; members who don't attend are faded.
   boxes <- lapply(seq_len(nrow(strata)), function(i) {
-    list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i],
-         y1 = strata$ymax[i], line = list(width = 0),
-         fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0)")
+    # One light box per slot spanning all the rows of its members, with a small gap to the next box.
+    gap <- 0.06
+    list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i] + gap,
+         y1 = strata$ymax[i] - gap, line = list(width = 0),
+         fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0.8)")
   })
   note <- function(x, y, text, anchor = "center", clickable = FALSE) {
-    # The slot numbers get a light backing so they stay readable on the dark bands.
+    # The slot numbers sit in the light boxes above, so they need no backing of their own.
     list(x = x, y = y, text = text, xanchor = anchor, showarrow = FALSE, font = list(size = 10, color = "#444"),
-         captureevents = clickable, bgcolor = if (clickable) NULL else "rgba(255,255,255,0.75)", borderpad = 1)
+         captureevents = clickable)
   }
   ends <- lodes %>% filter(x %in% range(x)) %>% mutate(first = x == min(x))
   labels <- c(
@@ -573,7 +580,7 @@ plot_exit_sankey_interactive <- function(schedule) {
     plotly::layout(shapes = boxes, annotations = labels, hovermode = "closest",
                    xaxis = list(title = "", tickvals = seq_len(n_meetings), ticktext = levels(flow$meeting),
                                 range = c(0.45, n_meetings + 0.55), showgrid = FALSE, zeroline = FALSE),
-                   yaxis = list(title = "Fagráðsmenn, í þeirri röð sem þeir fara (ofar = seinna)",
+                   yaxis = list(title = if (colour_by == "member") "Ofar = fer seinna" else "Fagráðsmenn, í þeirri röð sem þeir fara (ofar = seinna)",
                                 showticklabels = FALSE, showgrid = FALSE, zeroline = FALSE)) %>%
     htmlwidgets::onRender(
       "function(el, x, data) {

@@ -19,7 +19,7 @@ presenters:
     office: "VR-II"
     github: tungufoss
 event-meta: "Kynning fyrir Rannís"
-event-date: "20. október 2026"
+event-date: "28. október 2026"
 ---
 
 {{< hi-title >}}
@@ -98,12 +98,20 @@ Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. 
 Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill fæsta fundi, og er því ekki fullkomlega sambærileg. Í sviðsmynd 3 finnur lausnarinn góða lausn en getur ekki sannað að hún sé sú besta.
 :::
 
-## Hver fær hvað?
+## Hver fær hvað? {#sankey}
 
-![](img/sankey_s2.svg){fig-alt="Sankey-mynd: hvenær hver fagráðsmaður fer af hverjum fundi í sviðsmynd 2"}
+```{r}
+#| echo: false
+#| fig-height: 4.6
+#| fig-width: 10
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+schedule_s2 <- panel_from_agenda(panel, "data/s2_agenda.csv")
+plot_exit_sankey_interactive(schedule_s2, colour_by = "member")
+```
 
 ::: {.blue-note}
-Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
+Hvert band er einn fagráðsmaður (kóði; smelltu á hann til að fylgja honum) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
 :::
 
 ## Greiðslur: ritstjóri eða lesari?
@@ -166,7 +174,7 @@ Hugmynd að skiptingu: þrír nemendur vinna samhliða, hver í um þrjá mánu�
 
 ::: {.fa-card}
 * [hi-blue] database | Gögn | Aðgang að sögulegum gögnum: breytingaskrám og tímastimplum funda.
-* [hi-teal] comments | Samtal | Samtal við upplýsingatæknideild um tengingu við kerfi sjóðsins.
+* [hi-teal] comments | Samstarf við IT | Samstarf við upplýsingatæknideild um tengingu við kerfi sjóðsins, t.d. API-tengingu.
 * [hi-yellow] handshake | Afstaða | Umræðu um hvort Rannís vilji taka verkefnið áfram sem NSN-sumarverkefni.
 :::
 
