@@ -556,14 +556,16 @@ plot_exit_sankey_interactive <- function(schedule, colour_by = c("waiting", "mem
                               hoverinfo = "skip", showlegend = FALSE)
   # Meeting columns: one box per leaving slot with its number; members who don't attend are faded.
   boxes <- lapply(seq_len(nrow(strata)), function(i) {
-    list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i],
-         y1 = strata$ymax[i], line = list(width = 0),
-         fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0)")
+    # One light box per slot spanning all the rows of its members, with a small gap to the next box.
+    gap <- 0.06
+    list(type = "rect", x0 = strata$x[i] - half, x1 = strata$x[i] + half, y0 = strata$ymin[i] + gap,
+         y1 = strata$ymax[i] - gap, line = list(width = 0),
+         fillcolor = if (strata$absent[i]) "rgba(255,255,255,0.65)" else "rgba(255,255,255,0.8)")
   })
   note <- function(x, y, text, anchor = "center", clickable = FALSE) {
-    # The slot numbers get a light backing so they stay readable on the dark bands.
+    # The slot numbers sit in the light boxes above, so they need no backing of their own.
     list(x = x, y = y, text = text, xanchor = anchor, showarrow = FALSE, font = list(size = 10, color = "#444"),
-         captureevents = clickable, bgcolor = if (clickable) NULL else "rgba(255,255,255,0.75)", borderpad = 1)
+         captureevents = clickable)
   }
   ends <- lodes %>% filter(x %in% range(x)) %>% mutate(first = x == min(x))
   labels <- c(
