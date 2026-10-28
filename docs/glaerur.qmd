@@ -100,12 +100,18 @@ Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill
 
 ## Hver fær hvað?
 
-![](img/sankey_s2.svg){fig-alt="Sankey-mynd: hvenær hver fagráðsmaður fer af hverjum fundi í sviðsmynd 2"}
+```{r}
+#| echo: false
+#| fig-height: 4.6
+#| fig-width: 10
+source("_setup.R")
+source("../code/panel_schedule.R", chdir = TRUE)
+schedule_s2 <- panel_from_agenda(panel, "data/s2_agenda.csv")
+plot_exit_sankey_interactive(schedule_s2, colour_by = "member")
+```
 
 ::: {.blue-note}
-Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki.
-
-[<i class="fa-solid fa-hand-pointer"></i> Gagnvirk útgáfa í greinargerðinni](https://hi-idn.github.io/IDeLM-panel-fairness/scenarios.html#fig-exit-s2){target="_blank"}
+Hvert band er einn fagráðsmaður (kóði) og hver súla fundur. Talan er dagskrárliðurinn þegar hann fer af fundinum: ofar þýðir að hann fer seinna og – að hann mætir ekki. Smelltu á kóða til að fylgja einum fagráðsmanni.
 :::
 
 ## Greiðslur: ritstjóri eða lesari?

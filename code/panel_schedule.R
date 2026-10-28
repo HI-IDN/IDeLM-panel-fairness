@@ -462,8 +462,11 @@ plot_exit_sankey <- function(schedule) {
 # the round goes on. Clicking a member's band at the first or last meeting, or their code at the left
 # or right edge, keeps that member's path in colour and greys out the others; clicking again clears
 # it. Hovering a band at a meeting shows the member, the slot after which they leave and their
-# peel-off points so far (without changing which member is lit).
-plot_exit_sankey_interactive <- function(schedule) {
+# peel-off points so far (without changing which member is lit). With colour_by = "member" every
+# member keeps their own colour (as in the static figure, used by the slides) and the colour bar is
+# left out.
+plot_exit_sankey_interactive <- function(schedule, colour_by = c("waiting", "member")) {
+  colour_by <- match.arg(colour_by)
   static <- plot_exit_sankey(schedule)
   # The PDF has no interactivity: fall back to the static alluvial plot.
   if (!knitr::is_html_output()) return(static)
@@ -487,6 +490,8 @@ plot_exit_sankey_interactive <- function(schedule) {
   top_value <- max(lodes$cumulative)
   scale_colours <- hi_sequential(256)
   colour_of <- function(value) scale_colours[pmin(256, 1 + floor(255 * value / max(top_value, 1)))]
+  member_fill <- member_colours(sort(unique(lodes$member)))
+  band_colour <- function(member, value) if (colour_by == "member") member_fill[[member]] else colour_of(value)
 
   # Each band is drawn as small polygons: the box of the first meeting, then for every later meeting the
   # S-curve leading into it, cut into a few slices that fade from the colour of the meeting before to the
@@ -518,13 +523,13 @@ plot_exit_sankey_interactive <- function(schedule) {
   }
   for (member in members) {  # the first traces: member * per_member + 1 ... are one member's polygons
     lode <- lodes[lodes$member == member, ]
-    figure <- add_polygon(figure, box_polygon(lode, 1), colour_of(lode$cumulative[1]))
+    figure <- add_polygon(figure, box_polygon(lode, 1), band_colour(member, lode$cumulative[1]))
     for (i in seq_len(nrow(lode))[-1]) {
       for (k in seq_len(slices)) {
         value <- lode$cumulative[i - 1] + (lode$cumulative[i] - lode$cumulative[i - 1]) * (k - 0.5) / slices
-        figure <- add_polygon(figure, slice_polygon(lode, i, k), colour_of(value))
+        figure <- add_polygon(figure, slice_polygon(lode, i, k), band_colour(member, value))
       }
-      figure <- add_polygon(figure, box_polygon(lode, i), colour_of(lode$cumulative[i]))
+      figure <- add_polygon(figure, box_polygon(lode, i), band_colour(member, lode$cumulative[i]))
     }
   }
   for (member in members) {  # the next traces: invisible points carrying the tooltips
@@ -541,7 +546,7 @@ plot_exit_sankey_interactive <- function(schedule) {
                                 showlegend = FALSE)
   }
   # The colour bar: an invisible trace that carries the scale.
-  figure <- plotly::add_trace(figure, type = "scatter", mode = "markers", x = c(1, 1), y = c(0, 0),
+  if (colour_by == "waiting") figure <- plotly::add_trace(figure, type = "scatter", mode = "markers", x = c(1, 1), y = c(0, 0),
                               marker = list(size = 0.1, opacity = 0, color = c(0, top_value),
                                             colorscale = lapply(seq(0, 1, length.out = 8),
                                                                 function(v) list(v, colour_of(v * top_value))),
