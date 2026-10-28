@@ -578,7 +578,7 @@ plot_exit_sankey_interactive <- function(schedule, colour_by = c("waiting", "mem
     plotly::layout(shapes = boxes, annotations = labels, hovermode = "closest",
                    xaxis = list(title = "", tickvals = seq_len(n_meetings), ticktext = levels(flow$meeting),
                                 range = c(0.45, n_meetings + 0.55), showgrid = FALSE, zeroline = FALSE),
-                   yaxis = list(title = "Fagráðsmenn, í þeirri röð sem þeir fara (ofar = seinna)",
+                   yaxis = list(title = if (colour_by == "member") "Ofar = fer seinna" else "Fagráðsmenn, í þeirri röð sem þeir fara (ofar = seinna)",
                                 showticklabels = FALSE, showgrid = FALSE, zeroline = FALSE)) %>%
     htmlwidgets::onRender(
       "function(el, x, data) {
