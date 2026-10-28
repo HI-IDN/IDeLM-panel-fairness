@@ -98,7 +98,7 @@ Allar nota sömu gögn: 110 umsóknir, fjarvistir og tímamörk fagráðsmanna. 
 Fyrirvarar: sviðsmynd 1 var keyrð án fjarvista og án forgangs þess sem vill fæsta fundi, og er því ekki fullkomlega sambærileg. Í sviðsmynd 3 finnur lausnarinn góða lausn en getur ekki sannað að hún sé sú besta.
 :::
 
-## Hver fær hvað?
+## Hver fær hvað? {#sankey}
 
 ```{r}
 #| echo: false
